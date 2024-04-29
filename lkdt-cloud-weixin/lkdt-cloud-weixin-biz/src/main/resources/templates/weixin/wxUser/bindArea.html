@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width"> -->
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+    <!-- iphone会把一串数字识别为电话号码，点击的时候会提示是否呼叫，屏蔽这功能则把telephone设置为no -->
+    <meta content="telephone=no" name="format-detection" />
+    <!-- iphone的私有标签，默认值为default（白色），可以定为black（黑色）和black-translucent（灰色半透明） -->
+    <meta content="black" name="apple-mobile-web-app-status-bar-style">
+    <!-- iphone设备的是有标签 允许全屏模式浏览，隐藏浏览器导航栏 -->
+    <meta content="yes" name="apple-mobile-web-app-capable" />
+    <!-- 全屏显示 -->
+    <meta content="yes" name="apple-touch-fullscreen" />
+    <!-- UC强制全屏 -->
+    <meta name="full-screen" content="yes">
+    <!-- QQ强制全屏 -->
+    <meta name="x5-fullscreen" content="true">
+    <!-- 屏蔽百度转码 -->
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <title>智高速</title>
+    <link rel="stylesheet" href="/lkdtWX/plugins/weui/jquery-weui/css/weui.min.css">
+    <link rel="stylesheet" href="/lkdtWX/plugins/weui/jquery-weui/css/jquery-weui.min.css">
+    <link rel="stylesheet" href="/lkdtWX/plugins/weui/css/weuix.css"/>
+    <style>
+        ::-webkit-scrollbar{display: none;}
+        .contacts-content{position: absolute;top: 0;bottom: 0;width: 100%;overflow: auto;background-color: #eee;}
+        .contacts-content .weui-cells__title{margin-top: 0;margin-bottom: 0;font-weight: bold;}
+        .contacts-content .weui-panel{margin: 0px 10px;}
+        .contacts-content .weui-panel .weui-media-box{padding: 10px 5px;}
+        .contacts-content .weui-panel .weui-media-box .weui-media-box__hd{width: 40px;height: 40px;line-height: 40px;margin-left: .8em;}
+        .contacts-content .weui-panel .weui-media-box .weui-media-box__hd img{width: 40px;height: 40px;border-radius: 50%;}
+        .contacts-content .weui-panel .weui-media-box .weui-media-box__title {font-size: 14px;}
+        .toast{display: none;position: fixed;left: 50%;top: 50%;margin-left: -50px;margin-top: -50px;width: 100px;
+            height: 100px;line-height: 100px;text-align: center;font-size: 48px;background-color: rgba(0, 0, 0, 0.5);color: #fff;border-radius: 10px;}
+        .weui-search-bar {position: relative;display: -webkit-box;display: -webkit-flex;display: flex;box-sizing: border-box;background-color: #efeff4;}
+        .weui-search-bar__label {position: absolute;top: 1px;right: 1px;bottom: 1px;left: 1px;z-index: 0;border-radius: 3px;text-align: center;color: #9b9b9b;background: #fff;}
+    </style>
+</head>
+<body>
+
+    <div id="hwSubList" class="contacts-content">
+
+        <div class="weui-btn_default weui-header ">
+            <h1 class="weui-header-title f-green">辖区绑定</h1>
+            <div class="weui-header-right"><a href="###" class="icon icon-70 f-green" onclick="primaryClick()">提交</a></div>
+        </div>
+        <div class="weui-search-bar" id="searchBar">
+            <form class="weui-search-bar__form" action="#">
+            	<input id="openid" th:value="${openid}" type="hidden">
+                <div class="weui-search-bar__box">
+                    <i class="weui-icon-search"></i>
+                    <input class="weui-search-bar__input" id="searchInput" placeholder="搜索" required="" type="search">
+                    <a href="javascript:" class="weui-icon-clear" id="searchClear"></a>
+                </div>
+                <label class="weui-search-bar__label" id="searchText" style="transform-origin: 0px 0px 0px; opacity: 1; transform: scale(1, 1);">
+                    <i class="weui-icon-search"></i>
+                    <span>搜索</span>
+                </label>
+            </form>
+            <a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel">取消</a>
+        </div>
+
+    </div>
+    <div class="toast"></div>
+
+    <script src="/lkdtWX/plugins/weui/js/commonMap.js" charset="utf-8"></script>
+    <script src="/lkdtWX/plugins/weui/jquery-weui/js/jquery.min.js" charset="utf-8"></script>
+    <script src="/lkdtWX/plugins/weui/jquery-weui/js/jquery-weui.min.js" charset="utf-8"></script>
+    <script src="/lkdtWX/plugins/weui/js/axios.min.js"></script>
+    <script type="text/javascript">
+        
+        let openid = "";
+        $(function(){
+        	openid = $("#openid").val();
+        	//初始化获取所有路段
+	        axios.post('/weixin/map/getHighways',{hwId:0})//也可以直接拼接在url
+	            .then(function(rs){
+	                if(rs.data && rs.data.highways){
+	                    showHighways(rs.data.highways);
+	                } else {
+	                    console.log("无路段数据");
+	                    //$.toptip('无路段数据','success');
+	                }
+	            }).catch(function(e){
+	            console.log(e);
+	            //$.toptip('路段请求失败','error');
+	        });
+        	
+        	
+        });
+        
+        function showHighways(highways){
+
+            if(!highways){
+                $.toast("ERR网络数据异常", "forbidden");
+                return;
+            }
+            //根据公路id排序
+            highways.sort(function(a,b){
+                return a.text - b.text;
+            });
+            //右侧导航
+            // let letter = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+            let letter = [];
+            // 模拟数据生成
+            let contactsHtml = '';
+            highways.forEach(function(item,index,arr){
+                //生成导航
+                letter.push(item.text);
+                //生成主界面
+                contactsHtml +=
+                    `<div class="weui-cells__title" index="` + item.text + `">` + item.text + `</div>
+                    <div class="weui-panel weui-panel_access">
+                        <div class="weui-panel__bd">`;
+                if(item.children.length > 0){
+                    item.children.forEach(function(ite,i,array){
+                        contactsHtml +=
+                            `<div class="weui-cell weui-cell_switch">
+                                <div class="weui-cell__bd">`+ite.state.nameDetail+`</div>
+                                <div class="weui-cell__ft">
+                                    <label for="hwSubList_`+ite.id+`" class="weui-switch-cp">
+                                        <input id="hwSubList_`+ite.id+`" class="weui-switch-cp__input" type="checkbox">
+                                        <div class="weui-switch-cp__box"></div>
+                                    </label>
+                                </div>
+                            </div>`;
+                    });
+                } else {
+                    contactsHtml +=
+                        `<div class="weui-cell weui-cell_switch">
+                            <div class="weui-cell__bd">空</div>
+                        </div>`;
+                }
+                contactsHtml +=
+                        `</div>
+                    </div>`;
+            });
+            $('.contacts-content').append(contactsHtml);
+
+          	//数据初始化
+            $.ajax({
+    			type : 'GET',
+    			data : {
+    				"openid" : openid
+    			},
+    			url : '/system/wxManor/getHwIdsByOpenid',
+    			success : function(rs) {
+    				let jsonHw = $.parseJSON(rs);
+    				if(rs && jsonHw.hwIds){
+                        //比对hwId
+                        function bool(hwId){
+                            for(let item in jsonHw.hwIds){
+                                if(jsonHw.hwIds[item].hwId == hwId){
+                                    return true;
+                                }
+                            }
+                            return false;
+                        }
+                        //数据加载
+                        let hwSubLists = $("#hwSubList input[type='checkbox']");
+                        for(let i = 0; i < hwSubLists.length; i++){
+                            if(bool(hwSubLists[i].id.substr(10))){
+                                hwSubLists[i].checked = "checked";
+                            }
+                        }
+                    } else {
+                        //$.toast("请关注路段", "success");
+                    }
+    			}
+    		});
+          	
+            
+        }
+
+
+        /**提交*/
+        function primaryClick(){
+            //$.showLoading();
+            //参数
+            let list = new Array();
+            let delList = [];
+            let hwSubLists = $("#hwSubList input[type='checkbox']");
+            for(let i = 0; i < hwSubLists.length; i++){
+                if(hwSubLists[i].checked){
+                	list[i] = hwSubLists[i].id.substr(10);
+                   // list.push({"hwId": hwSubLists[i].id.substr(10)});
+                } else {
+                    //delList.push({"hwId": hwSubLists[i].id.substr(10)});
+                }
+            }
+            if(!openid){
+                $.toast("认证失败", "forbidden");
+                return;
+            }
+            
+            $.ajax({
+            	cache : true,
+    			type : 'POST',
+    			url : '/system/wxManor/saveHwInfo?openid='+openid+'&hwIds='+list,
+    			async : false,
+    			traditional:true,
+        		error : function(request) {
+        			parent.layer.alert("Connection error");
+        		},
+    			success : function(rs) {
+    				if(rs && rs.code == 0){
+    					parent.layer.msg("操作成功");
+    					parent.reLoad();
+    					var index = parent.layer.getFrameIndex(window.name); // 获取窗口索引
+    					parent.layer.close(index);
+                    } else {
+                        $.toast("保存失败", "cancel");
+                    }
+    			}
+    		});
+            
+            
+        }
+        
+    </script>
+</body>
+</html>

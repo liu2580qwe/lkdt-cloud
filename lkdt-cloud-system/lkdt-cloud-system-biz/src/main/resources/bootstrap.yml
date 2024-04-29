@@ -1,0 +1,23 @@
+server:
+  port: 8091
+spring:
+  profiles:
+    active: @profiles.active@
+  application:
+    name: @artifactId@
+  cloud:
+    nacos:
+      discovery:
+        server-addr: lkdt-cloud-nacos:8848
+      config:
+        file-extension: yml
+        server-addr: ${spring.cloud.nacos.discovery.server-addr}
+        shared-dataids: application-lkdt-cloud-${spring.profiles.active}.yml
+feign:
+  sentinel:
+    enabled: true
+  hystrix:
+    enabled: true
+resttemplate:
+  sentinel:
+    enabled: true

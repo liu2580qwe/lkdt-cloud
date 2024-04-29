@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="renderer" content="webkit">
+<!--[if lt IE 9]>
+    <meta http-equiv="refresh" content="0;ie.html"/>
+    <![endif]-->
+<link rel="shortcut icon" href="favicon.ico">
+<link href="/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+<link href="/css/font-awesome.min.css?v=4.4.0" rel="stylesheet">
+<link href="/css/plugins/toastr/toastr.min.css" rel="stylesheet">
+<link href="/css/animate.css" rel="stylesheet">
+<link href="/css/style.css?v=4.1.0" rel="stylesheet">
+<style type="text/css">
+
+.head_top{position:relative; background: url(../img/jcdsj_logo.png) no-repeat center center; height: 42px; line-height: 42px;
+
+
+}
+.head_top span{
+	text-align: center; height: 100%; display: flex; justify-content: center; align-items: center; font-size: 40px; 
+	background: linear-gradient( 0deg,#0095d6, #46daff);
+    background-size: cover;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-fill-color: transparent; font-weight: bolder; cursor: text;}
+.head_top img{width:90%;margin:auto;}
+.head_top p{width:100%;text-align:center;color:#55bfff;position:absolute;bottom: -18px;left: -10px;}
+.head_top p span{font-family:'yjsz';font-size:20px;}
+</style>
+</head>
+<body class="fixed-sidebar full-height-layout gray-bg  pace-done mini-navbar"
+	style="overflow: hidden">
+	<div id="wrapper">
+		<!--左侧导航开始-->
+		<!--左侧导航结束-->
+		<!--右侧部分开始-->
+		<div id="page-wrapper" class="gray-bg dashbard-1" style="margin: 0 0 0 0">
+			<div class="row border-bottom">
+				<nav class="navbar navbar-static-top" role="navigation"
+					style="margin-bottom: 0">
+					<div class="head_top">
+						<span style="font-size: 30px">江苏东部高速公路如皋服务区PPV智慧管理平台</span>
+					</div>
+				</nav>
+			</div>
+			
+			<div class="row J_mainContent" id="content-main" style="height: 100%">
+				<iframe class="J_iframe" name="iframe0" width="100%" height="100%"
+					src="" th:src="@{/ppv/main_zzy}" frameborder="0" data-id="index_v1.html"
+					seamless></iframe>
+			</div>
+		</div>
+		<!--右侧部分结束-->
+		<!--右侧边栏开始-->
+		<div id="right-sidebar">
+		</div>
+	</div>
+	<!-- 全局js -->
+	<script src="/lkdtWX/js/jquery.min.js?v=2.1.4"></script>
+	<script src="/lkdtWX/js/bootstrap.min.js?v=3.3.6"></script>
+	<script src="/lkdtWX/js/plugins/metisMenu/jquery.metisMenu.js"></script>
+	<script src="/lkdtWX/js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+	<script src="/lkdtWX/js/plugins/layer/layer.min.js"></script>
+	<!-- 自定义js -->
+	<script src="/lkdtWX/js/app.js?v=4.1.0"></script>
+	<script type="text/javascript" src="/lkdtWX/js/contabs.js"></script>
+	<!-- 第三方插件 -->
+	<script src="/lkdtWX/js/plugins/pace/pace.min.js"></script>
+	<!-- vue -->
+	<script type="text/javascript" src="/lkdtWX/js/vue.min.js">
+		
+	</script>
+	<script src="/lkdtWX/js/appjs/oa/webSocket/sockjs.min.js"></script>
+	<script src="/lkdtWX/js/appjs/oa/webSocket/stomp.min.js"></script>
+	<!-- Toastr script -->
+	<script src="/lkdtWX/js/plugins/toastr/toastr.min.js"></script>
+	<script type="text/javascript">
+		var stompClient = null;
+		$(function() {
+			//connect();
+		});
+
+
+		var wrapper = new Vue({
+			el : '#wrapper',
+			data : {
+				total : '',
+				rows : '',
+			},
+			methods : {
+				notify : function() {
+					$.getJSON('/oa/notify/message', function(r) {
+						wrapper.total = r.total;
+						wrapper.rows = r.rows;
+					});
+				},
+				personal : function() {
+					layer.open({
+						type : 2,
+						title : '个人设置',
+						maxmin : true,
+						shadeClose : false,
+						area : [ '800px', '600px' ],
+						content : '/sys/user/personal'
+					});
+				}
+			},
+			created : function() {
+				this.notify()
+			}
+		})
+	</script>
+</body>
+</html>

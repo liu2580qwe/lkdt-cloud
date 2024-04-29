@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.lkdt.modules.radar.mapper.ZcLdRadarEquipmentMapper">
+
+	<delete id="deleteByMainId" parameterType="java.lang.String">
+		DELETE 
+		FROM  zc_ld_radar_equipment 
+		WHERE
+			 unit_id = #{mainId}
+	 </delete>
+	
+	<select id="selectByMainId" parameterType="java.lang.String" resultType="org.lkdt.modules.radar.entity.ZcLdEquipment">
+		SELECT * 
+		FROM  zc_ld_radar_equipment
+		WHERE
+			 unit_id = #{mainId}
+	</select>
+
+</mapper>

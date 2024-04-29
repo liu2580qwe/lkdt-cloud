@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.lkdt.modules.fog.mapper.AlarmRoadControlInfoMapper">
+    <select id="queryAlarmRoadControlList" resultType="org.lkdt.modules.fog.entity.AlarmRoadControlInfo">
+        SELECT * FROM (
+              SELECT
+                 T1.ROAD_ALARM_ID,
+                 T1.ALARM_LEVEL alarmlevel,
+                 T1.MINDISTANCE_NOW mindistancenow,
+                 T1.MINDISTANCE_HIS mindistancehis,
+                 T1.DETAIL_UPDATE_TIME startDate,
+                 SYSDATE() endDate,
+                 T2.ID ROADNUM,
+                 T2.NAME AS ROADNAME,
+                 '' TSNAME,
+                 '' DIRECTION,
+                 '' IO
+              FROM
+                 ZC_ALERT_THREEPART T1,ZC_HIGHWAY T2
+              WHERE
+                  T1.HW_ID = T2.ID AND T1.ROAD_ALARM_ID =  #{roadAlarmId}
+          UNION ALL
+              SELECT
+                  T1.ROAD_ALARM_ID,
+                  '99' alarmlevel,
+                  '0' mindistancenow,
+                  '0' mindistancehis,
+                  T1.start_date startDate,
+                  T1.end_date endDate,
+                  T1.ROADNUM ,
+                  T1.ROADNAME ,
+                  T1.TSNAME,
+                  T1.DIRECTION,
+                  CASE T1.IO
+                      WHEN '0' THEN
+                          '入口'
+                      ELSE
+                          '出口'
+                      END IO
+              FROM
+                   ZC_ALARM_ROAD_CONTROL_INFO T1
+              WHERE T1.ROAD_ALARM_ID = #{roadAlarmId}
+      ) T ORDER BY T.startDate
+    </select>
+</mapper>

@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<title>高速公路雾霾监控</title>
+<!--设置是否为缩放模式 -->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- 新 Bootstrap 核心 CSS 文件 -->
+<link href="/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+
+<!-- 轮播swiper文件 -->
+<link rel="stylesheet" type="text/css" href="/css/swiper.min.css">
+<!--界面样式-->
+<link rel="stylesheet" type="text/css" href="/css/visual.css">
+
+<link href="/lkdtWX/js/plugins/layer/skin/layer.css" rel="stylesheet">
+
+<style>
+[src='/plugins/offLineMap/bmap-offline/images/copyright_logo.png'] {
+	display: none !important;
+}
+
+[class=" BMap_cpyCtrl BMap_noprint anchorBL"] {
+	display: none !important;
+}
+
+.img_equip_list {
+	position: relative;
+	width: 100%;
+	float: left;
+	padding: 1px 1px;
+	margin-top: 0px;
+	height: 130px;
+	cursor: pointer;
+}
+
+#eventList {
+	height: 85%;
+	overflow-y: auto;
+}
+
+#eventList ul {
+	list-style: none;
+	padding: 0px;
+	margin: 0px;
+	width: 100%;
+	height: 20px;
+	line-height: 20px;
+	border-width: 1px;
+	border-color: #063B6A;
+	border-style: none none dashed none;
+	border-top: 0px;
+	font-size: 12px;
+	color: white;
+}
+
+#eventList ul li {
+	display: block;
+	width: 20%;
+	float: left;
+	text-indent: 1em;
+}
+
+li, li a {
+	width: 100%;
+	display: block;
+	overflow: hidden;
+	word-break: keep-all;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.camimg {
+	background: url("/fog/cam.png");
+	background-size:100%;
+	height: 20px;
+	width: 20px;
+}
+</style>
+
+</head>
+<body class="ksh">
+	<div id="load">
+		<div class="load_img">
+			<!-- 加载动画 -->
+			<img class="jzxz1" src="/lkdtWX/img/jzxz1.png"> <img class="jzxz2"
+				src="/lkdtWX/img/jzxz2.png">
+		</div>
+	</div>
+	<div class="head_top">
+		<span></span>
+	</div>
+	<div class="visual">
+		<div class="visual_left">
+			<div class="visual_box visual_box1">
+				<div class="visual_title">
+					<span>公路交通能见度【G15可视距离】</span> <img src="/lkdtWX/img/ksh33.png">
+				</div>
+				<div class="visual_chart sfzcll">
+					<div id="routVisibility"
+						style="width: 100%; height: 100%; float: left; clear: right;"></div>
+					<!--<div id="routVisibility-btn" style="position: absolute;right: 10px;">
+                        <button class="btn btn-default dropdown-toggle glyphicon glyphicon-list"
+                                style="padding: 0 3px;background-color: #061537;border-color: #061537;color: #07A6FF;"
+                                type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        </button>
+                        <ul id="routVisibility-dropdown-menu" class="dropdown-menu" aria-labelledby="dropdownMenu1"
+                            style="position: relative;background-color: #065A96;overflow-y:scroll;height: 160px;">
+                            <li><a href="##" onclick="" style="color: #ffffff;width: 100%;text-align: left;">1234</a></li>
+                            <li><a href="##" onclick="" style="color: #ffffff;width: 100%;text-align: left;">5678</a></li>
+                        </ul>
+                    </div>-->
+				</div>
+			</div>
+			<div class="visual_box visual_box1">
+				<div class="visual_title">
+					<span>公路交通能见度【G25可视距离】</span> <img src="/lkdtWX/img/ksh33.png">
+				</div>
+				<div class="visual_chart sfzcll">
+					<div id="routVisibility25"
+						style="width: 100%; height: 100%; float: left; clear: right;"></div>
+					<!--<div id="routVisibility25-btn" style="position: absolute;right: 10px;">
+                        <button class="btn btn-default dropdown-toggle glyphicon glyphicon-list"
+                                style="padding: 0 3px;background-color: #061537;border-color: #061537;color: #07A6FF;"
+                                type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        </button>
+                        <ul id="routVisibility25-dropdown-menu" class="dropdown-menu" aria-labelledby="dropdownMenu1"
+                            style="position: relative;background-color: #065A96;overflow-y:scroll;height: 160px;">
+                            <li><a href="##" onclick="" style="color: #ffffff;width: 100%;text-align: left;">1234</a></li>
+                            <li><a href="##" onclick="" style="color: #ffffff;width: 100%;text-align: left;">5678</a></li>
+                        </ul>
+                    </div>-->
+				</div>
+			</div>
+			<div class="visual_box visual_elietianqifenjiyujing">
+				<div class="visual_title">
+					<span>团雾预警</span> <img src="/lkdtWX/img/ksh33.png">
+				</div>
+
+				<!-- Swiper2 -->
+				<div class="swiper-container">
+					<div class="swiper-wrapper">
+						<div class="swiper-slide">
+							<div class="visual_table">
+								<div id="alarmList" class="list_alarm_stroll_y">
+									<ul class="th">
+										<li>编号</li>
+										<li>能见度</li>
+										<li>开始时间</li>
+										<li>持续时间</li>
+									</ul>
+									<ul id="contentUl">
+										<li>-</li>
+										<li>-</li>
+										<li>-</li>
+										<li>-</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+						<div class="swiper-slide">
+							<div class="visual_table">
+								<div id="alarmList_wind" class="list_alarm_stroll_y">
+									<ul class="th">
+										<li>位置</li>
+										<li>风速</li>
+										<li>风向</li>
+										<li>时间</li>
+									</ul>
+									<ul id="contentUl_wind">
+										<li>-</li>
+										<li>-</li>
+										<li>-</li>
+										<li>-</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+						<div class="swiper-slide">
+							<div class="visual_table">
+								<div id="alarmList" class="list_alarm_stroll_y">
+									<ul class="th">
+										<li>编号</li>
+										<li>能见度</li>
+										<li>开始时间</li>
+										<li>确认状态</li>
+									</ul>
+									<ul id="contentUl_unconfirm">
+										<li>-</li>
+										<li>-</li>
+										<li>-</li>
+										<li>-</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- Add Pagination -->
+					<div class="swiper-pagination" style="display: none;"></div>
+					<!-- Add Arrows -->
+					<div class="swiper-button-next"></div>
+					<div class="swiper-button-prev"></div>
+				</div>
+			</div>
+		</div>
+		<div class="visual_con">
+			<div class="visual_conTop" id="main1">
+
+				<div class="visual_conTop_box visual_conTop2">
+					<div>
+						<!--<h3>当前警情数(起)</h3>
+                        <p>67</p>
+                        <div class="conTop_smil">
+                            <a class="sz">日环比:<span>+3%</span><i class="fa fa-long-arrow-up"></i></a>
+                            <a class="xd">周环比:<span>-2%</span><i class="fa fa-long-arrow-down"></i></a>
+                        </div>-->
+						<img src="/fog/nofind.png" alt="预览" onerror="nofind(this)"
+							title="NOT FOUND" class="img_equip_list ez" />
+					</div>
+				</div>
+				<div class="visual_conTop_box visual_conTop2">
+					<div>
+						<!--<h3>当前警情数(起)</h3>
+                        <p>99</p>
+                        <div class="conTop_smil">
+                            <a class="sz">日环比:<span>+3%</span><i class="fa fa-long-arrow-up"></i></a>
+                            <a class="xd">周环比:<span>-2%</span><i class="fa fa-long-arrow-down"></i></a>
+                        </div>-->
+						<img src="/fog/nofind.png" alt="预览" onerror="nofind(this)"
+							title="NOT FOUND" class="img_equip_list ez" />
+					</div>
+				</div>
+				<div id="main13" class="visual_conTop_box visual_conTop2">
+					<div>
+						<!--<h3>当前警情数(起)</h3>
+                        <p>7421</p>
+                        <div class="conTop_smil">
+                            <a class="null">null</a>
+                            <a class="xd">月环比:<span>-2%</span><i class="fa fa-long-arrow-down"></i></a>
+                        </div>-->
+						<img src="/fog/nofind.png" alt="预览" onerror="nofind(this)"
+							title="NOT FOUND" class="img_equip_list ez" /> <a id="main1sub"
+							href="/main_equip_list" onclick="return true;"
+							style="float: right; color: #2EC3F1; font-size: 8px; display: none;"
+							target="_blank">更多...</a>
+					</div>
+				</div>
+
+				<div class="clear"></div>
+
+				<!--<div class="visual_chart" id="main1">
+                    <div class="visual_conTop_box visual_conTop2">
+                        <div>
+                            <img src="/fog/nofind.png" alt="预览" onerror="nofind(this)" title="NOT FOUND" class="img_equip_list ez"/>
+                        </div>
+                    </div>
+                    <div class="visual_conTop_box visual_conTop2">
+                        <div>
+                            <img src="/fog/nofind.png" alt="预览" onerror="nofind(this)" title="NOT FOUND" class="img_equip_list ez"/>
+                        </div>
+                    </div>
+                    <div class="visual_conTop_box visual_conTop2">
+                        <div>
+                            <img src="/fog/nofind.png" alt="预览" onerror="nofind(this)" title="NOT FOUND" class="img_equip_list ez"/>
+                        </div>
+                    </div>
+                    <a href="/main_equip_list" onclick="return true;" style="float: right;color: #95C1EE;" target="_blank">>></a>
+                </div>-->
+
+				<div id="outerdiv"
+					style="position: fixed; top: 0; left: 0; background: rgba(0, 0, 0, 0.7); z-index: 2; width: 100%; height: 100%; display: none;">
+					<div id="innerdiv" style="position: absolute;">
+						<img id="bigimg" style="border: 1px solid #ffffff;" src="" />
+					</div>
+				</div>
+			</div>
+			<div class="visual_conBot">
+				<img class="visual_conBot_l" src="img/ksh42.png" /> <img
+					class="visual_conBot_2" src="img/ksh43.png" /> <img
+					class="visual_conBot_3" src="img/ksh44.png" /> <img
+					class="visual_conBot_4" src="img/ksh45.png" />
+
+				<div id="allmap" style="height: 100%;">
+					<div style="position: absolute; right: 10px; z-index: 1;">
+						<button
+							class="btn btn-default dropdown-toggle glyphicon glyphicon-list"
+							title="数据统计"
+							style="padding: 0 3px; background-color: rgba(6, 21, 55, 0.1); border-color: rgba(6, 21, 55, 0.1); color: #07A6FF;"
+							type="button" data-toggle="dropdown" aria-haspopup="true"
+							aria-expanded="false"></button>
+						<ul class="dropdown-menu" aria-labelledby="dropdownMenu2"
+							style="position: relative; background-color: #065A96;">
+							<li><a href="##" data="alarm24" onclick="equipRealCon()"
+								style="color: #ffffff;">设备实时在线情况</a></li>
+							<!--<li><a href="##" data="alarm48" onclick="" style="color: #ffffff;">路段可见度统计</a></li>-->
+							<li><a href="##" data="alarm72" onclick="alarmCon()"
+								style="color: #ffffff;">告警统计</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="visual_right">
+			<div class="visual_box visual_sbgztj">
+				<div class="visual_title">
+					<span>道路冰雪预警（测试中）</span> <img src="/lkdtWX/img/ksh33.png">
+				</div>
+
+			</div>
+			<div class="visual_box visual_elietianqifenjiyujing">
+				<div class="visual_title">
+					<span>大风预警</span> <img src="/lkdtWX/img/ksh33.png">
+				</div>
+
+				<!-- Swiper1 -->
+				<!--<div class="swiper-container">
+                    <div class="swiper-wrapper">
+                        <div class="swiper-slide" id="main3"></div>
+                        <div class="swiper-slide" id="main31">
+                            <div class="visual_table">
+                                <div id="eventBroken" class="list_alarm_stroll_y">
+                                    <ul class="th">
+                                        <li>故障类型</li>
+                                        <li>摄像机id</li>
+                                        <li>桩号</li>
+                                        <li>位置</li>
+                                    </ul>
+                                    <ul id="content_eventBroken">
+                                        <li>无信号</li>
+                                        <li>NT001</li>
+                                        <li>G15_K1006</li>
+                                        <li>G15_K1006</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="swiper-pagination"></div>
+                    <div class="swiper-button-next"></div>
+                    <div class="swiper-button-prev"></div>
+                </div>-->
+
+			</div>
+			<div class="visual_box visualSfzsfl">
+				<div class="visual_title">
+					<span>不合规视频路数统计</span> <img src="/lkdtWX/img/ksh33.png"> <span
+						style="float: right; background: #061537; position: absolute; right: 0; bottom: -5px;">不合规视频占比:
+						<span id="percentage"></span>%
+					</span>
+				</div>
+				<div class="visual_chart" id="main9"></div>
+				<div class="visual_table">
+					<div id="eventList" class="list_alarm_stroll_y">
+						<ul class="th">
+							<li style="width: 10%; text-align: left;">#</li>
+							<li style="width: 30%; text-align: left;">摄像头</li>
+							<li style="width: 30%; text-align: left;">异常现象</li>
+							<li style="width: 30%; text-align: left;">位置</li>
+						</ul>
+						<ul id="exceptionEqus" style="cursor: pointer;">
+							<li style="width: 10%; text-align: left;"></li>
+							<li style="width: 30%; text-align: left;"></li>
+							<li style="width: 30%; text-align: left;"></li>
+							<li style="width: 30%; text-align: left;"></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<div class="clear"></div>
+		</div>
+	</div>
+
+	<audio id="mp3Audio" style="display: none;">
+		<source id="mp3Source" src="" type="audio/mpeg" autoplay="autoplay"
+			controls="controls" />
+	</audio>
+
+	<script type="text/javascript">
+		
+	</script>
+	<!--JS-->
+	<script language="javascript"
+		src="https://webapi.amap.com/maps?v=1.4.14&key=0fb99186996b7bff85d606c80d16f224&plugin=Map3D,AMap.DistrictSearch"></script>
+	<!-- UI组件库 1.0 -->
+	<script src="https://webapi.amap.com/ui/1.0/main.js?v=1.0.11"></script>
+
+	<script src="/lkdtWX/js/jquery.min.js?v=2.1.4"></script>
+	<script src="/lkdtWX/plugins/imgTools/EZView.js"></script>
+	<script src="/lkdtWX/plugins/imgTools/draggable.js"></script>
+	<script src="/lkdtWX/js/bootstrap.min.js"></script>
+	<script src="/lkdtWX/js/plugins/echarts/echarts.min.js"></script>
+	<script src="/lkdtWX/js/swiper.min.js"></script>
+	<script src="/lkdtWX/js/visual.js"></script>
+	<script type="text/javascript" src="/lkdtWX/js/plugins/layer/layer.min.js"></script>
+	<script src="/fog/js/boundaries.js"></script>
+	<script src="/fog/js/coordtransform.js"></script>
+	<!--     <script type="text/javascript" src="/lkdtWX/plugins/offLineMap/bmap-offline/map3.0_init.js"></script>
+    <script type="text/javascript" src="/lkdtWX/plugins/offLineMap/bmap-offline/map3.0.js"></script>
+    <script type="text/javascript" src="/lkdtWX/plugins/offLineMap/bmap-offline/AreaRestriction_min.js"></script>
+    <script type="text/javascript" src="/lkdtWX/plugins/offLineMap/bmap-offline/MarkerClusterer_min.js"></script>
+    <script type="text/javascript" src="/lkdtWX/plugins/offLineMap/bmap-offline/TextIconOverlay_min.js"></script> -->
+	<script src="/fog/js/main-v3.0.js?v=1"></script>
+</body>
+</html>

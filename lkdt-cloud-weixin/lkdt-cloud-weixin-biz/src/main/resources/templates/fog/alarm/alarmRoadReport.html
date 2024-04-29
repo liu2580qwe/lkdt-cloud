@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+
+<style>
+	body{
+		min-width: 950px;
+		overflow-x: auto;
+	}
+	
+	.search-span{
+		height: 60px;
+		padding: 10px 10px;
+		display: -webkit-inline-box;
+	}
+	
+	#titleData{
+		width: 100%;
+		height: 410px;
+		display: none;
+		text-align: center;
+		font-size: 36px;
+		color: #eee;
+		
+	}
+</style>
+<body class="gray-bg" >
+	<div class="wrapper wrapper-content" >
+		<div class="col-sm-12">
+			<div class="ibox">
+				<div class="ibox-body">
+					<div class="fixed-table-toolbar" style="display: flex;">
+						<div class="columns pull-right col-md-10 nopadding" style="width:100%">
+							<span class="search-span" style="">
+								<button class="btn btn-success" onclick="yearReport()">按年统计报表</button>
+							</div>
+							<span class="search-span" style="">
+								<button class="btn btn-success" id="wqxx" style="display: none;" onclick="alarmDetails('','','');">雾情详细</button>
+							</div>
+						</div>
+					</div>
+					<div id="info" style="width: 100%;  height: 410px;margin-top: 15px;" >
+						<div id="titleData" ></div>
+						<div id="yearReport" style="width: 100%;height: 410px;"></div>
+						<div id="monthReport" style="width: 100%;height: 410px;display: none;"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<div th:include="include :: footer"></div>
+	
+<script src="/lkdtWX/js/plugins/echarts/echarts.min.js"></script>
+<script type="text/javascript">
+	let legendHwNamesArray = "";
+	let myChartYearReport;
+	let myChartMonthReport;
+	$(function () {
+		yearReport();
+	});
+	
+	/**年统计报表**/
+	function yearReport(){
+		$.ajax({
+			type : 'get',
+			url : '/report/alarmReport/yearReportStatistics',
+			data:{},
+			success : function(data) {
+				if(data.result == "NULL_HW"){	
+// 					layer.msg("您的账号未绑定路段，请联系管理员。");
+					$("#titleData").html("您的账号未绑定路段，请联系管理员。");
+					$("#titleData").css("display","block");
+				}else if(data.result == "NULL_DATA"){
+// 					layer.msg("暂未查到雾情数据。");
+					$("#titleData").html("暂未查到雾情数据。");
+					$("#titleData").css("display","block");
+				}else{
+					$("#wqxx").css("display","-webkit-inline-box");
+					legendHwNamesArray = data.legendData;
+					showYearReport(data);
+				}
+	 		}
+		});
+	}
+	
+	/**年统计报表**/
+	function showYearReport(data){
+		myChartYearReport = echarts.init(document.getElementById('yearReport'));
+		
+// 		let colors = "['#1790cf','#1bb2d8','#99d2dd','#88b0bb','#1c7099','#038cc4','#75abd0','#afd6dd']";
+		let colors = new Array();
+		colors[0] = "#1790cf";
+		colors[1] = "#1bb2d8";
+		colors[2] = "#99d2dd";
+		colors[3] = "#88b0bb";
+		colors[4] = "#1c7099";
+		colors[5] = "#038cc4";
+		colors[6] = "#75abd0";
+		colors[7] = "#afd6dd";
+		colors[8] = "#9287e7";
+		colors[9] = "#60acfc";
+		colors[10] = "#32d3eb";
+		colors[11] = "#5bc49f";
+		colors[12] = "#ff7c7c";
+		colors[13] = "#feb64d";
+		
+		//设置雾的颜色
+		if(data.legendData.length > 4){
+			colors[data.legendData.length-4] = "#f4ea2a";
+			colors[data.legendData.length-3] = "#ffa500";
+			colors[data.legendData.length-2] = "#d81e06";
+			colors[data.legendData.length-1] = "#9a1200";
+		}
+		
+		optionYearReport = {
+				title: {
+			        text: '年统计报表（单位：告警次数）',
+			        textStyle:{
+			    		fontSize: 16,//字体大小
+			    		color: '#ffffff'//字体颜色
+			    	},
+			    },
+			    tooltip: {
+			        trigger: 'axis',
+			        axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+			            type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow' | 'cross'
+			        },
+			    },
+			    legend: {
+			    	textStyle:{
+			    		fontSize: 16,
+			    		color: '#ffffff'
+			    	},
+			    	top:'6%',
+			        data: data_func(data.legendData)
+			    },
+			    grid: {
+			        left: '3%',
+			        right: '4%',
+			        bottom: '3%',
+			        top:'22%',
+			        containLabel: true
+			    },
+			    xAxis: [
+			        {
+			            type: 'category',
+			            axisLabel:{
+			            	show: true,
+			            	textStyle:{
+			            		color: '#ffffff'
+			            	}
+			            },
+			            triggerEvent:true,	//此属性表示点击['2020年', '2021年',。。。]会触发click事件
+			            data: data.xAxisData
+			        }
+			    ],
+			    yAxis: [
+			        {
+			            type: 'value',
+			            axisLabel:{
+			            	show: true,
+			            	textStyle:{
+			            		color: '#ffffff'
+			            	}
+			            },
+			        }
+			    ],
+			    color: colors ,
+			    series: serie_func(data.seriesData)//series这条属性抽出来，写成serie_func函数,根据后端返回值生成对应个数的data[]
+			};
+		
+		$("#yearReport").css("width","100%");
+		$("#yearReport").css("height","410px");
+		$("#monthReport").hide();
+		$("#yearReport").show();
+		myChartYearReport.off('click');	//清除之前的点击事件
+		myChartYearReport.setOption(optionYearReport, true);
+		
+        myChartYearReport.on('click', function (params) {
+        	let vHwName = "";
+        	let vAlarmDate = "";
+        	let vHwId = "";
+			if(params.componentType =="xAxis"){
+				vAlarmDate = params.value;
+			}else{
+				vAlarmDate = params.name;
+				if(params.seriesName.indexOf("告警") == -1 ){
+					vHwName = params.seriesName;
+					vHwId = params.seriesId;
+				}
+			}
+            monthReport(vHwId,vHwName,vAlarmDate,colors);
+        });
+
+	}
+	
+	/**月统计报表**/
+	function monthReport(hwId,hwName,nowYear,colors){
+		if(nowYear.length > 0){
+			if(nowYear.indexOf("年") > -1){
+				nowYear = nowYear.substring(0,nowYear.length-1);
+			}
+		}else{
+			let d = new Date();
+			nowYear = d.getFullYear();
+		}
+		
+		if(hwName.length > 0){
+			$.ajax({
+				type : 'get',
+				url : '/report/alarmReport/monthReportStatistics',
+				data:{'nowYear':nowYear,'hwId':hwId},
+				success : function(data) {
+					showMonthReport(data,nowYear,colors);
+		 		}
+			});
+		}else{
+			$.ajax({
+				type : 'get',
+				url : '/report/alarmReport/monthReportStatistics',
+				data:{'nowYear':nowYear},
+				success : function(data) {
+					showMonthReport(data,nowYear,colors);
+		 		}
+			});
+		}
+		
+		
+	}
+	
+	function showMonthReport(data,nowYear,colors){
+		$("#monthReport").css("width","100%");
+		$("#monthReport").css("height","410px");
+		$("#monthReport").show();
+		
+		//设置雾的颜色
+		if(data.legendData.length > 4){
+			colors[data.legendData.length-4] = "#f4ea2a";
+			colors[data.legendData.length-3] = "#ffa500";
+			colors[data.legendData.length-2] = "#d81e06";
+			colors[data.legendData.length-1] = "#9a1200";
+		}
+		
+		myChartMonthReport = echarts.init(document.getElementById('monthReport'));
+		
+		let titleText = "【"+nowYear+"】月统计报表（单位：告警次数）";
+		
+		optionMonthReport = {
+			title: {
+		        text: titleText,
+		        textStyle:{
+		    		fontSize: 16,//字体大小
+		    		color: '#ffffff'//字体颜色
+		    	}
+		    },
+		    tooltip: {
+		        trigger: 'axis',
+		        axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+		            type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow' | 'cross'
+		        },
+		    },
+		    legend: {
+		    	textStyle:{
+		    		fontSize: 16,//字体大小
+		    		color: '#ffffff'//字体颜色
+		    	},
+		    	top:'6%',
+		        data: data_func(data.legendData)
+		    },
+		    color: colors,
+		    
+		    grid: {
+		        left: '3%',
+		        right: '4%',
+		        bottom: '3%',
+		        top:'22%',
+		        containLabel: true
+		    },
+		    xAxis: [
+		        {
+		            type: 'category',
+		            axisLabel:{
+		            	show: true,
+		            	textStyle:{
+		            		color: '#ffffff'
+		            	}
+		            },
+		            triggerEvent:true,	//此属性表示点击['1月', '2月', '3月',。。。]会触发click事件
+		            data: data.xAxisData
+		        }
+		    ],
+		    yAxis: [
+		        {
+		            type: 'value',
+		            axisLabel:{
+		            	show: true,
+		            	textStyle:{
+		            		color: '#ffffff'
+		            	}
+		            }
+		        }
+		    ],
+		    series : serie_func(data.seriesData)//series这条属性抽出来，写成serie_func函数,根据后端返回值生成对应个数的data[]
+		};
+
+		
+		$("#yearReport").hide();
+		myChartMonthReport.off('click');	//清除之前的点击事件
+		myChartMonthReport.setOption(optionMonthReport, true);
+        
+		myChartMonthReport.on('click', function (params) {
+			let vHwName = "";
+			let vHwId = "";
+			let vAlarmDate = "";
+			if(params.componentType =="xAxis"){
+				vAlarmDate = nowYear+"-"+params.value.substring(0,2);
+			}else{
+				vAlarmDate = nowYear+"-"+params.name.substring(0,2);
+				if(params.seriesName.indexOf("告警") == -1 ){
+					vHwName = params.seriesName;
+					vHwId = params.seriesId;
+				}
+			}
+			alarmDetails(vHwId,vHwName,vAlarmDate);
+        });
+	}
+	
+
+	/**标题格式化**/
+	function tooltip_formatter_fun2(item_op,select_value){
+		let formatter_data = "";
+		let title_item = "";
+		let count = 0;
+		let count2 = 0;
+		
+		for(let i = 0; i < item_op.length; i++){  
+			let data_item = item_op[i];//循环写入每一个选项的内容，
+	        
+	        if(title_item != item_op[i].stack){
+        		title_item = item_op[i].stack ;
+        		count2 = 0
+	        }
+	        if(select_value[i]){
+	        		if(count2 == 0){
+	        			count2++;
+	        			if(formatter_data.length > 0){
+			        		formatter_data += "<br/>"+title_item+"{b"+count+"}"+"<br/>"+"{a"+count+"}：{c"+count+"}";
+	        			}else{
+	        				formatter_data += title_item+"{b"+count+"}"+"<br/>"+"{a"+count+"}：{c"+count+"}";
+	        			}
+	        		}else{
+	        			formatter_data += "<br/>"+"{a"+count+"}：{c"+count+"}";
+	        		}
+        		count++;
+        	}
+	        
+	    }; 
+		return formatter_data;
+	}
+	
+	/**标题格式化**/
+	function tooltip_formatter_fun(item_op){
+		let formatter_data = "";
+		let title_item = "";
+		for(let i = 0; i < item_op.length; i++){  
+			let data_item = item_op[i];//循环写入每一个选项的内容，
+	        if(i == 0){
+	        	title_item = item_op[i].stack ;
+	        	formatter_data = title_item+"{b"+i+"}<br/>{a"+i+"}：{c"+i+"}";
+	        }else{
+	        	if(title_item != item_op[i].stack){
+	        		title_item = item_op[i].stack ;
+	        		formatter_data += "<br/>"+title_item+"{b"+i+"}<br/>{a"+i+"}：{c"+i+"}";
+	        	}else{
+	        		formatter_data += "<br/>{a"+i+"}：{c"+i+"}";
+	        	}
+	        }
+	    }; 
+		return formatter_data;
+	}
+
+	/**legend的data参数生成器函数**/
+	function data_func (item_op) {
+		let lgend_data = []; 
+		let lgend_array = new Array();
+	    for(let i = 0; i < item_op.length; i++){  
+	    	if(item_op.length > 4 && i == item_op.length-4){
+	    		lgend_data.push("\n");  //路段和雾强制换行
+	    	}
+	        lgend_data.push(item_op[i] );  
+	    };     
+	    return lgend_data;
+	}
+	
+	function data_func2 (item_op) {
+		let lgend_data = []; 
+		let lgend_array = new Array();
+	    for(let i = 0; i < item_op.length; i++){  
+	        lgend_data.push(item_op[i] );  
+	    };     
+	    return lgend_data;
+	}
+	
+
+	/**serie生成器**/
+	function serie_func(item_op){  
+		let serie = []; 
+	    for(let i = 0; i < item_op.length; i++){  //根据后端传来的数据item_op的长度循环创建serie里面的data[]，这里取的名字是item
+	    	let hwName = item_op[i].name.split(":")[0];
+	    	let hwId = item_op[i].name.split(":")[1];
+	    	let item = {  
+	            name:hwName,
+	            id:hwId,
+	            type: 'bar',
+	            stack:item_op[i].stack,
+	            data:data_func2(item_op[i].data)
+	        }  
+	        serie.push(item );  
+	    };  
+		return serie;
+	} 
+
+	/***雾情详细**/
+	function alarmDetails(hwId,hwName,alarmDate){
+// 		window.location.replace("/report/alarmReport/alarmRoadReportDetails?hwName="+hwName+"&alarmDate="+alarmDate);
+		let titleHwNames = "";
+		if(hwName != null && hwName.length > 0){
+			titleHwNames = hwName;
+		}else{
+			for(let i = 0; i < legendHwNamesArray.length-4; i++){
+				titleHwNames += legendHwNamesArray[i];
+				if(i > 1){
+					break;
+				}else{
+					titleHwNames += "、";
+				}
+			}
+			if(legendHwNamesArray.length-4 < 3){
+				titleHwNames = titleHwNames.substring(0,titleHwNames.length-1);
+			}
+			if(legendHwNamesArray.length-4 > 3){
+				titleHwNames += "等路段";
+			}
+		}
+		layer.open({
+	        type : 2,
+	        title : titleHwNames+" 雾情详细：",
+	        maxmin : true,
+	        shadeClose : false, // 点击遮罩关闭层
+	        area : [ '100%', '100%' ],
+	        zIndex:99999999,
+	        content : "/report/alarmReport/alarmRoadReportDetails?hwId="+hwId+"&alarmDate="+alarmDate
+	    });
+	}
+	
+	window.onresize = function(){
+		myChartYearReport.resize();
+		myChartMonthReport.resize();    //若有多个图表变动，可多写
+	}
+
+</script>
+
+</body>
+</html>

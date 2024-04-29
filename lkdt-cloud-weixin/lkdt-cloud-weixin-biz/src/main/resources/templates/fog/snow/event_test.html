@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html>
+	<meta charset="utf-8">
+	<head th:include="include :: header"></head>
+	<link href="/css/plugins/fullcalendar/fullcalendar.min.css" rel="stylesheet">
+  	<link href="/css/plugins/fullcalendar/fullcalendar.print.css" rel="stylesheet" media="print">
+	<style>
+	p {
+		margin: 0 0 14px;
+		font-size: 3.1vw;
+		color: #f1a908;
+	}
+	.col-md-4 {
+		width: 33.33%;
+		float: left;
+	}
+	.fc-icon-x:after {
+		font-size: 290%;
+	}
+	</style>
+	<script>
+		function nofind(_this){
+			_this.src="/fog/nofind.jpg";
+		}
+	</script>
+	<body class="gray-bg" style="height: 97%; overflow: hidden;padding: 5px;background: #132535;">
+		<input id="epId" name="epId" type="hidden" th:value="${epId}">
+		<input id="path" name="path" type="hidden" th:value="${path}">
+		<input id="fMeter" name="fMeter" type="hidden" th:value="${fMeter}">
+		<input id="videopath" name="videopath" type="hidden" th:value="${videopath}">
+		<div class="row" style="height: 50%;width: 100%;">
+			<div id="mydiv1" class="fc-popover fc-more-popover" style="display: none;background-color: #313046;cursor: pointer;width: 50%;position: absolute; z-index: 9999;left: 0;">
+				<img id="clickimg" alt="" src="" style="width: 90%;margin-left: 8%;    max-height: 35vw;">
+				<span class="fc-close fc-icon fc-icon-x"></span>
+			</div>
+			<div class="col-md-6" style="background-color: #090a21; color: #fff; font-size: 15px;padding: 5px;height: 100%; padding-left: 40px; width: 50%;float: left; font-family: sans-serif;">
+				<span>
+					<p style="font-size: medium;">当前预警：<span>暂无告警</span></p>
+					<p style="font-size: medium;">位置：<span>xxxx大桥</span></p>
+					<img src="/lkdtWX/img/induce_gray.png" style="height: 40px; width: 40px; position: absolute; bottom: 30px; left: calc(100%/10);" title="当前状态"/>
+					<div id="youdaodeng" class="pull-left" style="height: 100px; width: 100%;position: absolute;bottom: 5px;padding-right: 0px;">
+						<div style="left: calc(100%/8);position: absolute; width: 60%;height: 100%;border-style: none; border-color: #D07870;">
+							<div style="height: 28px;float: bottom;margin-bottom: 5px;">
+								<h2 class="tile-title" style="font-size: smaller;color: lightgray;margin-left: 2px;">预警控制</h2>
+							</div>
+							<div style="height: 28px;float: bottom;margin-bottom: 5px;">
+								<button class="btn btn-danger btn-xs" style="float: left;margin: 2px;background-color: red;" onclick="alarmYoudaodeng(3)">红色警报</button>
+								<button class="btn btn-warning btn-xs" style="float: left;margin: 2px;" onclick="alarmYoudaodeng(2)">黄色警报</button>
+								<button class="btn btn-default btn-xs" style="float: left;margin: 2px;" onclick="alarmYoudaodeng(1)">解除警报</button>
+								<!--<button class="btn btn-warning btn-xs" style="float: left;margin: 2px;">橙色警报</button>-->
+							</div>
+						</div>
+					</div>
+					<input id="close" type="button" onclick="closeFog()" style="display: none;    position: fixed;
+		top: 0px;
+		left: 38%;" value="关闭告警"/>
+				</span>
+			</div>
+			<div class="col-md-6" style="height: 100%;width: 50%;float: left;">
+				<div style="text-align: center; height: 100%; float: left; width: 100%;">
+					<img id='img1' alt="" onerror="nofind(this)" style="height: 100%;width: auto;margin:auto;display: none;">
+					<div id="video123" style="height: 100%;width: 100%;"></div>
+					<div id='fMeter_V' style="position: absolute; top: 75%; left: 20%;color: #ff9d06; font-size: 22px;" th:value="${fMeter}"></div>
+				</div>
+			</div>
+		</div>
+		<div class="row" style="height: 50%;width: 99%;">
+			<div class="col-md-12" style="height: 100%;">
+				<div id="container1" style="height: 100%;width:100%;"></div>
+			</div>
+		</div>
+		<!-- ECharts -->
+		<script type="text/javascript" src="/lkdtWX/js/plugins/echarts/echarts.min.js"></script>
+		<script type="text/javascript" src="/lkdtWX/js/common-options.js"></script>
+		<script type="text/javascript" src="/lkdtWX/js/jquery.min.js" ></script>
+		<script type="text/javascript" src="/lkdtWX/js/ckplayer/ckplayer.min.js"></script>
+		<!-- FastClick -->
+		<script type="text/javascript" src="/lkdtWX/js/fastclick.js"></script>
+	</body>
+	<script type="text/javascript">
+
+		$('.fc-close').bind('click',function(event){
+			hide('mydiv1');
+		});
+
+		function hide(id) {
+			let objDiv = $("#"+id+"");
+			$(objDiv).css("display", "none");
+		}
+
+
+		function show(id) {
+			let objDiv = $("#"+id+"");
+			$(objDiv).css("display","block");
+		}
+
+		function closeFog(){
+			let epId = $("#epId").val();
+			$.ajax({
+				type: "POST",
+				url: "/system/alarm/closeFog/"+epId,
+				success: function(data) {
+					if(data.code == 0) {
+						parent.layer.msg("操作成功");
+						let index = parent.layer.getFrameIndex(window.name); // 获取窗口索引
+						parent.layer.close(index);
+
+					} else {
+						parent.layer.alert(data.msg);
+						let index = parent.layer.getFrameIndex(window.name); // 获取窗口索引
+						parent.layer.close(index);
+
+					}
+
+				}
+			});
+		}
+
+		$(function() {
+			let hasClose = parent.gethasClose();
+			if(hasClose == 1){
+				$("#close").show();
+			}
+			//$("#videopath").val('https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8');
+			//$("#videopath").val('rtmp://58.200.131.2:1935/livetv/hunantv');
+			$("#videopath").val('rtmp://live-bk.jchc.cn/live/K1645_700_ChuKou1 G25_ChuKou1');
+			let videoObject = {
+				container: '#video123',//“#”代表容器的ID，“.”或“”代表容器的class
+				variable: 'player',//该属性必需设置，值等于下面的new chplayer()的对象
+				autoplay: true,//自动播放
+				live: true,
+				html5m3u8: true,
+				mobileCkControls: false,
+				//poster: '/fog/nofind.jpg',
+				video: $("#videopath").val()//url//视频地址
+			};
+			let player = null;
+			player = new ckplayer(videoObject);
+			document.getElementById('img1').src = $("#path").val();
+			if(!$("#videopath").val()){
+				$("#video123").hide();
+				$("#img1").show();
+			}
+
+
+
+		});
+
+		/**
+		 * 更新数据
+		 */
+		function updateImgPath(){
+			//获取图片
+			$.ajax({
+				type: "post",
+				url: "/system/equipment/lookup/updateimgpath/"+$("#epId").val(),
+			}).success(function(message) {
+				let imgdata = message;
+				let p = imgdata.path;
+			}).fail(function(err){
+				console.log(err);
+			});
+			let date = new Date(new Date().getTime() - 24*60*60*1000).Format('yyyy-MM-dd hh:mm:ss');
+			//获取统计图
+			$.ajax({
+				type: "get",
+				url: "/system/alarm/xxxxxx",
+				dataType:'json',
+				data: {epId:$("#epId").val(), date:date}
+			}).success(function(data) {
+
+			}).fail(function(err){
+				console.log(err);
+			});
+		}
+
+
+		let option = {
+			title: {
+				text: "事件统计",
+				textStyle: {
+					color: '#57617B'
+				}
+			},
+			tooltip: {
+				trigger: 'axis',
+				axisPointer: {
+					type: 'cross',
+					label: {
+						backgroundColor: '#283b56'
+					}
+				},
+				formatter:function(a){
+					let value = 0;
+					if(a[0].value <= 100){
+						value = parseInt(a[0].value*0.3);
+					}else if(a[0].value <= 200){
+						value = parseInt(a[0].value*0.2+10);
+					}else if(a[0].value <= 300){
+						value = parseInt(a[0].value*0.5-50);
+					}else if(a[0].value <= 400){
+						value = parseInt(a[0].value-200);
+					}else if(a[0].value <= 700){
+						value = parseInt((parseInt(a[0].value))-200);
+					}
+					return  a[0].name + '<br/>'+ a[0].marker + a[0].seriesName + '：' + value;
+				}
+			},
+			xAxis: {
+				type: 'category',
+				name: '时间',
+				boundaryGap: false,
+				axisLine: {
+					lineStyle: {
+						color: '#57617B'
+					}
+				},
+				axisLabel: {
+					//interval:10,
+					textStyle: {
+						color:'#fff',
+					},
+					// formatter : function(params) {
+					// 	return params.substr(0,2);
+					// }
+				},
+				nameTextStyle:{
+					color: '#ffffff'
+				}
+			},
+			yAxis: {
+				type: 'value',
+				name: '告警数',
+				boundaryGap: [0, '30%'],
+				axisTick: {
+					show: false
+				},
+				axisLine: {
+					show:false,
+					lineStyle: {
+						color: '#57617B',
+
+					}
+				},
+				axisLabel: {
+					textStyle: {
+						color:'#fff',
+					}
+				},
+				splitLine: {
+					lineStyle: {
+						color: 'rgba(255,255,255,0.2)',
+						type:'dotted',
+					}
+				},
+				nameTextStyle:{
+					color: '#ffffff'
+				},
+				axisPointer:{
+					show:false
+				}
+			},
+			visualMap: {
+				show: false,
+				top: 'top',
+				left:'middle',
+				color:['#16DDFD'],
+				textStyle:{
+					color:'#fff'
+				}
+				// pieces: [{
+				// 	gt: 0,
+				// 	lte: 1,
+				// 	color: '#ff0000'
+				// }, {
+				// 	gt: 100,
+				// 	lte: 200,
+				// 	color: '#fd4a05'
+				// }, {
+				// 	gt: 200,
+				// 	lte: 300,
+				// 	color: '#ffeb3b'
+				// }, {
+				// 	gt: 300,
+				// 	lte: 400,
+				// 	color: '#007eff'
+				// }, {
+				// 	gt: 400,
+				// 	color: '#48ef8b'
+				// }]
+			},
+			series: [{
+				data: [
+					['2019-10-10', 1],
+					['2019-10-11', 1],
+					['2019-10-12', 7],
+					['2019-10-13', 5],
+					['2019-10-14', 0],
+					['2019-10-15', 0],
+					['2019-10-16', 10],
+					['2019-10-17', 3],
+					['2019-10-18', 1]
+				],
+				type: 'line',
+				name:'告警数',
+				smooth: true,
+				lineStyle: {
+					normal: {
+						width: 2
+					}
+				}
+			}]
+		};
+		let myChart1 = echarts.init(document.getElementById("container1"));
+		myChart1.setOption(option, false);
+
+		/**
+		 * 预警控制
+		 */
+		function alarmYoudaodeng(level){
+			alert(level + ":开发中······");
+		}
+
+	</script>
+</html>

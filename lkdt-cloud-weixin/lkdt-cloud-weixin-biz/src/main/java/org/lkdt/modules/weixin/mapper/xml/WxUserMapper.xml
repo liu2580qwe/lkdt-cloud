@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.lkdt.modules.weixin.mapper.WxUserMapper">
+
+    <select id="getByUnionId" resultType="org.lkdt.modules.weixin.entity.WxUser">
+        SELECT
+            u.`openid`,
+            u.`police_id`,
+            u.`name`,
+            u.`phone`,
+            u.`nickname`,
+            u.`role`,
+            u.`create_time`,
+            u.`unionid`,
+            u.`rownum`
+        FROM
+            (
+                SELECT
+                    `openid`,
+                    `police_id`,
+                    `name`,
+                    `phone`,
+                    `nickname`,
+                    `role`,
+                    `create_time`,
+                    `unionid`,
+                    @rownum := @rownum + 1 AS rownum
+                FROM
+                    ( SELECT @rownum := 0 ) r,
+                    zc_wx_user
+                where unionid = #{unionid}
+            ) u
+        WHERE u.rownum = 1
+    </select>
+    <select id="getByMinOpenId" resultType="org.lkdt.modules.weixin.entity.WxUser">
+        SELECT
+            u.`openid`,
+            u.`police_id`,
+            u.`name`,
+            u.`phone`,
+            u.`nickname`,
+            u.`role`,
+            u.`create_time`,
+            u.`unionid`,
+            u.`minopenid`,
+            u.`rownum`
+        FROM
+            (
+                SELECT
+                    `openid`,
+                    `police_id`,
+                    `name`,
+                    `phone`,
+                    `nickname`,
+                    `role`,
+                    `create_time`,
+                    `unionid`,
+                    `minopenid`,
+                    @rownum := @rownum + 1 AS rownum
+                FROM
+                    ( SELECT @rownum := 0 ) r,
+                    zc_wx_user
+                where minopenid = #{minopenid}
+            ) u
+        WHERE u.rownum = 1
+    </select>
+</mapper>

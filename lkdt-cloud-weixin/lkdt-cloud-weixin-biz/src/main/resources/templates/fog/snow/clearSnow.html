@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>高速公路雾霾监控</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="/css/font-awesome.min.css?v=2" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css?v=3.3.7">
+    <link href="/css/animate.css?v=2" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/css/swiper.min.css?v=2">
+    <link rel="stylesheet" type="text/css" href="/lkdtWX/js/plugins/layer/skin/layer.css?v=2">
+    <link rel="stylesheet" type="text/css" href="/css/clearSnow.css?v=2">
+    <style type="text/css">
+        .dsc {
+            margin: 5px;
+            text-align: center;
+            display: none;
+        }
+
+        #rechart:hover .dsc {
+            display: block;
+        }
+
+        .amap-layer {
+            /*animation: glow 800ms ease-out infinite alternate;*/
+        }
+
+        .amap-labels {
+            /*animation: glow 800ms ease-out infinite alternate;*/
+        }
+
+        @keyframes glow {
+            0% {
+                box-shadow: 0 0 0;
+            }
+            100% {
+                box-shadow: rgb(253 10 10) 0px 0px 88px inset;
+            }
+        }
+        html,body{
+            height: 100%;
+        }
+        #allmap{
+            background: none !important;
+        }
+        .amap-layer:nth-of-type(1){
+            opacity:0.2;
+            filter:alpha(opacity=40);
+        }
+    </style>
+
+</head>
+<body>
+<section id="main" class="p-relative" role="main" style="height: calc(100% - 20px);overflow-y: hidden;">
+    <!-- Sidebar -->
+    <aside id="sidebar" style="width: 188px">
+
+        <!-- Sidbar Widgets -->
+        <div class="side-widgets overflow" tabindex="5000"
+             style="overflow: hidden; outline: none;">
+            <!-- Profile Menu -->
+            <!-- Feeds -->
+            <div class="s-widget m-b-25">
+                <h2 class="tile-title">告警统计</h2>
+                <div class="alert alert-danger alert-icon" onclick="openCalendar()">
+                    <span style="margin-left: 26px;">今日告警:<span id="todayAlarm"></span>次</span> <i
+                        class="icon fa fa-exclamation-triangle"></i>
+                </div>
+
+                <div class="alert alert-danger alert-icon" onclick="openCalendar()">
+                    <span style="margin-left: 26px;">本月累计告警:<span id="monthAlarm"></span>次</span> <i
+                        class="icon fa fa-exclamation-circle"></i>
+                </div>
+            </div>
+            <!--Weather forecast-->
+            <div class="panel  weather-info list_alarm_stroll_y" style="height: calc(100% - 169px);">
+                <iframe src="https://apip.weatherdt.com/v2/h5.html?bg=1&md=024&lc=auto&key=yogzi4VzUV" width="190px"
+                        style="border: 0" height="100%"></iframe>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Content -->
+    <section id="content" class="container" style="margin-left: 188px">
+
+
+        <!-- Quick Stats -->
+        <div class="block-area" style="padding-top: 5px;padding-left: 5px;height: 110px;" id="rechart">
+            <div class="row">
+                <div class="col-md-2 col-xs-6" style="width: calc(20% - 15px);margin-left: 15px;padding: 0px;">
+                    <div class="tile quick-stats media">
+                        <div id="routVisibility"
+                             style="height: 100px; width: 100%; "></div>
+                        <!--<div class="dsc">G15连云港段道路能见度</div>-->
+                    </div>
+
+                </div>
+                <div class="col-md-2 col-xs-6" style="width: calc(20% - 5px);margin-left: 5px;padding: 0px;">
+                    <div class="tile quick-stats media">
+                        <div id="routVisibility25" class="pull-left"
+                             style="height: 100px; width: 100%;"></div>
+                        <!--<div class="dsc">G15连云港段道路能见度</div>-->
+                    </div>
+                </div>
+                <div class="col-md-2 col-xs-6" style="width: calc(20% - 5px);margin-left: 5px;padding: 0px;">
+                    <div class="tile quick-stats media">
+
+                        <div id="routVisibility35" class="pull-left"
+                             style="height: 100px; width: 100%;"></div>
+                    </div>
+                </div>
+
+                <div class="col-md-2 col-xs-6" style="width: calc(20% - 5px);margin-left: 5px;padding: 0px;height: 100px;">
+                    <div class="tile quick-stats media">
+                        <div id="monthReport" class="pull-left"
+                             style="height: 100px; width: 100%;"></div>
+                    </div>
+                </div>
+
+                <div class="col-md-2 col-xs-6" style="width: calc(20% - 10px);margin-left: 5px;padding: 0px;height: 100px;display: none;">
+                    <div class="tile quick-stats media">
+                        <div id="yearReport" class="pull-left"
+                             style="height: 100px; width: 100%;"></div>
+                    </div>
+                </div>
+
+                <!--诱导灯-->
+                <div class="col-md-2 col-xs-6" style="width: calc(20% - 10px);margin-left: 5px;padding: 0px;height: 100px;">
+                    <div class="tile quick-stats media">
+                        <div id="youdaodeng" class="pull-left" style="height: 100px; width: 100%;padding-right: 0px;">
+                            <div style="width: 40%;height: 100%;float: left">
+                                <div style="height: 28px;">
+                                    <h2 class="tile-title" style="font-size: smaller;color: lightgray;margin-left: 2px;">xxxx位置</h2>
+                                </div>
+                                <img src="/lkdtWX/img/induce_gray.png" style="height: 40px; width: 40px; margin-left: calc(100%/2 - 20px);margin-top: 5px;" title="当前状态"/>
+                                <div style="width:100%;">
+                                    <label style="font-size: smaller;color: lightgray;margin-left: calc(100%/2 - 24px);margin-top: 5px;">暂无闪烁</label>
+                                </div>
+                            </div>
+                            <div style="width: 60%;height: 100%;float: left;border-left-style: double;border-left-color: rgba(242, 242, 242,0.5);">
+                                <div style="height: 28px;">
+                                    <h2 class="tile-title" style="font-size: smaller;color: lightgray;margin-left: 2px;">预警控制</h2>
+                                </div>
+                                <div style="height: 28px;">
+                                    <button class="btn btn-danger btn-xs" style="float: left;margin: 2px;background-color: red;" onclick="alarmYoudaodeng(3)">红色警报</button>
+                                    <button class="btn btn-warning btn-xs" style="float: left;margin: 2px;" onclick="alarmYoudaodeng(2)">黄色警报</button>
+                                    <!--<button class="btn btn-warning btn-xs" style="float: left;margin: 2px;">橙色警报</button>-->
+                                </div>
+                                <div style="height: 28px;">
+                                    <button class="btn btn-default btn-xs" style="float: left;margin: 2px;" onclick="alarmYoudaodeng(1)">解除警报</button>
+                                    <!--<button class="btn btn-default btn-xs" style="float: left;margin: 2px;background-color: #00fdfd;" onclick="测试按钮(1, 1, 1)">
+                                        测试按钮
+                                    </button>-->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <hr class="whiter">
+
+        <!-- Main Widgets -->
+
+        <div class="block-area" style="padding-top: 0px;padding-left: 5px;height: calc(100% - 115px);">
+            <div class="row" style="height: calc(100%);">
+                <div class="col-md-8" style="padding-right: 0px;height: calc(100%);">
+                    <!-- Main Chart -->
+                    <div class="tile" style="height: calc(100%);">
+                        <div class="visual_conBot" style="height: calc(100%);">
+                            <input id="liveAddress" style="height: calc(100%);" th:value="${liveAddress}" hidden/>
+                            <div id="allmap" style="min-height: 400px;height: calc(100%);">
+                                <div id="left_bottom_btn"
+                                     style="position: absolute; left: 10px;bottom: 10px; z-index: 1;">
+                                    <button class="btn btn-default" title="不合规设备" type="button" aria-expanded="false"
+                                            onclick="buhegeshipin_click()"
+                                            style="padding: 0 3px; background-color: rgba(6, 21, 55, 0.1); border-color: rgba(6, 21, 55, 0.1); color: #07A6FF;"
+                                    >不合规设备
+                                    </button>
+                                    <button class="btn btn-default" title="异常设备" type="button" aria-expanded="false"
+                                            onclick="tuanwuyujing_click()"
+                                            style="display:none;padding: 0 3px; background-color: rgba(6, 21, 55, 0.1); border-color: rgba(6, 21, 55, 0.1); color: #07A6FF;"
+                                    >异常设备
+                                    </button>
+                                </div>
+                                <div id="buhegeshipin"
+                                     style="position:absolute;width:100%;bottom:0;z-index:99;background-color:#061537;color: white;display: none;">
+                                    <div class="close_out">
+                                        <div id="close"></div>
+                                    </div>
+                                    <div class="visual_title">
+                                        <span>不合规视频路数统计</span> <img src="/lkdtWX/img/ksh33.png">
+                                        <span>不合规视频占比:<span id="percentage"></span>%</span>
+                                    </div>
+                                    <div class="visual_table">
+                                        <div id="eventList" class="list_alarm_stroll_y">
+                                            <ul class="th">
+                                                <li style="width:10%;text-align: left;">#</li>
+                                                <li style="width:30%;text-align: left;">摄像头</li>
+                                                <li style="width:30%;text-align: left;">异常现象</li>
+                                                <li style="width:30%;text-align: left;">位置</li>
+                                            </ul>
+                                            <ul id="exceptionEqus">
+                                                <li style="text-align: left;"></li>
+                                                <li style="text-align: left;"></li>
+                                                <li style="text-align: left;"></li>
+                                                <li style="text-align: left;"></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="tuanwuyujing"
+                                     style="position:absolute;width:100%;bottom:0;z-index:99;background-color:#061537;color: white;display: none;">
+                                    <div class="close_out">
+                                        <div id="close"></div>
+                                    </div>
+                                    <div class="visual_title">
+                                        <span>异常设备</span> <img src="/lkdtWX/img/ksh33.png">
+                                    </div>
+                                    <div class="visual_table">
+                                        <div id="alarmList" class="list_alarm_stroll_y">
+                                            <ul class="th">
+                                                <li style="width:25%;text-align: left;">编号</li>
+                                                <li style="width:25%;text-align: left;">情况说明</li>
+                                                <li style="width:25%;text-align: left;">开始时间</li>
+                                                <li style="width:25%;text-align: left;">持续时间</li>
+                                            </ul>
+                                            <ul id="contentUl">
+                                                <li style="width:25%;text-align: left;">-</li>
+                                                <li style="width:25%;text-align: left;">-</li>
+                                                <li style="width:25%;text-align: left;">-</li>
+                                                <li style="width:25%;text-align: left;">-</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="scroll-wrap">
+                                    <ul id="scroll-wrap-id" class="scroll-con fn-left">
+                                        <!--<li >xxx路段当前最小可视距离xxx米。</li>-->
+                                    </ul>
+                                </div>
+                                <div id="alarm_icon">
+                                    <img src="/lkdtWX/img/alarm_black.png" width="100%" height="100%">
+                                </div>
+
+                                <div id="expand" data="1">
+                                    <span class="glyphicon glyphicon-chevron-right expand-triangle"
+                                          aria-hidden="true"></span>
+                                </div>
+                                <div id="expand-popc"></div>
+                                <div id="expand-popc-preview">
+                                    <div class="img_close_out">
+                                        <div id="close"></div>
+                                    </div>
+                                    <img id="expand-popc-preview-img"/>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="clearfix"></div>
+                </div>
+
+                <div class="col-md-4" style="height: 100%; padding: 0 5px;">
+                    <div class="tile" style="height: 50%;">
+                        <h2 class="tile-title">事件检测</h2>
+                        <div class="ul-li-list list_alarm_stroll_y">
+                            <ul class="th"><li>事件类型</li><li>发生时间</li><li>位置</li><li>诱导灯状态</li></ul>
+                            <ul id="contentUl_event">
+                                <ul class="ul-line-movein" onclick="contentUl_event_click(this);">
+                                    <li class="nonum-line" title="交通事故"><a>交通事故</a></li>
+                                    <li class="nonum-line" title="2020-12-03 12:32:56"><a>2020-12-03 12:32:56</a></li>
+                                    <li class="nonum-line" title="xxxxxxxx"><a>xxxxxxxx</a></li>
+                                    <li class="nonum-line" title="红色警报"><a>红色警报</a></li>
+                                </ul>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="tile" style="height: calc(50% - 11px);">
+                        <h2 class="tile-title">路段雾情排名</h2>
+                        <div class="listview narrow list_alarm_stroll_y" id="hwIdCounts" style="height: calc(100% - 28px);overflow-y: scroll;">
+                        </div>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</section>
+
+<script language="javascript"
+        src="https://webapi.amap.com/maps?v=1.4.14&key=0fb99186996b7bff85d606c80d16f224&plugin=Map3D,AMap.DistrictSearch"></script>
+<!-- 高德UI组件库 1.0 -->
+<script type="text/javascript" src="https://webapi.amap.com/ui/1.0/main.js?v=1.0.11"></script>
+<script type="text/javascript" src="/lkdtWX/js/jquery.min.js?v=2.1.4&date=20201125"></script>
+<script type="text/javascript" src="/lkdtWX/js/plugins/echarts/echarts.min.js?v=2&date=20201125"></script>
+<script type="text/javascript" src="/lkdtWX/js/swiper.min.js?v=2&date=20201125"></script>
+<script type="text/javascript" src="/lkdtWX/js/plugins/layer/layer.min.js?v=2&date=20201125"></script>
+<script type="text/javascript" src="/lkdtWX/js/common-options.js?v=2&date=20201125"></script>
+<script type="text/javascript" src="/fog/js/clearSnow.js?v=2&date=20201125-1"></script>
+<script type="text/javascript">
+
+
+</script>
+</body>
+</html>

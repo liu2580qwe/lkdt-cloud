@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+
+<style>
+	body{
+		min-width: 950px;
+		overflow-x: auto;
+	}
+	
+	.clear{clear:both;}
+	
+	.search-span{
+		height: 60px;
+		padding: 10px 10px;
+		display: -webkit-inline-box;
+	}
+	
+	.nullData{
+		width: 100%;
+		height: 410px;
+		text-align: center;
+		font-size: 36px;
+		color: #eee;
+	}
+	
+	.info {
+		width: 100%;  
+		height: 400px;
+		margin-top: 15px;
+	}
+	
+	.info .yearReport{
+		width: 49%;
+		height: 400px;
+		float: left;
+		border: 1px solid #eee;
+		padding-top: 1%;
+		margin-right: 15px;
+	}
+	
+	.info .monthReport{
+		width: 49%;
+		height: 400px;
+		float: left;
+		border: 1px solid #eee;
+		padding-top: 1%;
+	}
+	
+	.info .alarmList{
+		width: 49%;
+		height: 400px;
+		float: left;
+		border: 1px solid #eee;
+		margin-bottom: 15px;
+		margin-right: 15px;
+	}
+	
+	.alarmList ul{
+		list-style: none;
+		padding: 0px;
+		margin: 0px;
+		width: 100%;
+		height: 35px;
+		line-height: 35px;
+		border-width: 1px;
+		border-color: #063B6A;
+		border-style: none none dashed none;
+		border-top: 0px;
+		font-size: 16px;
+		color: #fff;
+	}
+		
+	.alarmList li{
+		display: block;
+		width: 16%;
+		margin-left:1%;
+		float: left;    
+		text-align: center;
+		text-overflow:ellipsis; 
+		white-space:nowrap; 
+		overflow:hidden;
+	}
+	
+	.alarmList li.dfd{
+		width: 17%;
+	}
+	
+	.alarmList li.fs{
+		width: 19%;
+	}
+	
+	.alarmList li.kssj{
+		width: 18%;
+	}
+	
+	.alarmList li.cxsj{
+		width: 25%;
+	}
+	
+	.info .windMap{
+		width: 49%;
+		height: 400px;
+		float: left;
+		margin-bottom: 15px;
+	}
+	
+	.windMap .wind-blue{
+		background:url("/fog/windImg/wind-blue.png");
+		background-size:100%;
+		height:20px;
+		width:20px;
+	}
+	
+	.windMap .wind-red{
+		background:url("/fog/windImg/wind-red.png");
+		background-size:100%;
+		height:20px;
+		width:20px;
+	}
+	
+	.windMap .wind-yellow{
+		background:url("/fog/windImg/wind-yellow.png");
+		background-size:100%;
+		height:20px;
+		width:20px;
+	}
+	
+	.info .yearReport,.info .monthReport,.info .alarmList,.info .windMap{
+		display: none;
+	}
+	
+	.time-mask{
+		position: absolute;
+       	top: 0px;
+       	bottom: 0px;
+       	left: 0px;
+       	right: 0px;
+       	z-index: 98;
+       	background: rgba(0, 0, 0, 0.5);
+       	display: none;
+	}
+	
+	.track-cnt {
+		width: 65%;
+       	height: 400px;
+       	margin: 30% auto 0px auto;
+       	background: url(/fog/beijing.jpg) no-repeat;
+       	border-radius: 8px;
+       	z-index: 99;
+       	opacity: 1;
+       	border: 1px solid #eee;
+	}
+	
+	.track-cnt h2{
+		margin: 0px 20px;
+		height: 50px;
+		line-height: 50px;
+		font-size: 30px;
+	}
+	
+	.track-cnt ul li{
+		list-style: none;
+	}
+	
+	.track-list li {
+		position: relative;
+		padding-left: 25px;
+		height: 2.5vw;
+		line-height: 2.5vw;
+		border-left: 1px solid #d9d9d9;
+		color: #eee;
+		font-size: 1.5vw;
+	}
+	
+	.track-list li.first {
+		color: red;
+		padding-top: 0;
+		border-left-color: #fff;
+	}
+
+	.track-list li .node-icon {
+		position: absolute;
+		left: -6px;
+		top: 50%;
+		width: 11px;
+		height: 11px;
+		background: #95C1EE;
+		border-radius:10px;
+	}
+	
+	.track-list li .node-div{
+/* 		text-overflow:ellipsis;  */
+		white-space:nowrap; 
+/* 		overflow:hidden; */
+		position: relative;
+		top: 4px;
+	}
+
+	.track-list li.first .node-icon {
+		background-position: 0 -72px;
+	}
+
+	.track-list li .time {
+		margin-right: 15px;
+	}
+
+	.track-list li .fengxiang {
+		
+	}
+	
+	.track-list li .fengsu {
+		
+	}
+
+	.track-list li.first .time {
+		margin-right: 20px;
+	}
+
+	
+	.node-div .gaojing{
+		color: red;
+	}
+	
+	.node-div .huisheng{
+		color: #ffeb3b;
+	}
+	
+	.node-div .jiechu{
+		color: #48ef8b;
+	}
+	
+</style>
+<body class="gray-bg">
+	<div class="wrapper wrapper-content" >
+		<div class="col-sm-12">
+			<div class="ibox">
+				<div class="ibox-body">
+					<div class="fixed-table-toolbar" style="display: flex;">
+						<div class="columns pull-right col-md-10 nopadding" style="width:100%">
+							<span class="search-span" style="" th:if="${result eq 'Y'}">
+								<span>告警年份：</span>
+					            <input type="text" class="layui-input" id="year" placeholder="yyyy" lay-verify="date" autocomplete="off">
+			                </span>
+							<span class="search-span" style="" th:if="${result eq 'Y'}">
+								<span>大风监测点：</span>
+								<select id="wind" name="wind"  class="form-control chosen-select" style="width: 180px;display: inline;">
+									<option th:each="wind:${windList}" th:value="${wind.windId}" th:text="${wind.windName}" ></option>
+								</select>
+							</span>
+							<span class="search-span" style="" th:if="${result eq 'Y'}">
+								<button class="btn btn-success" onclick="reLoad()">查询</button>
+							</span>
+						</div>
+					</div>
+					<div id="info" class="info"  >
+						<div class="nullData" th:if="${result eq 'NULL_HW'}">您的账号未绑定路段，请联系管理员。</div>
+						<div class="nullData" th:if="${result eq 'NULL_WIND'}">您的账号没有大风监测点。</div>
+						<div id="nullData" class="nullData" ></div>
+						
+						<div id="yearReport" class="yearReport" ></div>
+						<div id="monthReport" class="monthReport" ></div>
+						<div class="clear"></div>
+						
+							<h2 id="listTitle"></h2>
+						<div id="alarmList" class="alarmList">
+							<ul style="border-bottom: 1px solid #eee">
+								<li class='dfd'>大风点</li>
+								<li>告警等级</li>
+								<li class='fs'>风速(米/秒)</li>
+								<li class='kssj'>开始时间</li>
+								<li class="cxsj">持续时长</li>
+							</ul>
+							<ul id="contentUl" style="height: 363px;overflow:auto;">
+								<li>-</li>
+								<li>-</li>
+								<li>-</li>
+								<li>-</li>
+								<li>-</li>
+							</ul>
+						</div>
+						<div id="windMap" class="windMap"></div>
+						<div class="clear"></div>
+						
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<!-- 时间轴蒙板 -->
+	<div class="time-mask" onClick="closeMask()">
+		<div class="track-cnt">
+			<h2 id='colseTitle'>大风告警时间线</h2>
+			<div id="roadColse" class="track-list"></div>
+		</div>
+	</div>
+	
+	<div th:include="include :: footer"></div>
+	
+<!-- 时间控件 -->
+<script	src="/lkdtWX/js/plugins/laydate/laydate.js"></script>
+<!-- echarts -->
+<script src="/lkdtWX/js/plugins/echarts/echarts.min.js"></script>
+<!-- 高德地图 -->	
+<script language="javascript" src="https://webapi.amap.com/maps?v=1.4.14&key=0fb99186996b7bff85d606c80d16f224&plugin=Map3D,AMap.DistrictSearch"></script>
+<!-- UI组件库 1.0 -->
+<script type="text/javascript" src="https://webapi.amap.com/ui/1.0/main.js?v=1.0.11"></script>
+<!-- 地图数据展示 -->
+<script	src="/fog/alarm/alarmMap.js"></script>
+
+
+<script type="text/javascript">
+	let myChartYearReport;
+	let myChartMonthReport;
+
+	$(function() {
+		laydate.render({
+			elem: '#year',
+			type: 'year',
+			value: new Date()
+		});
+		
+		
+		reLoad();
+	});
+	
+	function reLoad(){
+		let year = $("#year").val() ;
+		if(year==""){
+			let d = new Date();
+			year = d.getFullYear();
+		}
+		let windId = $('#wind').val() ;
+		if(typeof(year)=='undefined' || typeof(windId)=='undefined'){
+			$("#nullData").hide();
+			$("#yearReport").hide();
+			$("#monthReport").hide();
+			$("#alarmList").hide();
+			$("#windMap").hide();
+			$(".time-mask").hide();
+			return ;
+		}
+		yearReport(year,windId);
+		
+	}
+	
+	/**年统计报表**/
+	function yearReport(year,windId){
+		$.ajax({
+			type : 'get',
+			url : '/report/alarmReport/windYearReportStatistics',
+			data:{'year':year,'windId':windId},
+			success : function(data) {
+				showYearReport(data,year,windId);
+	 		}
+		});
+	}
+	
+	/**年统计报表**/
+	function showYearReport(data,year,windId){
+		if(data.length == 0){
+			$("#yearReport").hide();
+			$("#monthReport").hide();
+			$("#alarmList").hide();
+			$("#windMap").hide();
+			$(".time-mask").hide();
+			$("#nullData").html("暂无数据");
+			$("#nullData").show();
+			return;
+		}
+		$("#nullData").hide();
+		$("#yearReport").show();
+		
+		monthReport(year,windId);
+		windAlarmList(year,windId,"","");
+		
+		myChartYearReport = echarts.init(document.getElementById('yearReport'));
+// 		let colors = "['#f4ea2a','#ffa500','#d81e06','#9a1200']";
+		let colors = [];
+		let servicedata = [];
+	    for(let i = 0; i < data.length; i++){  
+	    	let obj = new Object();
+            obj.value = data[i].statisticsNum; 
+            obj.name = data[i].levelDescByLevel;
+            servicedata[i] = obj;
+            
+            if(data[i].level == "1"){		//三级
+            	colors[i] = "#f4ea2a";	
+            }else if(data[i].level == "2"){	//二级
+            	colors[i] = "#ffa500";
+            }else if(data[i].level == "3"){	//一级
+            	colors[i] = "#d81e06";
+            }else if(data[i].level == "4"){		//特级
+            	colors[i] = "#9a1200";
+            }
+            
+	    };     
+	    
+		optionYearReport = {
+				title: {
+			        text: '大风告警次数统计('+year+'年年报表)',
+			        left: 'center',
+			        textStyle:{
+			    		fontSize: 16,//字体大小
+			    		color: '#ffffff'//字体颜色
+			    	}
+			    },
+			    tooltip: {
+			        trigger: 'item',
+			        position: 'right',
+// 			        formatter: '{a} <br/>{b} : {c} ({d}%)'
+			    },
+// 			    legend: {
+// 			        orient: 'vertical',
+// 			        left: 'left',
+// 			        data: ['三级告警', '二级告警', '一级告警', '特级告警']
+// 			    },
+ 				color: colors,
+			    series: [
+			        {
+			            name: '大风告警数据' , //data[0].windName+'【'+year+'】大风告警数据',
+			            type: 'pie',
+			            radius: '55%',
+			            center: ['50%', '50%'],
+			            data:servicedata,
+			            emphasis: {
+			                itemStyle: {
+			                    shadowBlur: 10,
+			                    shadowOffsetX: 0,
+			                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+			                }
+			            }
+			        }
+			    ]
+			};
+		
+// 		myChartYearReport.off('click');	//清除之前的点击事件
+		myChartYearReport.setOption(optionYearReport, true);
+        
+//         myChartYearReport.on('click', function (params) {
+//             monthReport(year,windId);
+//         });
+
+	}
+	
+	/**月统计报表**/
+	function monthReport(year,windId){
+		$.ajax({
+			type : 'get',
+			url : '/report/alarmReport/windMonthReportStatistics',
+			data:{'year':year,'windId':windId},
+			success : function(data) {
+				showMonthReport(data,year,windId);
+	 		}
+		});
+	}
+	
+	function showMonthReport(data,nowYear,windId){
+		$("#monthReport").show();
+		
+		myChartMonthReport = echarts.init(document.getElementById('monthReport'));
+		
+		optionMonthReport = {
+			title: {
+				text: '大风告警次数统计('+nowYear+'年月报表)',
+		        textStyle:{
+		    		fontSize: 16,//字体大小
+		    		color: '#ffffff'//字体颜色
+		    	}
+		    },
+		    tooltip: {
+		        trigger: 'axis',
+		        axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+		            type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow' | 'cross'
+		        },
+		    },
+		    legend: {
+		    	textStyle:{
+		    		fontSize: 16,//字体大小
+		    		color: '#ffffff'//字体颜色
+		    	},
+		    	top:'6%',
+		        data: data.legendData
+		    },
+		    color: ['#f4ea2a','#ffa500','#d81e06','#9a1200'],
+		    
+		    grid: {
+		        left: '3%',
+		        right: '4%',
+		        bottom: '3%',
+		        top:'22%',
+		        containLabel: true
+		    },
+		    xAxis: [
+		        {
+		            type: 'category',
+		            axisLabel:{
+		            	show: true,
+		            	textStyle:{
+		            		color: '#ffffff'
+		            	}
+		            },
+		            triggerEvent:true,	//此属性表示点击['1月', '2月', '3月',。。。]会触发click事件
+		            data: data.xAxisData
+		        }
+		    ],
+		    yAxis: [
+		        {
+		            type: 'value',
+		            axisLabel:{
+		            	show: true,
+		            	textStyle:{
+		            		color: '#ffffff'
+		            	}
+		            }
+		        }
+		    ],
+		    series : serie_func(data.seriesData)
+		};
+
+		myChartMonthReport.off('click');	//清除之前的点击事件
+		myChartMonthReport.setOption(optionMonthReport, true);
+		
+		myChartMonthReport.on('click', function (params) {
+			let vMonth = "";
+			let vLevel = "";
+			let level = "";
+			if(params.componentType =="xAxis"){
+				vMonth = params.value.substring(0,2);
+			}else{
+				vMonth = params.name.substring(0,2);
+// 				vLevel = params.seriesName;
+// 				if(vLevel == "特级告警"){
+// 					level = "4";
+// 				}else if(vLevel == "一级告警"){
+// 					level = "3";
+// 				}else if(vLevel == "二级告警"){
+// 					level = "2";
+// 				}else if(vLevel == "三级告警"){
+// 					level = "1";
+// 				}
+			}
+			windAlarmList(nowYear,windId,vMonth,level);
+        });
+	}
+	
+	/**serie生成器**/
+	function serie_func(item_op){  
+	    let serie = []; 
+	    for(let i = 0; i < item_op.length; i++){  //根据后端传来的数据item_op的长度循环创建serie里面的data[]，这里取的名字是item
+	    	let item = {  
+	            name:item_op[i].name,
+	            type: 'bar',
+	            stack:item_op[i].stack,
+	            data:item_op[i].data
+	        }  
+	        serie.push(item );  
+	    };  
+		return serie;
+	} 
+	
+
+	/**大风告警列表***/
+	function windAlarmList(year,windId,month,level){
+		if(month==""){
+			let d = new Date();
+			month = d.getMonth()+1;
+			if(month < 10){
+				month = "0"+month;
+			}
+		}
+		let date = year+"-"+month;
+		$("#listTitle").html("大风告警列表("+date+")");
+
+		$.ajax({
+			type : 'get',
+			url : '/report/alarmReport/windAlarmList',
+			data:{'date':date,'windId':windId,'level':level},
+			success : function(data) {
+				showWindAlarmList(data);
+				$("#windMap").show();
+				mapInit(data,"windMap","wind")
+	 		}
+		});
+	}
+	
+	function showWindAlarmList(data){
+		$("#alarmList").show();
+		let html = "";
+        for (let i = 0; i < data.length; i++) {
+        	html += "<ul>";
+        	let param__ = null;
+            if(data[i].lon && data[i].lat){
+                param__= data[i].lon+","+data[i].lat;
+            } else {
+                param__= "-1,-1";
+            }
+           
+            html += "<li class='dfd' ><a href='###' style='color: #95C1EE;' " +
+            "title='" +data[i].windName + "' onclick='"+"locationFunc("+param__+")"+"'>" +
+                data[i].windName+ "</a></li>";
+                html += "<li title='" + data[i].levelDescByLevel + "'>" + data[i].levelDescByLevel + "</li>";
+            html += "<li class='fs'>" + data[i].distance + "(m/s)</li>";
+            let begintime = data[i].begintime.substring(8,10)+"号"+data[i].begintime.substring(11,16);
+            html += "<li class='kssj' title='" + data[i].begintime + "'>" + (begintime==''?'&nbsp;':begintime) + "</li>";
+            html += "<li class='cxsj'><a href='###' style='color: #95C1EE;' " +
+                "title='" +toHourMinute(data[i].forMinute)+ "' onclick='openFog(\""+data[i].epId+"\",\""+data[i].name+"\",\""+data[i].equLocation+"\",\""+data[i].begintime+"\",\""+data[i].endtime+"\")'>" +
+                toHourMinute(data[i].forMinute)+ "</a></li>";
+            html += "</ul>";
+        }
+        $("#contentUl").html(html);
+        
+	}
+	
+	/**
+	 * 警告列表定位
+	 * */
+	function locationFunc(lon,lat){
+		//异常
+	    if(lon == -1 || lat == -1){
+	        layer.msg("ERROR403·经纬度异常");
+	        return;
+	    }
+	    let point = new AMap.LngLat(lon, lat);
+	    map.setZoom(14);  // 初始化地图,设置中心点坐标和地图级别
+	    map.setCenter(point);
+	}
+	
+	/**关闭蒙版**/
+	function closeMask(){
+		$(".time-mask").hide();
+		$("#roadColse").html("");
+	}
+	
+	function openFog(epId,name,equLocation,beginTime,endTime){
+		$.ajax({
+			type: "get",
+            url: "/system/alarm/alarmDistanceStatisticWind",
+            dataType:'json',
+        	data: {epId:epId,beginTime:beginTime,endTime:endTime},
+			success : function(data) {
+				let vheight = document.body.scrollHeight;
+				let mheight = (document.body.offsetHeight - $(".track-cnt").height()) /2;
+				mheight += getScrollTop();
+				
+				$(".time-mask").css("height",vheight);
+				$(".time-mask").show();
+				$(".track-cnt").css("margin-top",mheight);
+				if(data.intList.length == 0){
+					$("#roadColse").html("");
+					return ;
+				}
+				let arrayData = data.intList;
+				let rcHtml = "<ul style='height: 330px;overflow:auto;'>";
+				let lastAlarmLevel = -1;
+				
+				for (let i = 0; i < arrayData.length; i++) {
+					rcHtml += "<li>";
+					rcHtml += "<i class='node-icon'></i>";
+					rcHtml += "<div class='node-div'>";
+					rcHtml += "<span class='time'>"+arrayData[i][1]+"</span>";
+					if(i == 0 && arrayData[i][2] >= 10.8){
+						rcHtml += "发生<span class='gaojing'>"+getWindAlarmLevelDesc(arrayData[i][2])+"</span>,";
+					}
+					if(i == arrayData.length-1 && arrayData[i][2] < 10.8){
+						rcHtml += "<span class='jiechu'>"+getWindAlarmLevelDesc(arrayData[i][2])+"</span>,";
+					}
+					if(i > 0 && lastAlarmLevel < getWindAlarmLevel(arrayData[i][2])){
+						rcHtml += "告警等级提升至<span class='gaojing'>"+getWindAlarmLevelDesc(arrayData[i][2])+"</span>,";
+					}
+					lastAlarmLevel = getWindAlarmLevel(arrayData[i][2]);
+					rcHtml += "<span class='fengxiang'>风向"+getWinddVal(arrayData[i][0])+"</span>,";
+					rcHtml += "<span class='fengli'>风力"+getWindLevel(arrayData[i][2])+"</span>,";
+					rcHtml += "<span class='fengsu'>风速"+arrayData[i][2]+"米/秒</span>。";
+					rcHtml += "</div>";
+					rcHtml += "</li>";
+					if(i == data.length-1 ){
+						rcHtml += "</ul>";
+					}
+				}
+				$("#roadColse").html(rcHtml);
+	 		}
+		});
+	}
+	
+	//获取风向值
+	function getWinddVal(windd){
+		if(windd==4){
+			return "北";
+		}else if(windd==5){
+			return "东北";
+		}else if(windd==6){
+			return "东";
+		}else if(windd==7){
+			return "东南";
+		}else if(windd==0){
+			return "南";
+		}else if(windd==1){
+			return "西南";
+		}else if(windd==2){
+			return "西";
+		}else if(windd==3){
+			return "西北";
+		}
+		return null;
+	}
+	//获取风等级
+	function getWindLevel(winds){
+		if(winds<1.5){
+			return "1级";
+		}else if(winds<=3.3){
+			return "2级";
+		}else if(winds<=5.4){
+			return "3级";
+		}else if(winds<=7.9){
+			return "4级";
+		}else if(winds<=10.7){
+			return "5级";
+		}else if(winds<=13.8){
+			return "6级";
+		}else if(winds<=17.1){
+			return "7级";
+		}else if(winds<=20.7){
+			return "8级";
+		}else if(winds<=24.4){
+			return "9级";
+		}else if(winds<=28.4){
+			return "10级";
+		}else if(winds<=32.6){
+			return "11级";
+		}else if(winds<=36.9){
+			return "12级";
+		}else if(winds<=41.4){
+			return "13级";
+		}else if(winds<=46.1){
+			return "14级";
+		}else if(winds>=46.1){
+			return "15级";
+		}
+		return null;
+	}
+	
+	//获取告警等级
+	function getWindAlarmLevel(winds){
+		if (winds >= 28.5) {
+			return 4;
+		} else if (winds >= 20.8) {
+			return 3;
+		} else if (winds >= 13.9) {
+			return 2;
+		} else if (winds >= 10.8) {
+			return 1;
+		} else {
+			return 0;
+		}
+	}
+	
+	//获取告警等级
+	function getWindAlarmLevelDesc(winds){
+		if (winds >= 28.5) {
+			return "特级告警";
+		} else if (winds >= 20.8) {
+			return "一级告警";
+		} else if (winds >= 13.9) {
+			return "二级告警";
+		} else if (winds >= 10.8) {
+			return "三级告警";
+		} else {
+			return "告警解除";
+		}
+	}
+	
+	//取窗口滚动条高度 
+    function getScrollTop(){
+        var scrollTop=0;
+        if(document.documentElement&&document.documentElement.scrollTop){
+            scrollTop=document.documentElement.scrollTop;
+        }else if(document.body){
+            scrollTop=document.body.scrollTop;
+        }
+        return scrollTop;
+    }
+	
+    /**将分钟数量转换为小时和分钟**/
+	function toHourMinute(minutes){
+		if(minutes === "" || minutes == null){
+	        return "未结束";
+	　　}
+		if(!isNaN(minutes)){
+			return (Math.floor(minutes/60) + "小时" + (minutes%60) + "分" );
+		}else{
+			return "未结束";
+		}
+	}
+    
+	window.onresize = function(){
+		myChartYearReport.resize();
+		myChartMonthReport.resize();    //若有多个图表变动，可多写
+	}
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,152 @@
+version: '2'
+services:
+  #  lkdt-cloud-mysql:
+  #    build:
+  #      context: ./doc/db
+  #    environment:
+  #      MYSQL_ROOT_PASSWORD: root
+  #    restart: always
+  #    container_name: lkdt-cloud-mysql
+  #    image: lkdt-cloud-mysql
+  #    command:
+  #      --character-set-server=utf8mb4
+  #      --collation-server=utf8mb4_general_ci
+  #      --explicit_defaults_for_timestamp=true
+  #      --lower_case_table_names=1
+  #      --max_allowed_packet=128M
+  #    ports:
+  #      - 3306:3306
+#  lkdt-cloud-mysql:
+#    image: mysql:5.7.23
+#    restart: always
+#    container_name: lkdt-cloud-mysql
+#    ports:
+#      - "3306:3306"
+#    volumes:
+#      - /home/test/mysql/data:/var/lib/mysql
+#      - /home/test/mysql/initdb:/docker-entrypoint-initdb.d
+#      - /home/test/mysql/cnf/my.cnf:/etc/mysql/my.cnf
+#    command: [
+#        --character-set-server=utf8mb4
+#        --collation-server=utf8mb4_unicode_ci
+#        --max_connections=3000
+#        --explicit_defaults_for_timestamp=true
+#        --lower_case_table_names=1
+#        --max_allowed_packet=128M
+#    ]
+#    environment:
+#      MYSQL_ROOT_PASSWORD: "root"
+
+  lkdt-cloud-redis:
+    image: redis:5.0
+    ports:
+      - 6379:6379
+    restart: always
+    container_name: lkdt-cloud-redis
+    hostname: lkdt-cloud-redis
+  lkdt-cloud-rabbitmq:
+    image: rabbitmq:3-management
+#    image: rabbitmq:3
+    ports:
+      - 5672:5672
+      - 15672:15672
+    restart: unless-stopped
+    container_name: lkdt-cloud-rabbitmq
+    hostname: lkdt-cloud-rabbitmq
+
+  lkdt-cloud-nacos:
+    restart: unless-stopped
+    image: nacos/nacos-server
+    container_name: lkdt-cloud-nacos
+    hostname: lkdt-cloud-nacos
+    ports:
+      - 8848:8848
+    environment:
+      SPRING_DATASOURCE_PLATFORM: mysql
+      MYSQL_SERVICE_HOST: 192.168.3.100
+      MYSQL_SERVICE_PORT: 3306
+      MYSQL_SERVICE_DB_NAME: lkdt-nacos
+      MYSQL_SERVICE_USER: lkdt
+      MYSQL_SERVICE_PASSWORD: LKdt1234
+      MODE: standalone
+      MYSQL_SERVICE_DB_PARAM: characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+
+  lkdt-cloud-gateway:
+    build:
+      context: ./lkdt-cloud-gateway
+    restart: unless-stopped
+    ports:
+      - 9999:9999
+    container_name: lkdt-cloud-gateway
+    hostname: lkdt-cloud-gateway
+    image: lkdt-cloud-gateway
+
+  lkdt-cloud-system:
+    build:
+      context: ./lkdt-cloud-system/lkdt-cloud-system-biz
+    restart: unless-stopped
+    container_name: lkdt-cloud-system
+    hostname: lkdt-cloud-system
+    image: lkdt-cloud-system
+  #  lkdt-cloud-system2:
+  #    restart: unless-stopped
+  #    container_name: lkdt-cloud-system2
+  #    hostname: lkdt-cloud-system2
+  #    image: lkdt-cloud-system
+  #  lkdt-cloud-system3:
+  #    restart: unless-stopped
+  #    container_name: lkdt-cloud-system3
+  #    hostname: lkdt-cloud-system3
+  #    image: lkdt-cloud-system
+
+  lkdt-cloud-fog:
+    build:
+      context: ./lkdt-cloud-fog/lkdt-cloud-fog-biz
+    restart: unless-stopped
+    container_name: lkdt-cloud-fog
+    hostname: lkdt-cloud-fog
+    image: lkdt-cloud-fog
+
+  lkdt-cloud-weixin:
+    build:
+      context: ./lkdt-cloud-weixin/lkdt-cloud-weixin-biz
+    restart: unless-stopped
+    container_name: lkdt-cloud-weixin
+    hostname: lkdt-cloud-weixin
+    image: lkdt-cloud-weixin
+
+  lkdt-cloud-xxljob-admin:
+    build:
+      context: ./lkdt-xxl-job/lkdt-xxl-job-admin
+    restart: unless-stopped
+    container_name: lkdt-cloud-xxljob-admin
+    hostname: lkdt-cloud-xxljob-admin
+    image: lkdt-cloud-xxljob-admin
+#
+  lkdt-cloud-monitor:
+    build:
+      context: ./lkdt-cloud-monitor
+    restart: always
+    ports:
+      - 9111:9111
+    container_name: lkdt-cloud-monitor
+    hostname: lkdt-cloud-monitor
+    image: lkdt-cloud-monitor
+
+  lkdt-cloud-traffic-incident:
+    build:
+      context: ./lkdt-cloud-traffic-incident/lkdt-cloud-traffic-incident-biz
+    restart: always
+    container_name: lkdt-cloud-traffic-incident
+    hostname: lkdt-cloud-traffic-incident
+    image: lkdt-cloud-traffic-incident
+
+  lkdt-cloud-radar:
+    build:
+      context: ./lkdt-cloud-radar/lkdt-cloud-radar-biz
+    restart: always
+    ports:
+      - 9009:9009
+    container_name: lkdt-cloud-radar
+    hostname: lkdt-cloud-radar
+    image: lkdt-cloud-radar

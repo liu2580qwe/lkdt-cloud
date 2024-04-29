@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width"> -->
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+    <!-- iphone会把一串数字识别为电话号码，点击的时候会提示是否呼叫，屏蔽这功能则把telephone设置为no -->
+    <meta content="telephone=no" name="format-detection" />
+    <!-- iphone的私有标签，默认值为default（白色），可以定为black（黑色）和black-translucent（灰色半透明） -->
+    <meta content="black" name="apple-mobile-web-app-status-bar-style">
+    <!-- iphone设备的是有标签 允许全屏模式浏览，隐藏浏览器导航栏 -->
+    <meta content="yes" name="apple-mobile-web-app-capable" />
+    <!-- 全屏显示 -->
+    <meta content="yes" name="apple-touch-fullscreen" />
+    <!-- UC强制全屏 -->
+    <meta name="full-screen" content="yes">
+    <!-- QQ强制全屏 -->
+    <meta name="x5-fullscreen" content="true">
+    <!-- 屏蔽百度转码 -->
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <title>智高速</title>
+    <link rel="stylesheet" href="/lkdtWX/plugins/weui/jquery-weui/css/weui.min.css">
+    <link rel="stylesheet" href="/lkdtWX/plugins/weui/jquery-weui/css/jquery-weui.min.css">
+    <link rel="stylesheet" href="/lkdtWX/plugins/weui/css/weuix.css"/>
+    
+    <style>
+        ::-webkit-scrollbar{display: none;}
+        .contacts-content{position: absolute;top: 0;bottom: 0;width: 100%;overflow: auto;background-color: #fff;}
+        .contacts-content .weui-cells__title{margin-top: 0;margin-bottom: 0;font-weight: bold;}
+        .contacts-content .weui-panel{margin-top: 0;margin-right: 0px;}
+        .contacts-content .weui-panel .weui-media-box{padding: 10px 5px;}
+        .contacts-content .weui-panel .weui-media-box .weui-media-box__hd{width: 40px;height: 40px;line-height: 40px;margin-left: .8em;}
+        .contacts-content .weui-panel .weui-media-box .weui-media-box__hd img{width: 40px;height: 40px;border-radius: 50%;}
+        .contacts-content .weui-panel .weui-media-box .weui-media-box__title {font-size: 14px;}
+        .navbar{position: absolute;top: 0;bottom: 0;right: 0;width: 20px;overflow: hidden;display: flex;flex-direction: column;justify-content: space-around;color: #999;}
+        .navbar.hover{box-shadow: 0 0 3px 0 #ccc;border-left: 1px solid #ddd;background: linear-gradient(to left, #f9f9f9,#f1f1f1);color: #666;}
+        .navbar li{margin: 0 5px;text-align: center;font-size: 12px;line-height: normal;}
+        .navbar li.selected{border-radius: 10px;background-color: #505050;color: #fff;font-weight: bold;}
+        .toast{display: none;position: fixed;left: 50%;top: 50%;margin-left: -50px;margin-top: -50px;width: 100px;
+            height: 100px;line-height: 100px;text-align: center;font-size: 48px;background-color: rgba(0, 0, 0, 0.5);color: #fff;border-radius: 10px;}
+        .weui-search-bar {position: relative;padding: 8px 20px 8px 10px;display: -webkit-box;display: -webkit-flex;display: flex;box-sizing: border-box;background-color: #efeff4;}
+        .weui-search-bar__label {position: absolute;top: 1px;right: 1px;bottom: 1px;left: 1px;z-index: 0;border-radius: 3px;text-align: center;color: #9b9b9b;background: #fff;}
+        
+        .paper-page{
+        	display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="deptSubList" class="contacts-content">
+
+        <div class="weui-btn_default weui-header ">
+            <div class="weui-header-left"><a id="home_href" href="###" onclick="bindBack()" class="icon icon-109 f-green">返回主页</a></div>
+            <h1 class="weui-header-title f-green"></h1>
+            <div class="weui-header-right"><a href="###" class="icon icon-70 f-green" onclick="primaryClick()">生成日报</a></div>
+        </div>
+    </div>
+    <div class="navbar"></div>
+    <div class="paper-page" >
+    	<div class="weui-btn_default weui-header ">
+            <div class="weui-header-left"><a id="home_href" href="###" onclick="rBack()" class="icon icon-109 f-green">返回</a></div>
+            <h1 class="weui-header-title f-green"></h1>
+            <div class="weui-header-right"><a href="###" class="icon icon-70 f-green" onclick="copyNotice()">复制日报</a></div>
+        </div>
+        <div style="width: 92%;margin: 0 auto;">
+        	<view  data-content="" class="1" bindtap="copyNotice"  id="paper">
+        		
+			</view>
+        </div>
+    </div>
+
+    <script src="/lkdtWX/plugins/weui/js/commonMap.js" charset="utf-8"></script>
+    <script src="/lkdtWX/plugins/weui/jquery-weui/js/jquery.min.js" charset="utf-8"></script>
+    <script src="/lkdtWX/plugins/weui/jquery-weui/js/jquery-weui.min.js" charset="utf-8"></script>
+    <script src="/lkdtWX/plugins/weui/js/axios.min.js"></script>
+    <script type="text/javascript">
+    	let paperDate = "";
+        let openid = u.getStorage("openid");
+        $(function(){
+            //数据初始化
+            axios.post('/weixin/zhiBan/queryDeptList',{})//也可以直接拼接在url
+                .then(function(rs){
+                    if(rs.data){
+                    	let contactsHtml = `<div class="weui-panel weui-panel_access">`;
+                    	let depts = rs.data;
+                    	for(let i = 0; i < depts.length; i++){
+                    		if(depts[i].deptId != 13){
+	                    		//生成主界面
+	                        	contactsHtml +=
+	                                `<div class="weui-cell weui-cell_switch">
+	                                    <div class="weui-cell__bd">`+depts[i].name+`</div>
+	                                    <div class="weui-cell__ft">
+	                                        <label for="deptSubList_`+depts[i].deptId+`" class="weui-switch-cp">
+	                                            <input id="deptSubList_`+depts[i].deptId+`" class="weui-switch-cp__input" type="checkbox">
+	                                            <div class="weui-switch-cp__box"></div>
+	                                        </label>
+	                                    </div>
+	                                </div>`;
+                    		}
+                    	}
+                    	contactsHtml += `</div>`;
+                    	$('.contacts-content').append(contactsHtml);
+                    } else {
+                        $.toast("数据异常", "success");
+                    }
+                }).catch(function(e){
+                $.toast("网络异常", "cancel");
+            });
+        });
+
+        //返回
+        function bindBack(){
+            $.showLoading();
+            window.location.replace("/weixin/map/wxMapJump?pubOpenId="+u.getStorage("openid"));
+        }
+
+        /**提交*/
+        function primaryClick(){
+            $.showLoading();
+            //参数
+            let list = [];
+            let deptSubLists = $("#deptSubList input[type='checkbox']");
+            for(let i = 0; i < deptSubLists.length; i++){
+                if(deptSubLists[i].checked){
+                    list.push({"deptId": deptSubLists[i].id.substr(12)});
+                } 
+            }
+            if(list.length == 0){
+            	$.toast("请选择生成日报的路公司，可多选。", "forbidden");
+                return;
+            }
+            if(!openid){
+                $.toast("认证失败", "forbidden");
+                return;
+            }
+            axios.post('/weixin/zhiBan/getDailyPaper',{deptIds:list,openid:openid})//也可以直接拼接在url
+                .then(function(rs){
+                    $.hideLoading();
+                    if(rs.data && rs.data.length > 0){
+                        // $.noti({title: "保存成功",time: 2000,});
+                        //$.toast("保存成功", "success");
+                        //bindBack();
+                        $("#paper").empty();
+                        paperDate = rs.data;
+                        for(let i = 0; i < paperDate.length; i++){
+                        	$("#paper").append("<p>"+paperDate[i]+"</p>");
+                        }
+                        $("#deptSubList").hide();
+                        $(".paper-page").show();
+                    } else {
+                        $.toast("保存失败", "cancel");
+                    }
+                }).catch(function(e){
+                    $.hideLoading();
+                    $.toast("网络异常", "cancel");
+                }); 
+        }
+        
+        function rBack(){
+        	$(".paper-page").hide();
+        	$("#deptSubList").show();
+        }
+        
+      //一键复制
+        function copyNotice(){
+            var flag = copyText(paperDate); //传递文本
+            if(flag){
+            	$.toast("复制成功");
+            }
+      	}
+        function copyText(text) {
+            var textarea = document.createElement("input");//创建input对象
+            var currentFocus = document.activeElement;//当前获得焦点的元素
+            document.body.appendChild(textarea);//添加元素
+            textarea.value = text;
+            textarea.focus();
+            if(textarea.setSelectionRange)
+                textarea.setSelectionRange(0, textarea.value.length);//获取光标起始位置到结束位置
+            else
+                textarea.select();
+            try {
+                var flag = document.execCommand("copy");//执行复制
+            } catch(eo) {
+                var flag = false;
+            }
+            document.body.removeChild(textarea);//删除元素
+            currentFocus.focus();
+            return flag;
+        }
+        
+        
+        
+    </script>
+</body>
+</html>

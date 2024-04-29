@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>HTML5带工具台绘画板代码</title>
+
+<style type="text/css">
+@font-face {
+    font-family: 'iconfont';
+    src: url('/fonts/offset/font_616746_akwhdkxqajrlik9.eot');
+    src: url('/fonts/offset/font_616746_akwhdkxqajrlik9.eot?#iefix') format('embedded-opentype'),
+    url('/fonts/offset/font_616746_akwhdkxqajrlik9.woff') format('woff'),
+    url('/fonts/offset/font_616746_akwhdkxqajrlik9.ttf') format('truetype'),
+    url('/fonts/offset/font_616746_akwhdkxqajrlik9.svg#iconfont') format('svg');
+}
+.iconfont{
+	font-family:"iconfont";
+	font-size: 26px;
+	font-style:normal;
+	color: #fff;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+body,ul,ol,dl,h1,h2,h3,h4,h5,h6,p,input{
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+img,input{
+    border: none;
+}
+a{
+    text-decoration: none;
+}
+*{
+    box-sizing:border-box;
+}
+body{
+	font-family:"Helvetica Neue LT Rro","微软雅黑";
+    font-size: 12px;
+    color: #333;
+    background: #f3f3f4;
+}
+#canvas{
+    background: #7df6e3;
+    display: block;
+    cursor: pointer;
+}
+.h_console{
+    width: 83px;
+    background: #07133d;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+    position: absolute; 
+    top: 0;
+    left: 0;
+    z-index: 999;
+}
+.h_tool1{
+    width: 45px;
+    height: 294px;
+    background: #7bffe8;
+    margin: 20px auto;
+    border-radius: 4px;
+}
+.h_tool1 li{
+    width: 37px;
+    height: 37px;
+    background: #355fcf;
+    margin: 20px 5px 0;
+    border-radius: 8px;
+    float: left;
+    line-height: 37px;
+    text-align: center;
+}
+.h_tool1 li>span{
+	cursor: pointer;
+}
+.h_tool1 .bgtb{
+	background: rgb(147, 255, 47);
+}
+.h_tool1 .bgtb a{
+	color: #07133d;
+}
+.bgp{
+	position: relative;
+}
+#canvas{
+}
+</style>
+
+<script type="text/javascript" src="/lkdtWX/js/jquery.min.js" ></script>
+
+</head>
+<body>
+
+<div class="h_box">
+	<input id="epId" name="epId" class="" th:value="${epId}" type="hidden">
+	<div class="h_console">
+		<ul class="h_tool1">
+			<li id="line" class="bg">
+				<span class="iconfont" title="绘制直线">&#xe653;</span>
+			</li>
+			<li class="bg" id="revo">
+				<span class="iconfont" title="撤销">&#xe699;</span>
+			</li>
+			<li class="bg" id="refresh">
+				<span class="iconfont" title="刷新画板">&#xe747;</span>
+			</li>
+			<li class="bg" id="save">
+				<span class="iconfont" title="保存">&#xe69d;</span>
+			</li>
+		</ul>
+	</div>
+	<canvas id="canvas" width="1200" height="600" style="position: fixed;"></canvas>
+</div>
+
+<script type="text/javascript">
+$(function(){
+	var canvas = $('#canvas')[0];
+	var ctx = canvas.getContext("2d");	//获取绘图环境
+	var img = new Image();
+	img.onload = function(){
+		// 将图片画到canvas上面上去！
+		canvas.width =  img.width;
+		canvas.height =  img.height;
+		ctx.drawImage(img,0,0);
+		// 画中轴
+		/*
+		var w = parseInt(canvas.width/2);
+		ctx.moveTo(w,0);      
+		ctx.lineTo(w,canvas.height);
+		ctx.lineWidth = 2;
+		ctx.strokeStyle ="#7bffe8";
+		ctx.stroke();
+		*/
+	}
+
+	img.src = "[[${path}]]";
+
+	var num = 1; 
+	function palette(canvas,ctx){	//初始化画布内部元素默认样式
+		this.strokeColor = '#7bffe8';	//默认选中红色触发颜色
+		this.fillColor = 'green';	//默认选中绿色填充色
+		this.style = 'line';	//默认选中直线形状
+		this.type = 'stroke';	//默认的绘制方式是划
+		this.ctx = ctx;	//默认为绘图环境
+		this.canvas = canvas;		//默认画布
+		this.canvasW = canvas.width;	//默认画布宽
+		this.canvasH = canvas.height;		//默认画布高
+		this.history = [];	//默认的历史记录为数组
+		this.edges = '3';	//默认的边数为3
+	}
+	var p = new palette(canvas,ctx);	//实例化出来一个palette,引进参数canvas和ctx
+		
+//	* 创建点击事件执行绘画方式
+//	点击修改颜色
+	$('.bg').on('click',function(){
+		$(this).css('background','rgb(147, 255, 47)');
+		$(this).siblings().css('background','#3652d7');
+		$(this).find('a').css('color','#07133d');
+		$(this).siblings().children('a').css('color','#ffffff');
+	});
+//	点击直线按钮执行直线绘画
+	line.onclick = function(e){
+		p.style = 'line';
+	}
+//	点击刷新按钮执行页面刷新
+	refresh.onclick=function(){
+		p.history.length=0;
+		p.ctx.clearRect(0, 0, p.canvasW, p.canvasH);
+	}
+//	点击修改线条宽度按钮修改线条宽度
+//	点击保存执行保存
+	save.onclick=function(){
+		p.save();
+	}
+//	点击撤销按钮返回上一层 that.history.length
+	revo.onclick = function(){
+	    p.revo();
+	};
+	
+//	* 创建palette类下的对象
+	//	绘画初始化
+	palette.prototype.init = function(){
+		this.ctx.strokeStyle = this.strokeColor;
+//		strokeStyle 属性设置或返回用于笔触的颜色、渐变或模式。
+		this.ctx.fillStyle = this.fillColor;
+//		fillStyle 属性设置或返回用于填充绘画的颜色、渐变或模式。
+	}
+	//	绘制直线
+	palette.prototype.line = function(x1,y1,x2,y2){
+		this.ctx.beginPath();
+//		beginPath() 方法开始一条路径，或重置当前的路径
+		this.ctx.moveTo(x1 - 0.5,y1 - 0.5);
+//		moveTo() 方法可把窗口的左上角移动到一个指定的坐标。
+		this.ctx.lineTo(x2 - 0.5,y2 - 0.5);
+//		lineTo() 方法添加一个新点，然后创建从该点到画布中最后指定点的线条（该方法并不会创建线条）。
+		this.ctx.closePath();
+//		closePath() 方法创建从当前点到开始点的路径。
+		this.ctx.stroke();
+//		stroke() 方法会实际地绘制出通过 moveTo() 和 lineTo() 方法定义的路径。默认颜色是黑色。
+	}
+	//绘制矩形
+	
+//	绘制圆形
+//	绘制写字板
+//	绘制椭圆
+//	保存
+	palette.prototype.save = function(x1,y1,x2,y2){
+		//location.href = canvas.toDataURL().replace('image/png','image/stream');
+		canvas.toBlob(function (result) {
+            var form=new FormData();
+            form.append("pp",result);
+            form.append("epId",$("#epId").val());
+            ajax(form);
+        })
+	}
+//	橡皮
+//	撤回
+	palette.prototype.revo = function(x1,y1,x2,y2){
+        if ( this.history.length == 0) {
+	        alert("无效操作");
+	        return;
+	    }
+        console.log(this.history.length);
+	    ctx.clearRect(0, 0, this.canvasW, this.canvasH);
+	    this.history.pop();
+	    if (this.history.length == 0) {
+	    	return;
+	    }
+	    this.ctx.putImageData(this.history[this.history.length - 1], 0, 0);
+    }
+//	书写绘画函数
+	palette.prototype.drawing = function(){
+		var that = this;
+		this.canvas.onmousedown = function(e){	//鼠标移动画布的函数
+//			* 获取鼠标起始位置
+			var sx = e.offsetX;
+//			获取鼠标到时间源的宽度
+//			console.log(sx);
+			var sy = e.offsetY;		
+		
+//			获取鼠标到时间源的高度
+//			console.log(sy);
+			that.init();	//初始化样式
+//			获取鼠标移动时的坐标
+
+			this.onmousemove = function(e){
+				var mx = e.offsetX;
+//				console.log(mx);
+				var my = e.offsetY;
+//				console.log(my);
+			
+				if (that.style!= "eraser") {
+                    //that.ctx.clearRect(0, 0, that.canvasW, that.canvasH);
+//                  console.log(that.canvasW + ',' + that.canvasH);
+	
+//					清除鼠标在画布移动的填充色				
+	   				if(that.history.length>0){	//注：只能是that.history数组的长度大于0，才可以putImageData()
+		    			that.ctx.putImageData(that.history[that.history.length-1],0,0);
+//	    				putImageData() 方法将图像数据（从指定的 ImageData 对象）放回画布上。
+		    		}
+            }
+//				console.log(that.history.length);
+				that[that.style](sx,sy,mx,my);
+			}	
+//			获取鼠标移走的坐标
+			this.onmouseup = function(){
+				that.history.push(that.ctx.getImageData(0,0,that.canvasW,that.canvasH));
+//				getImageData() 方法返回 ImageData 对象，该对象拷贝了画布指定矩形的像素数据。
+				this.onmousemove=null;
+	    		// 清空鼠标移动事件
+	    		this.onmouseup=null;
+			    // 清空鼠标移出事件
+			}
+		}
+	}
+	p.drawing();	//调用drawing函数
+});
+
+function ajax(formData) {
+    $.ajax({
+    	url: "/fog/vef/saveImg",
+        type:"post",
+        Accept:"html/text;chatset=utf-8",
+        contentType:false,
+        data:formData,
+        processData:false,
+        success: function (data) {
+        	if (data.code == 0) {
+				parent.layer.msg("操作成功");
+				parent.reLoad('/files/verification/'+$("#epId").val()+'.png?'+(new Date()).getTime());
+				var index = parent.layer.getFrameIndex(window.name); // 获取窗口索引
+				parent.layer.close(index);
+
+			} else {
+				parent.layer.alert(data.msg)
+			}
+        }, error: function () {
+            console.log("上传失败！");
+        }
+    })
+}
+
+</script>
+
+ 
+</body>
+</html>

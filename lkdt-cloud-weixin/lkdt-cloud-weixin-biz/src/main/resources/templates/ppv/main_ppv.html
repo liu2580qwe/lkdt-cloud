@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <title>高速公路雾霾监控</title>
+    <!--设置是否为缩放模式 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 新 Bootstrap 核心 CSS 文件 -->
+    <link href="/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+
+    <!-- 轮播swiper文件 -->
+    <link rel="stylesheet" type="text/css" href="/css/swiper.min.css">
+    <!--界面样式-->
+    <link rel="stylesheet" type="text/css" href="/css/visual_ppv.css">
+    <link rel="stylesheet" type="text/css" href="/ppv/ppv.css"/>
+    <link rel="stylesheet" type="text/css" href="/lkdtWX/js/plugins/laydate/theme/default/laydate.css"/>
+
+    <style>
+        .img_equip_list{
+            width: 33%;float: left;padding: 2px;margin-top: 5px;height:100%;
+        }
+        
+        .visual_conTop2{
+        	width: 25% !important;
+        }
+        .tcw {
+		    background-image: url(/ppv/images/index/u0.png);
+		    background-size:100% 100%;
+		}
+        #close {position:absolute;top:10px;right: 0px;display: inline-block;width: 23px;height: 2px;background: red;transform: rotate(45deg);}
+        #close::after {content: "";display: block;width: 23px;height: 2px;background: red;transform: rotate(-90deg);}
+        .img_close_out{position:absolute;right: 0px;top:0px;width: 40px;height: 40px;}
+        .img_close_out:hover {cursor: pointer;}
+        #expand-popc-preview{
+            z-index: 111;background-color: rgba(45,193,240,0.5);padding: 0px;display: none;
+            position: fixed;height:450px;width:700px;top:50%;left:50%;transform: translateX(-50%) translateY(-50%);
+        }
+        #expand-popc-preview img{
+            width: 100%;height: 100%;
+        }
+    </style>
+
+</head>
+<body class="ksh" style="overflow-y:auto;">
+    <div id="load">
+        <div class="load_img">
+            <!-- 加载动画 -->
+            <img class="jzxz1" src="/lkdtWX/img/jzxz1.png">
+            <img class="jzxz2" src="/lkdtWX/img/jzxz2.png">
+        </div>
+    </div>
+    <div class="head_top"><span></span></div>
+    <div class="visual">
+        <div class="visual_left">
+            <div class="visual_box visual_box_quneishikuang">
+                <div class="visual_title">
+                    <span>区内实况</span>
+                    <img src="/lkdtWX/img/ksh33.png">
+                </div>
+                <div class="visual_chart" id="main1">
+                	<img src="/fog/nofind.png" alt="加载中......" onerror="nofind(this)" class="img_equip_list" onclick="expand_popc_click(this)"/>
+                	<img src="/fog/nofind.png" alt="加载中......" onerror="nofind(this)" class="img_equip_list" onclick="expand_popc_click(this)"/>
+                	<img src="/fog/nofind.png" alt="加载中......" onerror="nofind(this)" class="img_equip_list" onclick="expand_popc_click(this)"/>
+                </div>
+                <div id="expand-popc-preview">
+                    <div class="img_close_out"><div id="close"></div></div>
+                    <img id="expand-popc-preview-img"/>
+                </div>
+
+            </div>
+            <div class="visual_box visual_box_dangrirenliuliang">
+                <div class="visual_title">
+                    <span>当日人流量</span>
+                    <img src="/lkdtWX/img/ksh33.png">
+                </div>
+				<div class="visual_chart" id="main_option_dangrirenliuliang"></div>
+			</div>
+            <div class="visual_box visual_box_dangrirenliuliang">
+                <div style="height: 100%;width:50%;float: left;">
+                    <div class="visual_title">
+                        <span>车源地统计</span>
+                        <!--<img src="/lkdtWX/img/ksh33.png">-->
+                        <hr style="height:5px;width:80%;margin:0px;border:none;border-top:3px solid #07A6FF;" />
+                    </div>
+                    <div class="visual_chart" id="main_option_cheyuanditongji"></div>
+                </div>
+                <div style="height: 100%;width:50%;float: left;">
+                    <div class="visual_title">
+                        <span>客货比分析</span>
+                        <hr style="height:5px;width:80%;margin:0px;border:none;border-top:3px solid #07A6FF;" />
+                    </div>
+                    <div class="visual_chart" id="main_option_kehuobifenxi"></div>
+                </div>
+            </div>
+        </div>
+        <div class="visual_con">
+            <div class="visual_conTop">
+                <div class="visual_conTop_box visual_conTop2">
+                    <div>
+                        <h3>小型车今日流量</h3>
+                        <p style="width: 28%;" id='smallCarFlow'>0</p>
+                        <div class="conTop_smil" style="width: 72%;">
+                            <a id='smallDayRatio' class="sz">日环比:<span>+0.0%</span><i class="fa fa-long-arrow-up"></i></a>
+                            <a id='smallWeekRatio' class="xd">周环比:<span>-0.0%</span><i class="fa fa-long-arrow-down"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="visual_conTop_box visual_conTop2">
+                    <div>
+                        <h3>大型车今日流量</h3>
+                        <p id='bigCarFlow' style="width: 22%;">0</p>
+                        <div class="conTop_smil" style="width: 78%;">
+                           <a id='bigDayRatio' class="sz">日环比:<span>+0.0%</span><i class="fa fa-long-arrow-up"></i></a>
+                            <a id='bigWeekRatio' class="xd">周环比:<span>-0.0%</span><i class="fa fa-long-arrow-down"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="visual_conTop_box visual_conTop2">
+                    <div>
+                        <h3>充电桩今日流量</h3>
+                        <p id='chargingCarFlow' style="width: 22%;">0</p>
+                        <div class="conTop_smil" style="width: 78%;">
+                            <a id='chargingDayRatio' class="sz">日环比:<span>+0.0%</span><i class="fa fa-long-arrow-up"></i></a>
+                            <a id='chargingWeekRatio' class="xd">周环比:<span>-0.0%</span><i class="fa fa-long-arrow-down"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="visual_conTop_box visual_conTop2">
+                    <div>
+                        <h3>乘客今日流量</h3>
+                        <p>0</p>
+                        <div class="conTop_smil">
+                            <a class="null">null</a>
+                            <a class="xd">月环比:<span>-</span><i class="fa fa-long-arrow-down"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="clear"></div>
+            </div>
+            <div class="visual_conBot">
+            	<img class="visual_conBot_l" src="/lkdtWX/img/ksh42.png">
+            	<img class="visual_conBot_2" src="/lkdtWX/img/ksh43.png">
+            	<img class="visual_conBot_3" src="/lkdtWX/img/ksh44.png">
+            	<img class="visual_conBot_4" src="/lkdtWX/img/ksh45.png">
+                <!--<div class="visual_title">
+                    <span style="color: #ffffff;">地图实况</span>
+                    <img src="/lkdtWX/img/ksh33.png">
+                </div>-->
+                <div id="mapMainDiv_2048" class="visual_chart chart-cursor-d3">
+                	<div class="visual_chart tcw" id="myEcharttcw" style="width: 100%;height: 100%;margin: 20px 10px;">
+						
+					</div>
+                </div>
+            </div>
+        </div>
+        <div class="visual_right">
+            <div class="visual_box visual_box_shishicheweitongji">
+                <div class="visual_title visual_title2">
+                    <span>实时车位统计</span>
+                    <img src="/lkdtWX/img/ksh33.png">
+                </div>
+                <div class="visual_chart sfzcll sfzcll_shengyuchewei">
+                    <a>车型</a>
+                    <a>总车位</a>
+                    <a>剩余车位</a>
+                    <div class="sfzcll_shengyuchewei"></div>
+                    <div class="sfzcll_pos_box">
+                        <div class="sfzcll_box">
+                            <label>小客车</label>
+                            <div class="sfzcll_smallBk">
+                                <div class="ygl">
+                                    <span>81</span>
+                                </div>
+                            </div>
+                            <div class="sfzcll_smallBk">
+                                <div class="ygh">
+                                    <span id="remainSpace_car">-</span>
+                                </div>
+                            </div>
+                            <div class="clear"></div>
+                        </div>
+                        <div class="sfzcll_box">
+                            <label>大客车</label>
+                            <div class="sfzcll_smallBk">
+                                <div class="ygl">
+                                    <span>50</span>
+                                </div>
+                            </div>
+                            <div class="sfzcll_smallBk">
+                                <div class="ygh">
+                                    <span>41</span>
+                                </div>
+                            </div>
+                            <div class="clear"></div>
+                        </div>
+                        <div class="sfzcll_box">
+                            <label>货车</label>
+                            <div class="sfzcll_smallBk">
+                                <div class="ygl">
+                                    <span>3</span>
+                                </div>
+                            </div>
+                            <div class="sfzcll_smallBk">
+                                <div class="ygh">
+                                    <span>2</span>
+                                </div>
+                            </div>
+                            <div class="clear"></div>
+                        </div>
+                        <div class="sfzcll_box">
+                            <label>牲畜车</label>
+                            <div class="sfzcll_smallBk">
+                                <div class="ygl">
+                                    <span>3</span>
+                                </div>
+                            </div>
+                            <div class="sfzcll_smallBk">
+                                <div class="ygh">
+                                    <span>3</span>
+                                </div>
+                            </div>
+                            <div class="clear"></div>
+                        </div>
+                        <div class="sfzcll_box">
+                            <label>危化品车</label>
+                            <div class="sfzcll_smallBk">
+                                <div class="ygl">
+                                    <span>3</span>
+                                </div>
+                            </div>
+                            <div class="sfzcll_smallBk">
+                                <div class="ygh">
+                                    <span>3</span>
+                                </div>
+                            </div>
+                            <div class="clear"></div>
+                        </div>
+                        <!--<div class="sfzcll_box">
+                            <label>危化品</label>
+                            <div class="sfzcll_smallBk">
+                                <div class="ygl">
+                                    <span>100</span>
+                                </div>
+                            </div>
+                            <div class="sfzcll_smallBk">
+                                <div class="ygh">
+                                    <span>27</span>
+                                </div>
+                            </div>
+                            <div class="clear"></div>
+                        </div>
+                        <div class="sfzcll_box">
+                            <label>充电桩</label>
+                            <div class="sfzcll_smallBk">
+                                <div class="ygl">
+                                    <span>100</span>
+                                </div>
+                            </div>
+                            <div class="sfzcll_smallBk">
+                                <div class="ygh">
+                                    <span>27</span>
+                                </div>
+                            </div>
+                            <div class="clear"></div>
+                        </div>
+                        <div class="sfzcll_box">
+                            <label>无障碍</label>
+                            <div class="sfzcll_smallBk">
+                                <div class="ygl">
+                                    <span>100</span>
+                                </div>
+                            </div>
+                            <div class="sfzcll_smallBk">
+                                <div class="ygh">
+                                    <span>27</span>
+                                </div>
+                            </div>
+                            <div class="clear"></div>
+                        </div>-->
+                    </div>
+                </div>
+            </div>
+            <div class="visual_box visual_box_dangricheliangpingjuntingcheshichang">
+                <div class="visual_title">
+                    <span>当日平均停车时长</span>
+                    <img src="/lkdtWX/img/ksh33.png">
+                </div>
+                <div class="visual_chart" id="main_option_dangricheliangpingjuntingcheshichang"></div>
+            </div>
+            <div class="visual_box visual_box_dangricheliuliang">
+                <div class="visual_title">
+                    <span>当日车流量</span>
+                    <img src="/lkdtWX/img/ksh33.png">
+                </div>
+                <div class="visual_chart" id="main2_2"></div>
+            </div>
+        </div>
+        <div class="clear"></div>
+    </div>
+    <div id="dateTimeSelect" style="display: none;margin-left: 10px;margin-top: 10px;">
+        <div class="layui-inline">
+            日期类型：<select id="time_cheliuliang_select" onchange="time_cheliuliang_selectChange()" name="modules" lay-verify="required" style="background-color: #ffffff;width:200px;">
+                <option value="1">年-月-日</option>
+                <option value="2">年-月-日 时:分:秒</option>
+            </select>
+        </div><br>
+        <div class="layui-inline">
+            起始时间：<input id="startTime_cheliuliang1" type="text" style="background-color: #ffffff;width:200px;" class="layui-input"
+                        lay-verify="datetime" autocomplete="off"></input>
+            <input id="startTime_cheliuliang2" type="text" style="background-color: #ffffff;width:200px;" class="layui-input"
+                   lay-verify="datetime" autocomplete="off"></input>
+        </div><br>
+        <div class="layui-inline">
+            结束时间：<input id="endTime_cheliuliang1" type="text" style="background-color: #ffffff;width:200px;" class="layui-input"
+                        lay-verify="datetime" autocomplete="off"></input>
+            <input id="endTime_cheliuliang2" type="text" style="background-color: #ffffff;width:200px;" class="layui-input"
+                   lay-verify="datetime" autocomplete="off"></input>
+        </div>
+    </div>
+    <!--JS-->
+    <script src="/lkdtWX/js/jquery.min.js?v=2.1.4"></script>
+    <script src="/lkdtWX/js/bootstrap.min.js"></script>
+    <script src="/lkdtWX/js/layui.js"></script>
+    <script src="/lkdtWX/js/plugins/layer/laydate/laydate.js"></script>
+    <script src="/lkdtWX/js/plugins/echarts/echarts.min.js"></script>
+    <script src="/lkdtWX/js/chartMap.js"></script>
+    <script src="/lkdtWX/js/china.js"></script>
+    <script src="/lkdtWX/js/swiper.min.js"></script>
+    <script src="/lkdtWX/js/visual_ppv.js"></script>
+    <script type="text/javascript" src="/lkdtWX/js/plugins/layer/layer.min.js"></script>
+    <script type="text/javascript" src="/lkdtWX/js/common-options.js"></script>
+    <script type="text/javascript">
+        function nofind(_this){
+            _this.src="/fog/nofind.png";
+        }
+    	var myCharttcw = echarts.init(document.getElementById('myEcharttcw'));
+    	var myChart3 = echarts.init(document.getElementById('main2_2'));
+    	var main_option_dangrirenliuliang = echarts.init(document.getElementById('main_option_dangrirenliuliang'));
+    	 var main_option_cheyuanditongji = echarts.init(document.getElementById('main_option_cheyuanditongji'));
+         var main_option_kehuobifenxi = echarts.init(document.getElementById('main_option_kehuobifenxi'));
+         var main_option_dangricheliangpingjuntingcheshichang = echarts.init(document.getElementById('main_option_dangricheliangpingjuntingcheshichang'));
+         let option_dangrirenliuliang = {
+            tooltip: {//鼠标指上时的标线
+                trigger: 'axis',
+                    axisPointer: {
+                    lineStyle: {
+                        color: '#fff'
+                    }
+                }
+            },
+            // legend: {
+            //     icon: 'rect',
+            //         itemWidth: 14,
+            //         itemHeight: 5,
+            //         itemGap: 13,
+            //         data: ['人流量'],
+            //         right: '10px',
+            //         top: '0px',
+            //         textStyle: {
+            //         fontSize: 12,
+            //             color: '#fff'
+            //     }
+            // },
+            grid: {
+                x: 50,
+                y: 25,
+                x2: 8,
+                y2: 25,
+            },
+            xAxis: {
+                type: 'category',
+                    boundaryGap: false,
+                    axisLine: {
+                    lineStyle: {
+                        color: '#57617B'
+                    }
+                },
+                axisLabel: {
+                    textStyle: {
+                        color:'#fff',
+                    },
+                },
+                //data: date
+                data: ['2019-11-16','2019-11-17','2019-11-18','2019-11-19','2019-11-20','2019-11-20','2019-11-21','2019-11-22']
+            },
+            yAxis: {
+                type: 'value',
+                    boundaryGap: [0, '0'],
+                    axisTick: {
+                    show: false
+                },
+                axisLine: {
+                    lineStyle: {
+                        color: '#57617B',
+
+                    }
+                },
+                axisLabel: {
+                    margin: 10,
+                        textStyle: {
+                        fontSize: 14,
+                            color:'#fff',
+                    },
+                },
+                splitLine: {
+                    lineStyle: {
+                        color: 'rgba(255,255,255,.2)',
+                            type:'dotted',
+                    }
+                }
+            },
+            series: [
+                {
+                    name:'人流量',
+                    type:'line',
+                    smooth:true,
+                    symbol: 'none',
+                    sampling: 'average',
+                    lineStyle: {
+                        normal: {
+                            width: 2
+                        }
+                    },
+                    itemStyle: {
+                        normal: {
+                            color: 'rgb(21,107,204)',//#156BCC
+                        }
+                    },
+                    areaStyle: {
+                        normal: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                                offset: 0,
+                                color: 'rgba(21, 107, 204, 0.7)'
+                            }, {
+                                offset: 0.8,
+                                color: 'rgba(21, 107, 204, 0.3)'
+                            }], false),
+                            shadowColor: 'rgba(0, 0, 0, 0.1)',
+                            shadowBlur: 10
+                        }
+                    },
+                    data: ['2531','1829','1966','1982','1511','2122','1845','1981']
+                },
+            ]
+        };
+
+        let option_cheyuanditongji = {
+            title: {
+                text: '',
+                subtext: '单位/辆',
+                left: '1',
+            },
+            tooltip : {
+                trigger: 'item',
+                position: ['50%', '50%'],
+                formatter: "{a} <br/>{b} : {c} ({d}%)"
+            },
+            legend: {
+                // orient: 'vertical',
+                top: '10',
+                //bottom: 10,
+                right: '1',
+                data: ['省内', '省外'],
+                textStyle: {
+                    fontSize: 10,
+                    color: '#AAAAAA'
+                }
+            },
+            color:['#065690','#02C9D3'],
+            series : [
+                {
+                    name:'单位/辆',
+                    type: 'pie',
+                    radius : '65%',
+                    center: ['50%', '50%'],
+                    selectedMode: 'single',
+                    data:[
+                        {value:1548,name: '省内',},
+                        {value:535, name: '省外'},
+                    ],
+                }
+            ]
+        };
+
+        let option_kehuobifenxi = {
+            title: {
+                text: '',
+                subtext: '单位/辆',
+                left: '1',
+            },
+            tooltip : {
+                trigger: 'item',
+                position: ['50%', '50%'],
+                formatter: "{a} <br/>{b} : {c} ({d}%)"
+            },
+            legend: {
+                // orient: 'vertical',
+                top: '10',
+                //bottom: 10,
+                right: '1',
+                data: ['客车', '货车'],
+                textStyle: {
+                    fontSize: 10,
+                    color: '#AAAAAA'
+                }
+            },
+            color:['#065690','#02C9D3'],
+            series : [
+                {
+                    name:'单位/辆',
+                    type: 'pie',
+                    radius : '65%',
+                    center: ['50%', '50%'],
+                    selectedMode: 'single',
+                    data:[
+                        {value:2548,name: '客车',},
+                        {value:1535, name: '货车'},
+                    ],
+                }
+            ]
+        };
+
+        option_dangricheliangpingjuntingcheshichang = {
+            legend: {
+                top: '10',
+                //bottom: 10,
+                right: '1',
+                data: ['小型车', '大型车', '新能源车'],
+                textStyle: {
+                    fontSize: 10,
+                    color: '#AAAAAA'
+                }
+            },
+            tooltip: {},
+            dataset: {
+                source: [
+                    {product: '2019-11-19', '小型车': 43.3, '大型车': 85.8, '新能源车': 93.7},
+                    {product: '2019-11-20', '小型车': 83.1, '大型车': 73.4, '新能源车': 55.1},
+                    {product: '2019-11-21', '小型车': 86.4, '大型车': 65.2, '新能源车': 82.5},
+                    {product: '2019-11-22', '小型车': 72.4, '大型车': 53.9, '新能源车': 39.1}
+                ]
+            },
+            grid: {
+                x: 35,
+                y: 35,
+                x2: 8,
+                y2: 20,
+            },
+            xAxis: {
+                type: 'category',
+                axisLine:{
+                    lineStyle: {
+                        color: ['#36415E']
+                    },
+                },
+                axisLabel: {
+                    textStyle: {
+                        color:'#fff',
+                    },
+                },
+            },
+            yAxis: {
+                splitLine:{
+                    show:true,
+                    lineStyle: {
+                        type:'dotted',
+                        color: ['#293856'],
+                    }
+                },
+                axisLine:{
+                    lineStyle: {
+                        color: ['#36415E']
+                    },
+                },
+                axisLabel: {
+                    textStyle: {
+                        color:'#fff',
+                    },
+                },
+            },
+            color:['#89BD1B','#0088D4','#00F3ED'],
+            series: [
+                {type: 'bar'},
+                {type: 'bar'},
+                {type: 'bar'}
+            ]
+        };
+
+
+        //车流量查询条件
+        layui.use('laydate', function(){
+            let laydate = layui.laydate;
+            //执行一个laydate实例
+            laydate.render({
+                elem: '#startTime_cheliuliang1'
+                ,type: 'date'
+            });
+            laydate.render({
+                elem: '#endTime_cheliuliang1'
+                ,type: 'date'
+            });
+            laydate.render({
+                elem: '#startTime_cheliuliang2'
+                ,type: 'datetime'
+            });
+            laydate.render({
+                elem: '#endTime_cheliuliang2'
+                ,type: 'datetime'
+            });
+        });
+
+        function laydate_init_$(){
+            if($("#time_cheliuliang_select").val() == 1){
+                $('#startTime_cheliuliang1').show();
+                $('#endTime_cheliuliang1').show();
+                $('#startTime_cheliuliang2').hide();
+                $('#endTime_cheliuliang2').hide();
+            } else if($("#time_cheliuliang_select").val() == 2){
+                $('#startTime_cheliuliang1').hide();
+                $('#endTime_cheliuliang1').hide();
+                $('#startTime_cheliuliang2').show();
+                $('#endTime_cheliuliang2').show();
+            }
+        }
+
+        laydate_init_$();
+
+        //时间类型
+        function time_cheliuliang_selectChange(){
+            laydate_init_$();
+        }
+
+        function dateTimeSelect(){
+            layer.open({
+                title:'时间选择器',
+                type: 1,
+                area: ['350px', '220px'],
+                content: $('#dateTimeSelect'),//$('#id'),
+                btn: ['确定','重置'],
+                yes: function(index, layero){
+                    //时间验证
+                    if($("#time_cheliuliang_select").val() == 1){
+                        let reDateTime = /^(?:19|20)[0-9][0-9]-(?:(?:0[1-9])|(?:1[0-2]))-(?:(?:[0-2][1-9])|(?:[1-3][0-1]))$/;
+                        let isDateTime1 = reDateTime.test($('#startTime_cheliuliang1').val());
+                        let isDateTime2 = reDateTime.test($('#endTime_cheliuliang1').val());
+                        if(isDateTime1 && isDateTime2){
+                            $('#startTime_cheliuliang_value').text($('#startTime_cheliuliang1').val());
+                            $('#time_cheliuliang_value_to').text("~");
+                            $('#endTime_cheliuliang_value').text($('#endTime_cheliuliang1').val());
+                            layer.close(index);
+                        } else {
+                            alert("时间格式非法");
+                        }
+                    } else if($("#time_cheliuliang_select").val() == 2){
+                        let reDateTime = /^(?:19|20)[0-9][0-9]-(?:(?:0[1-9])|(?:1[0-2]))-(?:(?:[0-2][1-9])|(?:[1-3][0-1])) (?:(?:[0-2][0-3])|(?:[0-1][0-9])):[0-5][0-9]:[0-5][0-9]$/;
+                        let isDateTime1 = reDateTime.test($('#startTime_cheliuliang2').val());
+                        let isDateTime2 = reDateTime.test($('#endTime_cheliuliang2').val());
+                        if(isDateTime1 && isDateTime2){
+                            $('#startTime_cheliuliang_value').text($('#startTime_cheliuliang2').val());
+                            $('#time_cheliuliang_value_to').text("~");
+                            $('#endTime_cheliuliang_value').text($('#endTime_cheliuliang2').val());
+                            layer.close(index);
+                        } else {
+                            alert("时间格式非法");
+                        }
+                    }
+
+                },
+                btn2: function(index, layero){
+                    $('#startTime_cheliuliang1').val('');
+                    $('#endTime_cheliuliang1').val('');
+                    $('#startTime_cheliuliang2').val('');
+                    $('#endTime_cheliuliang2').val('');
+                    $('#startTime_cheliuliang_value').text('');
+                    $('#time_cheliuliang_value_to').text('');
+                    $('#endTime_cheliuliang_value').text('');
+                }
+            });
+        }
+
+        //初始化红点位置高度
+        //原始宽度 //改变后的宽度
+        var initWidth = 628,initHeight = 411,nextWidth = 628,nextHeight = 411;
+
+        $(function () {
+            var a = $('.visualSssf_left a');
+            for (var i = 0; i < a.length; i++) {
+                a[i].index = i;
+                a[i].onclick = function () {
+                    for (var i = 0; i < a.length; i++) {
+                        a[i].className = ''
+                    }
+                    this.className = 'active';
+                }
+            }
+
+            var sfzcllH = $('.sfzcll_box').height();
+            var sfzcllHtwo = sfzcllH - 2;
+            $('.sfzcll_box').css('line-height', sfzcllH + 'px');
+            $('.sfzcll_smallBk>div').css('line-height', sfzcllHtwo + 'px');
+
+            //删除加载动画
+            $('#load').fadeOut(1000);
+            setTimeout(function () {
+                $('#load').remove()
+            }, 1100);
+
+            //////////////服务区地图 start
+            locationRedPoint();//红点定位
+            //mapMainDiv_2048
+            window.onresize = function(){
+                locationRedPoint();
+            };
+            //////////////服务区地图 end
+
+            //小型车流量
+            smallCarTodayFlow();
+            //大型车流量
+            bigCarTodayFlow();
+            //充电桩流量
+            chargingCarTodayFlow();
+            //服务区车位状况
+            serviceAreaParkingCon();
+            getPKimgpath();
+            setInterval(function(){
+                serviceAreaParkingCon();//车位使用情况
+                getPKimgpath();//停车场图片获取
+            },10000);
+            //本月发生事件
+            //currentMonthEvent();
+            //车流量
+            carFlow();
+            setInterval(carFlow,60000);
+            //人流量
+            //peopleFlow();
+            //车位使用排行
+            // tollStationRanking();
+            //setInterval(tollStationRanking,60000);
+            //当日人流量 main_option_dangrirenliuliang
+            currentPeopleFlowQ();
+            //车源地统计，客货比分析  main_option_cheyuanditongji main_option_kehuobifenxi
+            carGoodAnalysis();
+            //当日车辆平均停车时长 main_option_dangricheliangpingjuntingcheshichang
+            currentDayCarAvgPkTime();
+            setInterval(currentDayCarAvgPkTime,5*60*1000);
+        });
+		
+        function currentPeopleFlowQ(){
+        	main_option_dangrirenliuliang.setOption(option_dangrirenliuliang);
+        }
+        
+        function currentDayCarAvgPkTime(){
+            $.get("/ppv/currentDayCarAvgPkTime",function(data,status){
+                if(data.code == 0){
+                    option_dangricheliangpingjuntingcheshichang.dataset.source = data.data;
+                    main_option_dangricheliangpingjuntingcheshichang.setOption(option_dangricheliangpingjuntingcheshichang);
+                } else {
+                    layer.msg("数据异常@R-M-404");
+                }
+            });
+        }
+        /**车源地统计，客货比分析*/
+       
+        function carGoodAnalysis(){
+        	main_option_cheyuanditongji.setOption(option_cheyuanditongji);
+        	main_option_kehuobifenxi.setOption(option_kehuobifenxi);
+        }
+
+        /**
+         * 红点定位
+         * */
+        function locationRedPoint(){
+            $('#u0_img').width($('#mapMainDiv_2048').width());
+            $('#u0_img').height($('#mapMainDiv_2048').height());
+            nextWidth = $('#mapMainDiv_2048').width();
+            nextHeight = $('#mapMainDiv_2048').height();
+            var rateHeight = nextHeight/initHeight;
+            var rateWidth = nextWidth/initWidth;
+            var parking_status = $(".parking_statu");
+            for(var i = 0; i < parking_status.length; i++){
+                var parkingStatusIndex = $(parking_status[i]);
+                parkingStatusIndex.css("left",parkingStatusIndex.css('left').replace(/px/g,"")*rateWidth);
+                parkingStatusIndex.css("top",parkingStatusIndex.css('top').replace(/px/g,"")*rateHeight);
+            }
+            initHeight = nextHeight;
+            initWidth = nextWidth;
+        }
+
+        /**小型车流量*/
+        function smallCarTodayFlow(){
+            $.get("/ppv/smallCarTodayFlow",function(data,status){
+                //alert("Data: " + data + "nStatus: " + status);
+                //smallCarFlow smallDayRatio smallWeekRatio
+                $('#smallCarFlow').text(data.todayFlow);
+                $('#smallDayRatio').text("日环比:"+data.dayRatio);
+                $('#smallWeekRatio').text("周环比:"+data.weekRatio);
+            });
+        }
+        /**大型车流量*/
+        function bigCarTodayFlow(){
+            $.get("/ppv/bigCarTodayFlow",function(data,status){
+                $('#bigCarFlow').text(data.todayFlow);
+                $('#bigDayRatio').text("日环比:"+data.dayRatio);
+                $('#bigWeekRatio').text("周环比:"+data.weekRatio);
+            });
+        }
+        /**大型车流量*/
+        function chargingCarTodayFlow(){
+            $.get("/ppv/chargingCarTodayFlow",function(data,status){
+                $('#chargingCarFlow').text(data.todayFlow);
+                $('#chargingDayRatio').text("日环比:"+data.dayRatio);
+                $('#chargingWeekRatio').text("周环比:"+data.weekRatio);
+            });
+        }
+        
+        var optiontcw = {
+    			grid:{
+    		        x:0,
+    		        y:0,
+    		        x2:0,
+    		        y2:0,
+    		    },
+       	    xAxis: {
+       	    	show:false,
+       	    	type: 'value',
+       	    	min:0,
+       	    	max:1360,
+       	    	maxInterval:1,
+       	    	splitNumber:1
+       	    },
+       	    yAxis: {
+       	    	show:false,
+       	    	type: 'value',
+       	    	min:0,
+       	    	max:1063,
+       	    	maxInterval:1,
+       	    	splitNumber:1
+       	    },
+       	    series: [{
+       	        symbolSize: 8,
+       	  		itemStyle:{
+       	  			color:"#ff0000"
+       	  		},
+       	  		hoverAnimation:false,
+	       	  	emphasis: {
+	                label: {
+	                    show: true,
+	                    color:'white',
+	                    fontSize:15,
+	                    backgroundColor:'#111111',
+	                    formatter: function (param) {
+	                        return param.data[2];
+	                    },
+	                    position: 'top'
+	                }
+	            },
+       	        data: [
+       	            /* [530 ,608],
+       	            [465, 541],
+       	            [465, 620],
+       	            [0.0, 0],
+       	            [1360, 1063] */
+       	        ], 
+       	        type: 'scatter'
+       	    }]
+       	};
+
+        /**
+         *  服务区车位状况
+         * */
+        function serviceAreaParkingCon(){
+            //停车位初始化
+            $(".parking_statu").hide();
+            //重设停车位使用状态
+            $.get("/ppv/getAllInUseParking",function(data,status){
+                if(data.length > 0){
+                	optiontcw.series[0].data = [];
+                    data.forEach(function(arr,index,dd){
+                        //$("#u"+arr.pkNumber*2).attr("title","#"+arr.pkNumber);
+                        //$("#u"+arr.pkNumber*2).show();
+                    	optiontcw.series[0].data[index] = arr.pkPoint.split(",").map(Number);
+                    	optiontcw.series[0].data[index].push(arr.pkNumber);
+                    });
+                    myCharttcw.setOption(optiontcw);
+                }
+                //实时车位统计
+                if(data.length > 0){
+                    $('#remainSpace_car').text(81 - data.length)
+                } else {
+                    $('#remainSpace_car').text(81)
+                }
+                //自定义显示数据 测试用
+                test_showRedPoint();
+            });
+        }
+
+        function test_showRedPoint(){
+            let data = [88,91,98,99,100,136,190,195,200,212,213,258,259,231,242,145,146,147,148,221,222,223,224];
+            data.forEach(function(arr,index,dd){
+                $("#u"+arr*2).attr("title","#"+arr);
+                $("#u"+arr*2).show();
+            });
+        }
+
+        /**本月发生事件*/
+        
+        function currentMonthEvent(){
+            
+            myChart3.setOption(option3);
+            var myChart31 = echarts.init(document.getElementById('main31'));
+            myChart31.setOption(option31);
+            var mySwiper1 = new Swiper('.visual_swiper1', {
+                autoplay: true,//可选选项，自动滑动
+                speed: 800,//可选选项，滑动速度
+                autoplay: {
+                    delay: 5000,//1秒切换一次
+                },
+            });
+        }
+
+        /**车流量*/
+        function carFlow(){
+            let myDate = new Date();
+            //let dateStrYYYYMM = myDate.getFullYear() + '-' + (myDate.getMonth()+1);
+            //let dateStrYYYYMMDD = myDate.getFullYear() + '-' + (myDate.getMonth()+1) + '-' + myDate.getDate();
+            let dateStrYYYYMMDD = myDate.Format("yyyy-MM-dd");
+            let option3 = JSON.parse(JSON.stringify(option2));
+            // //车流量 按日统计
+            // option2.xAxis.data = [];
+            // option2.series[0].data = [];
+            // option2.series[1].data = [];
+            // option2.series[2].data = [];
+            // let myChart2 = echarts.init(document.getElementById('main2'));
+            // myChart2.setOption(option2);
+            // $.get("/ppv/getPerMonthCarFlow?dateStr="+dateStrYYYYMM,function(data,status){//getPerMonthCarFlow getPerDayCarFlow
+            //     if(data){
+            //         option2.xAxis.data = data.dataX;
+            //         option2.series[0].data = data.data1;
+            //         option2.series[1].data = data.data2;
+            //         option2.series[2].data = data.data3;
+            //         let myChart2 = echarts.init(document.getElementById('main2'));
+            //         myChart2.setOption(option2);
+            //     }
+            // });
+            //车流量 按小时统计
+            option3.xAxis.data = [];
+            option3.series[0].data = [];
+            option3.series[1].data = [];
+            option3.series[2].data = [];
+            myChart3.setOption(option3);
+            $.get("/ppv/getPerDayCarFlow?dateStr="+dateStrYYYYMMDD,function(data,status){
+                if(data){
+                    option3.xAxis.data = data.dataX;
+                    option3.series[0].data = data.data1;
+                    option3.series[1].data = data.data2;
+                    option3.series[2].data = data.data3;
+                    myChart3.setOption(option3);
+                }
+            });
+        }
+
+        /**人流量*/
+        function peopleFlow(){
+            var myChart9 = echarts.init(document.getElementById('main9'));
+            myChart9.setOption(option2);
+        }
+
+        /**车位使用率排行*/
+        function tollStationRanking(){
+    //        var myChart4 = echarts.init(document.getElementById('main4'));
+    //        myChart4.setOption(option4);
+            $.get("/ppv/getCarportUsageRate",function(data,status){
+                if(data.length > 0){
+                    for(var i = data.length - 1; i > data.length - 5; i--){
+                        $('#swiper_wrapper').append("<div class='swiper-slide' id='option4_"+i+"'></div>");
+                        var option4_ = echarts.init(document.getElementById('option4_'+i));
+                        option4_.setOption(option4);
+                        option4_.setOption({
+                            xAxis:{
+                                max:300,
+                            },
+                            yAxis:[{
+                                "data": data[i].dataX,
+                            }],
+                            series: [{
+                                data: data[i].data,
+                            }, {
+                                data: data[i].data,
+                            }]
+                        });
+                    }
+                }
+                var mySwiper2 = new Swiper('.visual_swiper2', {
+                    autoplay: true,//可选选项，自动滑动
+                    direction: 'vertical',//可选选项，滑动方向
+                    speed: 2000,//可选选项，滑动速度
+                });
+            });
+
+
+    //        var myChart41 = echarts.init(document.getElementById('main41'));
+    //        myChart41.setOption(option4);
+
+        }
+
+        function getPKimgpath(){
+            var a = $('.img_equip_list');
+            $.get("/ppv/getPKImg",function(data,status){
+                for (var i = 0; i < data.length; i++) {
+                    a[i].src=data[i];
+
+                }
+                // $('.img_equip_list').on('click',function(){
+                //     var _this = $(this);//将当前的pimg元素作为_this传入函数
+                //     //imgShow("#outerdiv", "#innerdiv", "#bigimg", _this);
+                // });
+            });
+
+        }
+
+        $('.img_close_out').click(()=>{
+            $('#expand-popc-preview').hide(250);
+        });
+        function expand_popc_click(ele){
+            document.getElementById("expand-popc-preview-img").src = ele.src;
+            $('#expand-popc-preview').show(250);
+        }
+
+        function imgShow(outerdiv, innerdiv, bigimg, _this){
+            var src = _this.attr("src");//获取当前点击的pimg元素中的src属性
+            $(bigimg).attr("src", src);//设置#bigimg元素的src属性
+
+            /*获取当前点击图片的真实大小，并显示弹出层及大图*/
+            $("<img/>").attr("src", src).load(function(){
+                var windowW = $(window).width();//获取当前窗口宽度
+                var windowH = $(window).height();//获取当前窗口高度
+                var realWidth = this.width;//获取图片真实宽度
+                var realHeight = this.height;//获取图片真实高度
+                var imgWidth, imgHeight;
+                var scale = 0.8;//缩放尺寸，当图片真实宽度和高度大于窗口宽度和高度时进行缩放
+
+                if(realHeight>windowH*scale) {//判断图片高度
+                    imgHeight = windowH*scale;//如大于窗口高度，图片高度进行缩放
+                    imgWidth = imgHeight/realHeight*realWidth;//等比例缩放宽度
+                    if(imgWidth>windowW*scale) {//如宽度扔大于窗口宽度
+                        imgWidth = windowW*scale;//再对宽度进行缩放
+                    }
+                } else if(realWidth>windowW*scale) {//如图片高度合适，判断图片宽度
+                    imgWidth = windowW*scale;//如大于窗口宽度，图片宽度进行缩放
+                    imgHeight = imgWidth/realWidth*realHeight;//等比例缩放高度
+                } else {//如果图片真实高度和宽度都符合要求，高宽不变
+                    imgWidth = realWidth;
+                    imgHeight = realHeight;
+                }
+                $(bigimg).css("width",imgWidth);//以最终的宽度对图片缩放
+
+                var w = (windowW-imgWidth)/2;//计算图片与窗口左边距
+                var h = (windowH-imgHeight)/2;//计算图片与窗口上边距
+                $(innerdiv).css({"top":h, "left":w});//设置#innerdiv的top和left属性
+                $(outerdiv).fadeIn("fast");//淡入显示#outerdiv及.pimg
+            });
+
+            $(outerdiv).click(function(){//再次点击淡出消失弹出层
+                $(this).fadeOut("fast");
+            });
+        }
+        
+       	
+       	window.addEventListener("resize",()=>{
+       	    
+       		this.myCharttcw.resize();
+       	    this.myChart3.resize();
+       	    this.main_option_dangrirenliuliang.resize();
+       	    this.main_option_cheyuanditongji.resize();
+       	    this.main_option_kehuobifenxi.resize();
+       	    this.main_option_dangricheliangpingjuntingcheshichang.resize();
+       	});  
+        
+
+    </script>
+</body>
+
+</html>

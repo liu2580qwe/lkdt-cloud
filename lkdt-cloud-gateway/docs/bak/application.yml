@@ -1,0 +1,42 @@
+server:
+  port: 9999
+spring:
+  application:
+    name: '@artifactId@'
+  cloud:
+    nacos:
+      discovery:
+        server-addr: lkdt-cloud-nacos:8848
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowCredentials: true
+            allowedOriginPatterns: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+      routes:
+      #nacos
+      - id: lkdt-cloud-demo-biz
+        uri: lb://lkdt-cloud-demo-biz
+        predicates:
+        - Path=/demo/**
+      - id: lkdt-cloud-system-biz
+        uri: lb://lkdt-cloud-system-biz
+        predicates:
+        - Path=/sys/**,/test/**,/online/**,/api/**,/big/screen/**
+#feign
+feign:
+  sentinel:
+    enabled: true
+resttemplate:
+  sentinel:
+    enabled: true
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'

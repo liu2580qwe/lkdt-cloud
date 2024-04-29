@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width"> -->
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+    <!-- iphone会把一串数字识别为电话号码，点击的时候会提示是否呼叫，屏蔽这功能则把telephone设置为no -->
+    <meta content="telephone=no" name="format-detection" />
+    <!-- iphone的私有标签，默认值为default（白色），可以定为black（黑色）和black-translucent（灰色半透明） -->
+    <meta content="black" name="apple-mobile-web-app-status-bar-style">
+    <!-- iphone设备的是有标签 允许全屏模式浏览，隐藏浏览器导航栏 -->
+    <meta content="yes" name="apple-mobile-web-app-capable" />
+    <!-- 全屏显示 -->
+    <meta content="yes" name="apple-touch-fullscreen" />
+    <!-- UC强制全屏 -->
+    <meta name="full-screen" content="yes">
+    <!-- QQ强制全屏 -->
+    <meta name="x5-fullscreen" content="true">
+    <!-- 屏蔽百度转码 -->
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <title>智高速</title>
+    <!-- 引入 WeUI -->
+    <link rel="stylesheet" href="/lkdtWX/plugins/weui/css/weui.css"/>
+    <link rel="stylesheet" href="/lkdtWX/plugins/weui/css/weuix.css"/>
+
+    <style>
+        a{text-decoration: none;}
+        a:hover{text-decoration: none;}
+    </style>
+</head>
+<body>
+    <div class="weui-btn_primary weui-header ">
+        <div class="weui-header-left"><a href="###" onclick="bindBack()" class="icon icon-109 f-white">返回</a>  </div>
+        <h1 id="header-title" class="weui-header-title">选择</h1>
+        <div class="weui-header-right"><a href="###" class="icon icon-70 f-white" onclick="primaryClick()">提交</a></div>
+    </div>
+
+    <div class="weui-search-bar" id="searchBar">
+        <form class="weui-search-bar__form" action="#">
+            <div class="weui-search-bar__box">
+                <i class="weui-icon-search"></i>
+                <input class="weui-search-bar__input" id="searchInput" placeholder="搜索" required="" type="search">
+                <a href="javascript:" class="weui-icon-clear" id="searchClear"></a>
+            </div>
+            <label class="weui-search-bar__label" id="searchText" style="transform-origin: 0px 0px 0px; opacity: 1; transform: scale(1, 1);">
+                <i class="weui-icon-search"></i>
+                <span>搜索</span>
+            </label>
+        </form>
+        <a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel">取消</a>
+    </div>
+
+    <div id="hwSubList" class="weui-cells weui-cells_form"></div>
+    <a href="javascript:;" class="weui-btn weui-btn_primary" onclick="primaryClick()">点击提交</a>
+
+    <!-- 引入 WeJS -->
+    <script src="/lkdtWX/plugins/weui/js/commonMap.js"></script>
+    <script src="/lkdtWX/plugins/weui/js/zepto.min.js"></script>
+    <script src="/lkdtWX/plugins/weui/js/zepto.weui.js"></script>
+    <script src="/lkdtWX/plugins/weui/js/axios.min.js"></script>
+    <script>
+        let highways = u.getStorage("highways");
+        let openid = u.getStorage("openid");
+        //总路段
+        let hwId = getURLParameter("hwId");
+        //总路段描述
+        let detail = getURLParameter("detail");
+        //子路段
+        let highwaySub = null;
+        if(highways){
+            for(let i = 0; i < highways.length; i++){
+                if(highways[i].id == hwId){
+                    highwaySub = highways[i].children;
+                }
+            }
+        }
+        $("#header-title").text(detail);
+        if(highwaySub.length != null){
+            $('#hwSubList').empty();
+            highwaySub.forEach(function(item,index,arr){
+                $('#hwSubList').append("<div class=\"weui-cell weui-cell_switch\">\n" +
+                    "            <div class=\"weui-cell__bd\">"+item.state.nameDetail+"</div>\n" +
+                    "            <div class=\"weui-cell__ft\">\n" +
+                    "                <label for=\"hwSubList_"+item.id+"\" class=\"weui-switch-cp\">\n" +
+                    "                    <input id=\"hwSubList_"+item.id+"\" class=\"weui-switch-cp__input\" type=\"checkbox\">\n" +
+                    "                    <div class=\"weui-switch-cp__box\"></div>\n" +
+                    "                </label>\n" +
+                    "            </div>\n" +
+                    "        </div>")
+            });
+        }
+
+        //返回
+        function bindBack(){
+            window.location.replace("/weixin/map/bindRoadMulti");
+        }
+
+        /**提交*/
+        function primaryClick(){
+            //参数
+            let list = [];
+            let delList = [];
+            $("#hwSubList input").forEach(function(item,index,arr){
+                if(item.checked){
+                    list.push({"hwId": item.id.substr(10)});
+                } else {
+                    delList.push({"hwId": item.id.substr(10)});
+                }
+            });
+            if(list.length > 0){
+                if(!openid){
+                    $.toast("认证失败", "forbidden");
+                    return;
+                }
+                axios.post('/weixin/map/saveHwInfo',{hwIds:list,delHwIds:delList,openid:openid})//也可以直接拼接在url
+                    .then(function(rs){
+                        if(rs.data && rs.data.code == 0){
+                            $.noti({title: "保存成功",time: 2000,});
+                            $.showLoading("正在跳转......");
+                            setTimeout(function() {
+                                $.hideLoading();
+                                window.location.replace("/weixin/map/bindRoadMulti");
+                            }, 2000);
+                        } else {
+                            $.toast("保存失败", "cancel");
+                        }
+                    }).catch(function(e){
+                        $.toast("网络异常", "cancel");
+                    });
+            } else {
+                $.toast("没有需要保存的数据", 2000);
+            }
+        }
+
+        $(function(){
+            axios.post('/weixin/map/getHwIdsByOpenid',{openid:openid})//也可以直接拼接在url
+                .then(function(rs){
+                    if(rs.data && rs.data.hwIds){
+                        //比对hwId
+                        function bool(hwId){
+                            for(let item in rs.data.hwIds){
+                                if(rs.data.hwIds[item].hwId == hwId){
+                                    return true;
+                                }
+                            }
+                            return false;
+                        }
+                        //数据加载
+                        $("#hwSubList input").forEach(function(item,index,arr){
+                            if(bool(item.id.substr(10))){
+                                item.checked = "checked";
+                            }
+                        });
+                    } else {
+                        $.toast("请选择路段", "success");
+                    }
+                }).catch(function(e){
+                    $.toast("网络异常", "cancel");
+                });
+        });
+    </script>
+</body>
+</html>

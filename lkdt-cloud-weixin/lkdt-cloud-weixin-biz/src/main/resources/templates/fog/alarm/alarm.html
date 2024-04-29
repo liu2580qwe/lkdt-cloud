@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<style>
+	.search-span{
+		height: 60px;
+		padding: 10px 10px;
+		display: -webkit-inline-box;
+	}
+	input::-webkit-input-placeholder {
+	/* WebKit browsers */ 
+	color:#999!important;
+	}
+	input:-moz-placeholder {
+		/* Mozilla Firefox 4 to 18 */ 
+		color:#999!important;
+	}
+	input::-moz-placeholder {
+		/* Mozilla Firefox 19+ */ 
+		color:#999!important;
+	}
+	input:-ms-input-placeholder {
+		/* Internet Explorer 10+ */ 
+		color:#999!important;
+	}
+</style>
+<body class="gray-bg">
+	<div class="wrapper wrapper-content ">
+		<div class="col-sm-12">
+			<div class="ibox">
+				<div class="ibox-body">
+					<div class="fixed-table-toolbar">
+						<div class="columns pull-left">
+							<!-- <button shiro:hasPermission="system:alarm:add" type="button" class="btn  btn-primary" onclick="add()">
+								<i class="fa fa-plus" aria-hidden="true"></i>添加
+							</button> -->
+							<button shiro:hasPermission="system:alarm:batchRemove" type="button" class="btn  btn-danger"
+								onclick="batchRemove()">
+								<i class="fa fa-trash" aria-hidden="true"></i>删除
+							</button>
+						</div>
+						
+						<div class="columns pull-right col-md-10 nopadding" style="margin-right: 30px;">
+						    <span class="search-span" style="">
+								<span>告警时间：</span>
+								<input  id="starttime" name="starttime" class="" type="date" style="height: 34px;">
+								<span>—</span>
+								<input  id="endtime" name="endtime" class="" type="date" style="height: 34px;">
+							</span>
+							<span style="width: 10px;"></span>
+							<span class="search-span" style="">
+								<span>告警状态：</span>
+								<select  id="alarmstatus" data-placeholder="告警状态" class="form-control chosen-select"
+									 style="width: 100px;display: inline;">
+									<option value="">全部</option>
+									<option value="1">正确</option>
+									<option value="2">误报</option>
+									<option value="0">未确认</option>
+								</select>
+							</span>
+							<span class="search-span" style="">
+								<span>是否有效：</span>
+								<select  id="iseffective" data-placeholder="是否有效" class="form-control chosen-select"
+									 style="width: 100px;display: inline;">
+									<option value="">全部</option>
+									<option value="1">有效</option>
+									<option value="0">无效</option>
+								</select>
+							</span>
+							<span class="search-span" style="">
+								<span>告警级别：</span>
+								<select id="level" data-placeholder="是否有效" class="form-control chosen-select"
+									 style="width: 100px;display: inline;">
+									<option value="">全部</option>
+									<option value="1">大雾</option>
+									<option value="2">浓雾</option>
+									<option value="3">特浓雾</option>
+								</select>
+							</span>
+							<span class="search-span" style="">
+								<span>所属路段：</span>
+								<input id="hwId" name="hwId" class="hidden">
+								<input id="name" name="name" class="form-control" type="text"
+									style="cursor: pointer;width: 100px;" onclick="openHighway()"
+									readonly="readonly" placeholder="所属公路">
+							</span>
+							<span class="search-span" style="">
+								<span>摄像头编码：</span>
+								<input id="camcode" type="text" class="form-control" style="width: 100px;"
+								placeholder="">
+							</span>
+							<span class="search-span" style="">
+								<button class="btn btn-success" onclick="reLoad()">查询</button>
+							</span>
+							<span class="search-span" style="">
+								<button class="btn btn-success" onclick="reset()">重置</button>
+							</span>
+							
+							<div class="columns pull-right">
+								
+							</div>
+						</div>
+					</div>
+					<table id="exampleTable" data-mobile-responsive="true">
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--shiro控制bootstraptable行内按钮看见性 来自bootdo的创新方案 -->
+		<div>
+			<script type="text/javascript">
+				var s_edit_h = 'hidden';
+				var s_remove_h = 'hidden';
+				var s_resetPwd_h = 'hidden';
+			</script>
+		</div>
+		<div shiro:hasPermission="system:alarm:edit">
+			<script type="text/javascript">
+				s_edit_h = '';
+			</script>
+		</div>
+		<div shiro:hasPermission="system:alarm:remove">
+			<script type="text/javascript">
+				var s_remove_h = '';
+			</script>
+		</div>
+		<div shiro:hasPermission="system:alarm:resetPwd">
+			<script type="text/javascript">
+				var s_resetPwd_h = '';
+			</script>
+		</div>
+	</div>
+	<div th:include="include :: footer"></div>
+	<script type="text/javascript" src="/lkdtWX/js/appjs/fog/alarm/alarm.js"></script>
+</body>
+</html>

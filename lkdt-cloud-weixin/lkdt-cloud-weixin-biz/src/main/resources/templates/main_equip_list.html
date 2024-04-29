@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>设备预览</title>
+    <link href="/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="/lkdtWX/js/plugins/layer/skin/layer.css" rel="stylesheet">
+
+    <style>
+        .img_equip_list{
+            width: 310px;height: auto;float: left;padding: 5px;border-radius: 10px;
+        }
+        body{
+            background-color: #061537;
+        }
+        .list_alarm_stroll_y::-webkit-scrollbar {width: 7px;height: 1px;}
+        .list_alarm_stroll_y::-webkit-scrollbar-thumb {border-radius: 10px;
+            -webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);background: #07A6FF;}
+        .list_alarm_stroll_y::-webkit-scrollbar-track {-webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+            border-radius: 10px;background: #061537;}
+    </style>
+</head>
+<body class="list_alarm_stroll_y">
+    <div class="container-fluid" style="padding: 0 10px;margin-left: 50px;margin-right: 50px;background-color: #061537" >
+        <div id="search_" class="row" style="min-height:50px;margin: 0px;line-height:50px;position:fixed;z-index:2;background-color: #F8F8F8;">
+            <div class="col-md-24" style="padding:0px 5px 0px 5px;background-color: #061537">
+                <label class="form-inline" style="font-family: 微软雅黑;color: #ffffff;">摄像头ID：
+                    <input id="epId" class="form-control" type="text" autocomplete="off" style="color: #000000;"/>
+                </label>
+                <label class="form-inline" style="font-family: 微软雅黑;color: #ffffff;">桩号：
+                    <input id="eduName" class="form-control" type="text" autocomplete="off" style="color: #000000;"/>
+                </label>
+                <label class="form-inline" style="font-family: 微软雅黑;color: #ffffff;"> 位置：
+                    <input id="eduLocation" class="form-control" type="text" autocomplete="off" style="color: #000000;"/>
+                </label>
+                <input onclick="searchInfo()" class="btn" type="button" value="查询" style="background-color: #95C1EE"/>
+                <input onclick="clearAll()" class="btn" type="button" value="清空" style="background-color: #95C1EE"/>
+            </div>
+        </div>
+        <div id="content_" class="row" style="margin-top: 40px;">
+            <div class="col-xs-6 col-sm-12 col-md-24" style="padding:0px 5px 0px 10px;" >
+                <div id="alarmEquipImgRealTime">
+                    <img src="" alt="无数据" class="img-rounded img_equip_list"
+                         rtmpUrl="rtmp://live-bk.jchc.cn/live/K764_600_ChuKou1" onclick="liveView(this)"/>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div style="color:#95C1EE;height: 50px;line-height: 50px;float: right;margin-right: 30px;">江苏高速公路能见度实时播报与团雾智能预警</div>
+        </div>
+    </div>
+    <script src="/lkdtWX/js/jquery.min.js?v=2.1.4"></script>
+    <script src="/lkdtWX/js/lay/modules/layer.js"></script>
+    <script type="text/javascript" src="/lkdtWX/js/ckplayer/ckplayer.min.js" charset="utf-8"></script>
+    <script>
+        $(function(){
+            execAlarmEquipList();
+            $("#search_").bind('keydown',function(e){
+                if(e.keyCode == '13'){
+                    execAlarmEquipList();
+                }
+            });
+            $('#content_').css('margin-top',$('#search_').height());
+            window.onresize = function(){
+                $('#content_').css('margin-top',$('#search_').height());
+            }
+        });
+
+        function listEquipDivMouseOver(event){
+            event.lastElementChild.style.display = '';
+            event.lastElementChild.style.cursor = 'pointer';
+        }
+
+        function listEquipDivMouseOut(event){
+            event.lastElementChild.style.display = 'none';
+        }
+
+        function liveView(event){
+            layer.open({
+                type : 2,
+                title : "视频",
+                maxmin : true,
+                shadeClose : false, // 点击遮罩关闭层
+                area : [ '60%', '90%' ],
+                zIndex:5,
+                content : '/system/equipment/rtmp?rtmpUrl='+event.getAttribute('rtmpUrl')
+            });
+        }
+
+        /**
+         *  查询
+         */
+        function searchInfo(){
+            execAlarmEquipList();
+        }
+
+        /**
+         *  清空
+         */
+        function clearAll(){
+            //epId eduName eduLocation
+            $('#epId').val('');
+            $('#eduName').val('');
+            $('#eduLocation').val('');
+        }
+
+        //告警设备列表数组
+        var equipImgData = [];
+
+        /**
+         * 获取告警设备列表 能见度由低到高
+         */
+        function execAlarmEquipList(){
+            $.ajax({url:'/fog/fogTrack/getAlarmEquipList',type:'post',
+                data:{epId:$('#epId').val(),eduName:$('#eduName').val(),eduLocation:$('#eduLocation').val()},dataType:'json',
+                success:function(data){
+                    equipImgData = data;
+                    loadEquipImg(equipImgData);
+                }
+            });
+        }
+
+        /**
+         * 加载摄像头数据
+         * @param data
+         */
+        function loadEquipImg(data){
+            if(data.length > 0){
+                $('#alarmEquipImgRealTime').empty();
+                loadEquipments();
+            } else {
+                $('#alarmEquipImgRealTime').empty();
+                $('#alarmEquipImgRealTime').append('<img src="" alt="未查询到数据" class="img-rounded img_equip_list"/>');
+            }
+        }
+
+        /**
+         * 加载摄像头图片
+         */
+        function loadEquipments(){
+            var curr = equipImgData.shift();
+            if(curr){
+                var rtmpUrl = encodeURIComponent('https://ainjdjc.jchc.cn/live_video_low/'+curr.epId.replace(/\_/g,'')+'.m3u8');
+                //var rtmpUrl = encodeURIComponent('https://localhost:80/live_video/'+curr.epId.replace(/\\_/g,'')+'.m3u8');
+                //获取图片
+                $.ajax({type: "post",url: "/system/equipment/lookup/updateimgpath/"+curr.epId,})
+                    .success(function(message) {
+                        var $src_src_=curr.imgpath;
+                        $('#alarmEquipImgRealTime').append(
+                            '<div class="listEquipDiv" style="background:url('+$src_src_+');background-size: 100% auto;background-repeat: no-repeat;' +
+                            'width:300px;height:300px;margin:5px;float:left;color:rgba(248,231,81,0.6);cursor: pointer;" ' +
+                            'rtmpUrl="'+rtmpUrl+'" onclick="liveView(this)" title="单击播放" onmouseover="listEquipDivMouseOver(this)" onmouseout="listEquipDivMouseOut(this)">' +
+                            '<br>摄像头ID：<text style="font-size: 13px;font-weight: bold;">'+curr.epId+'</text><br>' +
+                            '桩号：<text style="font-size: 13px;font-weight: bold;">'+curr.equName+'</text><br>' +
+                            '位置：<text style="font-size: 13px;font-weight: bold;">'+curr.equLocation+'</text><br>' +
+                            '<img src="/css/plugins/blueimp/img/video-play.png" style="position:relative;width:50px;height:50px;left:120px;margin-top: 10px;display: none;" />'+
+                            '</div>');
+                        loadEquipments();
+                    }).fail(function(err){
+                    console.log(err);
+                });
+            }
+        }
+    </script>
+</body>
+</html>

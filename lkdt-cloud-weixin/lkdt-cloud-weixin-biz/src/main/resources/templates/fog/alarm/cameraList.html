@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+
+<body class="gray-bg">
+	<div class="wrapper wrapper-content ">
+		<div class="col-sm-12">
+			<div class="ibox">
+				<div class="ibox-body">
+					<input type="hidden" id="hwId" name="hwId" th:value="${hid}">
+					<div class="fixed-table-toolbar">
+						<div class="columns pull-right col-md-10 nopadding" style="width:100%">
+							<span class="search-span" style="">
+								<span>摄像头名称：</span>
+								<input id="camcode" type="text" class="form-control" style="width: 100px;display: initial;"
+								placeholder="">
+							</span>
+							<span class="search-span" style="">
+								<button class="btn btn-success" onclick="reLoad()">查询</button>
+							</span>
+							<div class="columns pull-right">
+								
+							</div>
+						</div>
+					</div>
+					<table id="exampleTable"
+						   data-toggle="table"
+						   data-single-select="true"
+						   data-click-to-select="true"
+						   data-pagination="true"
+						   data-side-pagination="server"
+						   data-page-list="[10, 25, 50, 100, 200, All]"
+						   data-query-params="queryParams"
+						   data-url="/system/alarm/selectCameraByHwId">
+						<thead>
+							<tr >
+								<th data-field="state" data-checkbox="false"></th>
+								<th data-field="equCode">摄像头编码</th>
+								<th data-field="equName">摄像头名称</th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div th:include="include :: footer"></div>
+
+	<script type="text/javascript">
+        function queryParams(params) {
+            params.shwId = $('#hwId').val();
+            params.equName = $('#camcode').val()
+            return params;
+        }
+		$("#exampleTable").bootstrapTable({
+            onClickRow:function (row,$element) {
+                parent.loadCamera(row.epId,row.equName);
+                var index = parent.layer.getFrameIndex(window.name); // 获取窗口索引
+                parent.layer.close(index);
+            }
+		});
+		function reLoad() {
+			//$('#exampleTable').bootstrapTable('refresh',{pageNumber:1});
+			$('#exampleTable').bootstrapTable('selectPage', 1);
+		}
+	</script>
+</body>
+
+</html>

@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width"> -->
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+    <!-- iphone会把一串数字识别为电话号码，点击的时候会提示是否呼叫，屏蔽这功能则把telephone设置为no -->
+    <meta content="telephone=no" name="format-detection" />
+    <!-- iphone的私有标签，默认值为default（白色），可以定为black（黑色）和black-translucent（灰色半透明） -->
+    <meta content="black" name="apple-mobile-web-app-status-bar-style">
+    <!-- iphone设备的是有标签 允许全屏模式浏览，隐藏浏览器导航栏 -->
+    <meta content="yes" name="apple-mobile-web-app-capable" />
+    <!-- 全屏显示 -->
+    <meta content="yes" name="apple-touch-fullscreen" />
+    <!-- UC强制全屏 -->
+    <meta name="full-screen" content="yes">
+    <!-- QQ强制全屏 -->
+    <meta name="x5-fullscreen" content="true">
+    <!-- 屏蔽百度转码 -->
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <title>智高速</title>
+    <!-- 引入 WeUI -->
+    <link rel="stylesheet" href="/lkdtWX/plugins/weui/css/weui.css"/>
+    <link rel="stylesheet" href="/lkdtWX/plugins/weui/css/weuix.css"/>
+
+    <style>
+        a{text-decoration: none;}
+        a:hover{text-decoration: none;}
+    </style>
+</head>
+<body>
+    <div class="weui-btn_default weui-header ">
+        <div class="weui-header-left"><a id="home_href" href="###" onclick="bindBack()" class="icon icon-109 f-green">返回主页</a></div>
+        <h1 class="weui-header-title f-green">路段绑定</h1>
+        <div class="weui-header-right"><a href="###" id="add" class="icon icon-34 f-green">添加</a></div>
+    </div>
+    <div class="weui-search-bar" id="searchBar">
+        <form class="weui-search-bar__form" action="#">
+            <div class="weui-search-bar__box">
+                <i class="weui-icon-search"></i>
+                <input class="weui-search-bar__input" id="searchInput" placeholder="搜索" required="" type="search">
+                <a href="javascript:" class="weui-icon-clear" id="searchClear"></a>
+            </div>
+            <label class="weui-search-bar__label" id="searchText" style="transform-origin: 0px 0px 0px; opacity: 1; transform: scale(1, 1);">
+                <i class="weui-icon-search"></i>
+                <span>搜索</span>
+            </label>
+        </form>
+        <a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel">取消</a>
+    </div>
+
+    <div class="weui-cells__title">
+        <a id="case1" href="###" class="icon icon-81 view-switch case1" style="color: #999999;font-size: 20px;">
+            <text style="font-size: 13px;vertical-align: middle;">已关注路段</text>
+        </a>
+        <a id="case2" href="###" class="icon icon-93 view-switch case2" style="color: #999999;font-size: 20px; display: none;">
+            <text style="font-size: 13px;vertical-align: middle;">已关注路段</text>
+        </a>
+    </div>
+
+    <ul id="list1" class="collapse"></ul>
+
+    <div id="list2" style="display: none;"></div>
+
+    <!-- 引入 WeJS -->
+    <script src="/lkdtWX/plugins/weui/js/commonMap.js"></script>
+    <script src="/lkdtWX/plugins/weui/js/zepto.min.js"></script>
+    <script src="/lkdtWX/plugins/weui/js/zepto.weui.js"></script>
+    <script src="/lkdtWX/plugins/weui/js/axios.min.js"></script>
+    <script>
+        let openid = u.getStorage("openid");
+        /**
+         * 折叠面板
+         */
+        $(function(){
+            axios.post('/weixin/map/getTreeHwIdsByOpenid',{openid:openid})//也可以直接拼接在url
+                .then(function(rs){
+                    //列表
+                    if(rs.data && rs.data.highways){
+                        //数据加载
+                        $('#list1').empty();
+                        rs.data.highways.forEach(function(item,index,arr){
+                            let html = "<li>\n" +
+                                "            <div class=\"weui-flex js-category\" >\n" +
+                                "                <div class=\"weui-flex__item\" >"+item.state.nameDetail+"</div>\n" +
+                                "                <i class=\"icon icon-74\"></i>\n" +
+                                "            </div>\n" +
+                                "            <div class=\"page-category js-categoryInner\">\n" +
+                                "                <div class=\"weui-cells page-category-content\">\n";
+                            let htmlSub = "";
+                            item.children.forEach(function(obj,i,items){
+                                htmlSub +=
+                                    "                       <div class=\"weui-cell weui-cell_swiped\" id=\""+obj.id+"\">\n" +
+                                    "                          <div class=\"weui-cell__bd\">\n" +
+                                    "                               <div class=\"weui-cell\">\n" +
+                                    "                                   <div class=\"weui-cell__bd\">\n" +
+                                    "                                       <p>"+obj.state.nameDetail+"</p>\n" +
+                                    "                                   </div>\n" +
+                                    "                                   <div class=\"weui-cell__ft\">向左滑动删除</div>\n" +
+                                    "                               </div>\n" +
+                                    "                           </div>\n" +
+                                    "                           <div class=\"weui-cell__ft\">\n" +
+                                    "                               <a class=\"weui-swiped-btn weui-swiped-btn_warn delete-swipeout\" href=\"javascript:\">删除</a>\n" +
+                                    "                               <a class=\"weui-swiped-btn weui-swiped-btn_default close-swipeout\" href=\"javascript:\">关闭</a>\n" +
+                                    "                           </div>\n" +
+                                    "                       </div>";
+                            });
+                            let htmlEnd =
+                                "                </div>\n" +
+                                "            </div>\n" +
+                                "        </li>";
+                            $('#list1').append(html+htmlSub+htmlEnd);
+
+                            //视图切换
+                            let html2 = "<h3>"+item.state.nameDetail+"</h3>\n" +
+                                "        <div class=\"weui-feeds\">\n" +
+                                "            <ul>\n";
+                            let html2Sub = "";
+                            item.children.forEach(function(obj,i,items){
+                                html2Sub +=
+                                    "                <li>"+obj.state.nameDetail+"</li>\n";
+                            });
+                            let html2End =
+                                "            </ul>\n" +
+                                "        </div>";
+                            $('#list2').append(html2+html2Sub+html2End);
+                        });
+                        //事件绑定
+                        $('.collapse .js-category').click(function(){
+                            let $parent = $(this).parent('li');
+                            if($parent.hasClass('js-show')){
+                                $parent.removeClass('js-show');
+                                $(this).children('i').removeClass('icon-35').addClass('icon-74');
+                            }else{
+                                $parent.siblings().removeClass('js-show');
+                                $parent.addClass('js-show');
+                                $(this).children('i').removeClass('icon-74').addClass('icon-35');
+                                $parent.siblings().find('i').removeClass('icon-35').addClass('icon-74');
+                            }
+                        });
+                        //删除绑定
+                        $('.weui-cell_swiped').click(function(){
+
+                        });
+                        $('.delete-swipeout').click(function () {
+                            let $this = $(this);
+                            axios.post('/weixin/map/deleteHwOp',{openid:openid,hwId:this.parentElement.parentElement.id})//也可以直接拼接在url
+                                .then(function(rs){
+                                if(rs.data && rs.data.code == 0){
+                                    if($this.parent().parent().parent().children().length > 1){
+                                        $this.parents('.weui-cell').remove();
+                                    } else {
+                                        $this.parents('.weui-cell').parent().parent().parent().remove();
+                                    }
+                                    $.toast("删除成功", 200);
+                                } else {
+                                    $.toast("删除失败", "forbidden");
+                                }
+                            }).catch(function(e){
+                                $.toast("网络异常", "cancel");
+                            });
+                        });
+                        $('.close-swipeout').click(function () {
+                            $(this).parents('.weui-cell').swipeout('close');
+                        });
+                        $('.weui-cell_swiped').swipeout('open');
+                        $(document).on("swipeout-open",'.weui-cell_swiped',function(){
+                            //监听打开触发
+                        });
+                        $(document).on("swipeout-close",'.weui-cell_swiped',function(){
+                            //监听关闭触发
+                        });
+                    } else {
+                        $.toast("无绑定路段", 1000);
+                    }
+                }).catch(function(e){
+                    $.toast("网络异常", "cancel");
+                });
+        });
+
+        //返回
+        function bindBack(){
+            window.location.replace("/weixin/map/wxMap");
+        }
+
+        $('.view-switch').click(function(ele){
+            if(this.classList.contains('case1')){
+                $('.view-switch .case1').hide();
+                $('#case1').hide();
+                $('#list1').hide();
+                $('.view-switch .case2').show();
+                $('#case2').show();
+                $('#list2').show();
+            } else {
+                $('.view-switch .case1').show();
+                $('#case1').show();
+                $('#list1').show();
+                $('.view-switch .case2').hide();
+                $('#case2').hide();
+                $('#list2').hide();
+            }
+        });
+
+        //路段选择定义
+        let hwPickerCols = new Array(2);
+        //获取路段
+        let highways = u.getStorage("highways");
+        if(highways){
+            hwPickerCols[0] = new Array(highways.length+1);
+            hwPickerCols[1] = new Array(highways.length+1);
+            hwPickerCols[0][0] = "";
+            hwPickerCols[1][0] = "---请选择---";
+            for(let i = 0; i < highways.length; i++){
+                hwPickerCols[0][i+1] = highways[i].id;
+                hwPickerCols[1][i+1] = highways[i].state.nameDetail;
+            }
+        }
+
+        $("#add").picker({
+            title: "请选择需要关注的路段",
+            cols: [
+                {
+                    textAlign: 'center',
+                    values: hwPickerCols[0],//['','G15','G25'],
+                    displayValues: hwPickerCols[1],//['---请选择---','G15高速公路','G25高速公路']
+                }
+            ],
+            onChange: function(p, v, dv) {
+                // console.log(p, v, dv);
+            },
+            onClose: function(p, v, d) {
+                if(p.value && p.value.length > 0 && p.value[0]){
+                    window.location.replace("/weixin/map/bindRoadMulti_select?hwId="+p.value[0]+"&detail="+p.displayValue[0]);
+                } else {
+                    //window.location.href = "";
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<meta http-equiv="Access-Control-Allow-Origin" content="*" />
+<head th:include="include :: header"></head>
+<style>
+	#ppvModelContent{
+		height:100%;
+		padding-top: 20px;
+	}
+	#ppvModel_left{
+		width:60%;
+		float: left;
+	}
+	#ppvModel_right{
+		width:40%;
+		float: left;
+		height:100%;
+		overflow-y: auto;
+		padding-right: 2px;
+		padding-bottom: 10px;
+	}
+	#ppvModel_right tbody tr{
+		cursor: pointer;
+	}
+	i:hover{
+		background-color: #29BDEE;
+		color: red;
+		cursor: pointer;
+	}
+	/*清除reset css*/
+	ul{
+		padding:0;
+		margin: 0;
+		list-style: none;
+	}
+	/*main*/
+	#list{
+		width:80px;
+		height:33px;
+		border:1px solid #fff;
+		box-shadow:0px 0px 5px #fff;
+		display: none;
+		/*一定要用绝对定位*/
+		position: absolute;
+		background-color: #1AB394;
+	}
+	#list li{
+		height:30px;
+		line-height:30px;
+		font-size:12px;
+		color:#000000;
+		text-align:center;
+	}
+	#list li:hover{
+		cursor: pointer;
+		background-color: #29BDEE;
+	}
+	.notClickKn {
+		background-color: rgba(0,47,73,1);
+		pointer-events:none;
+	}
+</style>
+<body class="gray-bg">
+	<ul id="list">
+		<li onclick="clearTrack()">清除痕迹</li>
+	</ul>
+	<div id="ppvModelContent">
+		<div id="ppvModel_left">
+			<input id="param_area_code" th:value="${areaCode}" style="display: none;"/>
+			<input id="param_camera_id" th:value="${cameraId}" style="display: none;"/>
+			<!--/ppv/images/index/demoImg1.png-->
+			<img id="demoImg" style="position: fixed;z-index: -1;top: 93px;left:1px;" src="" alt="The Scream" width="800" height="500">
+			<p id="firstCon">
+				<select id="serviceAreaDropDown" onchange="serviceAreaDropDownChange(this)">
+					<!--<option>服务区</option>-->
+				</select>
+				<!--<label class="radio-inline">
+					<input name="camera" type="radio" value="1" checked/>摄像头1
+				</label>
+				<label class="radio-inline">
+					<input name="camera" type="radio" value="1" />摄像头2
+				</label>-->
+			</p>
+
+			<input id="importImg" class="btn btn-default" type="file" value="导入图片" onchange="importImg();"
+				   accept="image/png,image/jpeg,image/gif" style="background-color: #1AB394;width: 300px;"/>
+			<a class="btn btn-default" href="" role="button" style="position:fixed;left:305px;top: 55px;background-color: #1AB394;">刷新</a>
+			<label class="checkbox-inline" style="position:fixed;left:373px;top: 62px;">
+				<input type="checkbox" id="previewCheckbox" value="option1" onchange="previewCheckboxChange();" checked><span>预览</span>
+			</label>
+			<canvas id="myCanvas" width="800" height="500" style="position: fixed;border:1px solid #d3d3d3;top: 92px;left:0px;">您的浏览器不支持 HTML5 canvas 标签。</canvas>
+			<button class="btn btn-default glyphicon glyphicon-pencil" id="selectCarSpace" onclick="selectCarSpace(this);"
+			   style="position: fixed;left:802px;top: 93px;padding: 5px;font-size:20px;background-color: #1AB394;" title="逆时针标记车位四个点"></button>
+			<button class="btn btn-default glyphicon glyphicon-record" id="finishCarSpace" onclick="finishCarSpace(this);"
+			   style="position: fixed;left:802px;top: 140px;padding: 5px;font-size:20px;background-color: #1AB394;" title="退出标记"></button>
+			<button class="btn btn-default glyphicon glyphicon-trash" id="clearTrack" onclick="clearTrack_1()"
+				style="position: fixed;left:802px;top: 187px;padding: 5px;font-size:20px;background-color: #1AB394;" title="清除标记"></button>
+			<button class="btn btn-default glyphicon glyphicon-floppy-saved" id="foreverSave" onclick="foreverSave(this);"
+				style="position: fixed;left:802px;top: 234px;padding: 5px;font-size:20px;background-color: #1AB394;" title="永久保存【仅保存当前摄像头车位列表】"></button>
+		</div>
+		<div id="ppvModel_right">
+			<p style="position: fixed;top: 15px;">
+				<a class="btn btn-default" href="#" role="button" style="background-color: #1AB394;" onclick="right.add()">增加</a>
+				<a class="btn btn-default" href="#" role="button" style="background-color: #1AB394;" onclick="right.delete()">删除</a>
+			</p>
+			<table class="table table-bordered table-hover table-condensed" style="margin-top: 35px;">
+				<thead>
+					<tr><th>车位号</th><th>X1(px)</th><th>Y1(px)</th><th>X2(px)</th><th>Y2(px)</th><th>X3(px)</th><th>Y3(px)</th><th>X4(px)</th><th>Y4(px)</th></tr>
+				</thead>
+				<tbody id="ppvModel_right_tbody">
+					<!--<tr><td><input name="parking" type="radio" value="1" />1</td><td>20</td><td>20</td><td>20</td><td>40</td><td>40</td><td>40</td><td>40</td><td>20</td></tr>-->
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<div th:include="include :: footer"></div>
+	<script>
+		$(window).resize(function(){
+			sizeR();
+		});
+		sizeR();
+		function sizeR(){
+			if($('#ppvModelContent').width() < 1466){
+				$('#demoImg').width(650);
+				$('#demoImg').height(400);
+				$('#myCanvas').width(650);
+				$('#myCanvas').height(400);
+				$('#selectCarSpace').css("left","652px");
+				$('#finishCarSpace').css("left","652px");
+				$('#clearTrack').css("left","652px");
+				$('#foreverSave').css("left","652px");
+			} else {
+				$('#demoImg').width(800);
+				$('#demoImg').height(500);
+				$('#myCanvas').width(800);
+				$('#myCanvas').height(500);
+				$('#selectCarSpace').css("left","802px");
+				$('#finishCarSpace').css("left","802px");
+				$('#clearTrack').css("left","802px");
+				$('#foreverSave').css("left","802px");
+			}
+		}
+		// let demoImg = document.getElementById("demoImg");
+		let canvas = document.getElementById("myCanvas");
+		let ctx = canvas.getContext("2d");
+		let counter = 0;//车位点
+		//操作缓存
+		let p_model_store_s_fog = {
+			saveStatus:function(){
+				let saveObj = {s:$('#serviceAreaDropDown').val(),c:$('input[name="camera"]:checked').val(),yc:document.getElementById('previewCheckbox').checked};
+				u.setStorage("p_model_store_s_fog",saveObj)
+			},
+			findServerAreaId:function(){
+				return u.getStorage("p_model_store_s_fog")?u.getStorage("p_model_store_s_fog").s:null;
+			},
+			findCameraId:function(){
+				return u.getStorage("p_model_store_s_fog")?u.getStorage("p_model_store_s_fog").c:null;
+			},
+			findPreviewChecked:function(){
+				return u.getStorage("p_model_store_s_fog")?u.getStorage("p_model_store_s_fog").yc:null;
+			}
+		};
+		let imgInit = {
+			width:function(){
+				return document.getElementById("demoImg").naturalWidth;
+			},
+			height:function(){
+				return document.getElementById("demoImg").naturalHeight;
+			}
+		};//背景图初始大小
+		//{width:canvas.width,height:canvas.height};//画布大小
+		let imgCanvas = {
+			width:function(){
+				return canvas.width;
+			},
+			height:function(){
+				return canvas.height;
+			}
+		};
+
+		/**坐标转换*/
+		let converter = {
+			//实际坐标转canvas坐标
+			initToCanvasX:function(initWidth){
+				if(initWidth == "" || initWidth == null || initWidth == undefined){
+					return initWidth;
+				}
+				return Math.round(parseInt(initWidth)*parseInt(imgCanvas.width())/parseInt(imgInit.width()));
+			},
+			initToCanvasY:function(initHeight){
+				if(initHeight == "" || initHeight == null || initHeight == undefined){
+					return initHeight;
+				}
+				return Math.round(parseInt(initHeight)*parseInt(imgCanvas.height())/parseInt(imgInit.height()));
+			},
+			//canvas坐标转实际坐标
+			canvasToInitX:function(canvasWidth){
+				if(canvasWidth == "" || canvasWidth == null || canvasWidth == undefined){
+					return canvasWidth;
+				}
+				return  Math.round(parseInt(canvasWidth)*parseInt(imgInit.width())/parseInt(imgCanvas.width()));
+			},
+			canvasToInitY:function(canvasHeight){
+				if(canvasHeight == "" || canvasHeight == null || canvasHeight == undefined){
+					return canvasHeight;
+				}
+				return  Math.round(parseInt(canvasHeight)*parseInt(imgInit.height())/parseInt(imgCanvas.height()));
+			},
+		};
+
+		function accDiv(arg1, arg2){
+			let t1 = 0, t2 = 0, r1, r2;
+			try { t1 = arg1.toString().split(".")[1].length } catch (e) { }
+			try { t2 = arg2.toString().split(".")[1].length } catch (e) { }
+			with (Math) {
+				r1 = Number(arg1.toString().replace(".", ""));
+				r2 = Number(arg2.toString().replace(".", ""));
+				return (r1 / r2) * pow(10, t2 - t1);
+			}
+		}
+
+		/**导入图片*/
+		function importImg(){
+			let file=document.getElementById('importImg');
+			let reader = new FileReader();   //新建一个FileReader对象
+			reader.readAsDataURL(file.files[0]);   //将读取的文件转换成base64格式
+			reader.onload = function(e) {
+				let base64Data=e.target.result;
+				document.getElementById("demoImg").src = base64Data;
+			}
+		}
+
+		/////////////////////////////////////////////////////左边 start/////////////////////////////////////////////////////
+
+		/**
+		 * 初始化绘制车位路径
+		 */
+		function initDrawPath(){
+			// ctx.drawImage(document.getElementById("demoImg"),0,0,canvas.width,canvas.height);
+			clearTrack();//清除痕迹
+			//判别是否预览
+			if(!document.getElementById("previewCheckbox").checked){
+				return;
+			}
+			//绘制路径
+			let trs = $('#ppvModel_right tbody tr');
+			for(let i = 0; i < trs.length; i++){
+				//绘制点
+				strokePoint(converter.initToCanvasX(trs[i].childNodes[1].textContent),converter.initToCanvasY(trs[i].childNodes[2].textContent));
+				strokePoint(converter.initToCanvasX(trs[i].childNodes[3].textContent),converter.initToCanvasY(trs[i].childNodes[4].textContent));
+				strokePoint(converter.initToCanvasX(trs[i].childNodes[5].textContent),converter.initToCanvasY(trs[i].childNodes[6].textContent));
+				strokePoint(converter.initToCanvasX(trs[i].childNodes[7].textContent),converter.initToCanvasY(trs[i].childNodes[8].textContent));
+				ctx.fillStyle = "blue";
+				ctx.fill();
+				//绘制路径
+				ctx.beginPath();
+				ctx.moveTo(converter.initToCanvasX(trs[i].childNodes[1].textContent),converter.initToCanvasY(trs[i].childNodes[2].textContent));
+				ctx.lineTo(converter.initToCanvasX(trs[i].childNodes[3].textContent),converter.initToCanvasY(trs[i].childNodes[4].textContent));
+				ctx.lineTo(converter.initToCanvasX(trs[i].childNodes[5].textContent),converter.initToCanvasY(trs[i].childNodes[6].textContent));
+				ctx.lineTo(converter.initToCanvasX(trs[i].childNodes[7].textContent),converter.initToCanvasY(trs[i].childNodes[8].textContent));
+				ctx.lineTo(converter.initToCanvasX(trs[i].childNodes[1].textContent),converter.initToCanvasY(trs[i].childNodes[2].textContent));
+				ctx.strokeStyle = "blue";
+				ctx.stroke();
+				if(trs[i].childNodes[0].children[0].checked){
+					ctx.fillStyle = "red";
+					ctx.fill();
+				} else {
+					ctx.fillStyle = "blue";
+					ctx.fill();
+				}
+			}
+			loading.close();
+		}
+
+		/**
+		 * 绘制车位路径
+		 */
+		function drawPath(ele){
+			let converterEle = {};
+			//坐标转换
+			converterEle.offsetX = converter.canvasToInitX(ele.offsetX);
+			converterEle.offsetY = converter.canvasToInitY(ele.offsetY);
+			let trs = $('#ppvModel_right tbody tr');
+			//绘制点
+			strokePoint(ele.offsetX,ele.offsetY);
+			let selectedRightRow = new Array();
+			for(let i = 0; i < trs.length; i++){
+				if(trs[i].childNodes[0].children[0].checked){
+					selectedRightRow = trs[i];
+				}
+			}
+			switch (++counter) {
+				case 1:
+					selectedRightRow.childNodes[1].textContent = converterEle.offsetX;
+					selectedRightRow.childNodes[2].textContent = converterEle.offsetY;
+					layer.msg("已完成第一个点",{time: 500});
+					break;
+				case 2:
+					selectedRightRow.childNodes[3].textContent = converterEle.offsetX;
+					selectedRightRow.childNodes[4].textContent = converterEle.offsetY;
+					//绘制路径
+					ctx.beginPath();
+					ctx.moveTo(converter.initToCanvasX(selectedRightRow.childNodes[1].textContent),converter.initToCanvasY(selectedRightRow.childNodes[2].textContent));
+					ctx.lineTo(converter.initToCanvasX(selectedRightRow.childNodes[3].textContent),converter.initToCanvasY(selectedRightRow.childNodes[4].textContent));
+					ctx.strokeStyle = "red";
+					ctx.stroke();
+					layer.msg("已完成第二个点",{time: 500});
+					break;
+				case 3:
+					selectedRightRow.childNodes[5].textContent = converterEle.offsetX;
+					selectedRightRow.childNodes[6].textContent = converterEle.offsetY;
+					ctx.beginPath();
+					ctx.moveTo(converter.initToCanvasX(selectedRightRow.childNodes[3].textContent),converter.initToCanvasY(selectedRightRow.childNodes[4].textContent));
+					ctx.lineTo(converter.initToCanvasX(selectedRightRow.childNodes[5].textContent),converter.initToCanvasY(selectedRightRow.childNodes[6].textContent));
+					ctx.strokeStyle = "red";
+					ctx.stroke();
+					layer.msg("已完成第三个点",{time: 500});
+					break;
+				case 4:
+					selectedRightRow.childNodes[7].textContent = converterEle.offsetX;
+					selectedRightRow.childNodes[8].textContent = converterEle.offsetY;
+					counter = 0;
+					layer.msg("车位:"+selectedRightRow.childNodes[0].textContent+" 已完成划分",{time: 500});
+					//绘制路径
+					ctx.beginPath();
+					ctx.moveTo(converter.initToCanvasX(selectedRightRow.childNodes[1].textContent),converter.initToCanvasY(selectedRightRow.childNodes[2].textContent));
+					ctx.lineTo(converter.initToCanvasX(selectedRightRow.childNodes[3].textContent),converter.initToCanvasY(selectedRightRow.childNodes[4].textContent));
+					ctx.lineTo(converter.initToCanvasX(selectedRightRow.childNodes[5].textContent),converter.initToCanvasY(selectedRightRow.childNodes[6].textContent));
+					ctx.lineTo(converter.initToCanvasX(selectedRightRow.childNodes[7].textContent),converter.initToCanvasY(selectedRightRow.childNodes[8].textContent));
+					ctx.lineTo(converter.initToCanvasX(selectedRightRow.childNodes[1].textContent),converter.initToCanvasY(selectedRightRow.childNodes[2].textContent));
+					ctx.fillStyle = "red";
+					ctx.fill();
+					break;
+			}
+		}
+
+		/**绘制点*/
+		function strokePoint(offsetX,offsetY){
+			ctx.beginPath();
+			ctx.moveTo(parseInt(offsetX)-1,parseInt(offsetY));
+			ctx.lineTo(parseInt(offsetX)+1,parseInt(offsetY));
+			ctx.lineWidth = 2;
+			ctx.strokeStyle = "red";
+			ctx.stroke();
+		}
+
+		/**清除*/
+		function clearTrack_1(){
+			clearTrack()
+			//退出预览
+			document.getElementById("previewCheckbox").checked = false;
+		}
+
+		/**清除痕迹*/
+		function clearTrack(){
+			//绘制服务区图 解决跨域问题
+			// ctx.drawImage(document.getElementById("demoImg"),0,0,canvas.width,canvas.height);
+			// ctx.fillStyle = 'rgba(255, 255, 255, 0)';
+			// ctx.fill();
+			ctx.clearRect(0,0,800,500);
+
+		}
+
+		/**选择车位区域*/
+		function selectCarSpace(ele){
+			ele.style.color = 'red';
+			$("#myCanvas").css("cursor","crosshair");
+			// clearTrack();
+			layer.msg("为右边所选车位选取四个点");
+			counter = 0;
+			// //退出预览
+			// document.getElementById("previewCheckbox").checked = false;
+		}
+
+		/**退出标记*/
+		function finishCarSpace(ele){
+			document.getElementById("selectCarSpace").style.color = '#fff';
+			$("#myCanvas").css("cursor",'auto');
+			counter = 0;
+			// //退出预览
+			// document.getElementById("previewCheckbox").checked = false;
+		}
+
+		function emptyToZero(num){
+			if(num == ""){
+				return 0;
+			}
+			return num;
+		}
+
+		/**永久保存*/
+		function foreverSave(){
+			//服务区code
+			let serviceAreaCode = $('#serviceAreaDropDown').val();//
+			//摄像机id
+			let cameraId = $('input[name="camera"]:checked').val();
+			let trs = $('#ppvModel_right tbody tr');
+			//trs[i].childNodes[1].textContent
+			let textObject = new Object();
+			for(let i = 0; i < trs.length; i++){
+				let textCKey = trs[i].childNodes[0].textContent;
+				let textCValue = emptyToZero(trs[i].childNodes[1].textContent)+','+emptyToZero(trs[i].childNodes[2].textContent)+';'+
+						emptyToZero(trs[i].childNodes[3].textContent)+','+emptyToZero(trs[i].childNodes[4].textContent)+';'+
+						emptyToZero(trs[i].childNodes[5].textContent)+','+emptyToZero(trs[i].childNodes[6].textContent)+';'+
+						emptyToZero(trs[i].childNodes[7].textContent)+','+emptyToZero(trs[i].childNodes[8].textContent);
+				textObject[textCKey] = textCValue;
+			}
+			//发送
+			$.ajax({
+				type: "POST",
+				dataType: "json",
+				contentType: "application/json",
+				url: "/ppv/model/saveParkModelData" ,
+				data: JSON.stringify({serviceAreaCode:serviceAreaCode,cameraId:cameraId,ppvModelJsonArray:textObject}),
+				success: function (result) {
+					if (result.code == 200) {
+						layer.msg("保存成功");
+					} else {
+						layer.msg("异常");
+					}
+				},
+				error : function(result) {
+					layer.msg("异常");
+				}
+			});
+		}
+
+		/**画布点击事件*/
+		$('#myCanvas').click(function(ele){
+			if($("#myCanvas").css("cursor") == 'crosshair'){
+				drawPath(ele);
+			}
+		});
+
+		/**鼠标右键点击事件*/
+		canvas.oncontextmenu = function(ev){
+			let listBox = document.getElementById('list');//获取自定义右键菜单
+			//兼容性写法示例：
+			ev = ev || event;//或（||）书写顺序有讲究，不能随意换
+			//阻止默认行为
+			ev.preventDefault();
+			//记录当前的坐标(x轴和y轴)
+			let x = ev.clientX;
+			let y = ev.clientY;
+			listBox.style.display = 'block';//右键点击时显示菜单框
+			listBox.style.left = x + 'px';
+			listBox.style.top = y + 'px';
+			//关闭右键
+			document.onclick = function(){
+				listBox.style.display = 'none';//再次点击时隐藏菜单框
+			}
+		};
+		/////////////////////////////////////////////////////左边 end/////////////////////////////////////////////////////
+		/////////////////////////////////////////////////////右边 start/////////////////////////////////////////////////////
+		$('#ppvModel_right tbody tr').click(function(){
+			// this.childNodes[0].childNodes[0].value
+			trClick(this);
+		});
+		/**
+		 * 行选中
+		 * @param ele
+		 */
+		function trClick(ele){
+			$('#ppvModel_right tbody tr').css("backgroundColor","");
+			ele.style.backgroundColor = '#29BDEE';
+			$(ele.childNodes[0].childNodes[0]).prop("checked",true);
+			//预览
+			document.getElementById("previewCheckbox").checked = true;
+			initDrawPath();
+			p_model_store_s_fog.saveStatus();
+		}
+
+		/**选中第一条数据*/
+		function selectFirstTr(){
+			//默认选中第一条
+			if($('#ppvModel_right tbody tr').length > 0){
+				$($('#ppvModel_right tbody tr')[0].childNodes[0].childNodes[0]).prop("checked",true);
+				$('#ppvModel_right tbody tr')[0].style.backgroundColor = '#29BDEE';
+			}
+		}
+
+		let right = {
+			add:function(){//增加
+				layer.open({
+					content: '<form class="layui-form" action="">' +
+							'<div class="layui-form-item">' +
+							'    <label class="layui-form-label">车位类型：</label>' +
+							'    <div class="layui-input-block">' +
+							'      <select id="pkType" lay-filter="aihao">' +
+							'        <option value="1">小型车</option>' +
+							'        <option value="2">大型车</option>' +
+							'        <option value="3">新能源车</option>' +
+							'      </select>' +
+							'    </div>' +
+							'  </div>'+
+                            '<div class="layui-form-item">' +
+							'    <label class="layui-form-label">车位号：</label>' +
+							'    <div class="layui-input-block">' +
+							'      <input type="number" id="pkNumber" autocomplete="off" placeholder="请输入数字" class="layui-input">' +
+							'    </div>' +
+							'  </div>'+
+							'<div class="layui-form-item">' +
+							'    <label class="layui-form-label">车位名称：</label>' +
+							'    <div class="layui-input-block">' +
+							'      <input type="text" id="pkName" autocomplete="off" placeholder="请输入名称" class="layui-input">' +
+							'    </div>' +
+							'  </div>'+
+                        '</form>'
+					,btn: ['保存', '取消']
+					,yes: function(index, layero){
+						$.ajax({
+							type: "POST",
+							dataType: "json",
+							contentType: "application/x-www-form-urlencoded",
+							url: "/ppv/model/savePark" ,
+							data: {serviceAreaCode:$('#serviceAreaDropDown').val(),cameraId:$('input[name="camera"]:checked').val(),pkNumber:$('#pkNumber').val(),
+								pkType:$('#pkType').val(),pkName:$('#pkName').val()},
+							success: function (result) {
+								if (result.code == 200) {
+									layer.msg("保存成功");
+									window.history.go(0);
+								} else {
+									layer.msg("异常");
+								}
+							},
+							error : function(result) {
+								layer.msg("异常");
+							}
+						});
+					}
+				});
+			},
+			delete:function(){//删除
+				let trs = $('#ppvModel_right tbody tr');
+				let delObj = {};
+				if(trs.length > 0){
+					for(let i = 0; i < trs.length; i++){
+						if(trs[i].childNodes[0].children[0].checked == true){
+							delObj.code = trs[i].childNodes[0].children[0].value;
+							delObj.number = trs[i].childNodes[0].textContent;
+							layer.confirm('是否删除【车位'+delObj.number+'】?', {icon: 3, title:'提示'}, function(index) {
+								$.ajax({
+									type: "POST",
+									dataType: "json",
+									contentType: "application/x-www-form-urlencoded",
+									url: "/ppv/model/deletePark",
+									data: {pkCode: delObj.code},
+									success: function (result) {
+										if (result.code == 200) {
+											layer.close(index);
+											layer.msg("删除成功");
+											window.history.go(0);
+										} else {
+											layer.msg("异常");
+										}
+									},
+									error: function (result) {
+										layer.msg("异常");
+									}
+								});
+							});
+						}
+					}
+				} else {
+					layer.msg("请选择需要删除的车位");
+				}
+			},
+		};
+		/////////////////////////////////////////////////////右边 end/////////////////////////////////////////////////////
+		//定义全局变量函数
+		let uzStorage = function () {
+			let ls = window.sessionStorage;
+			return ls;
+		};
+		//定义全局变量u
+		let u = {};
+		//设置缓存
+		u.setStorage = function (key, value) {
+			let v = value;
+			if (typeof v == 'object') {
+				v = JSON.stringify(v);
+				v = 'obj-' + v;
+			} else {
+				v = 'str-' + v;
+			}
+			let ls = uzStorage();
+			if (ls) {
+				ls.setItem(key, v);
+			}
+		};
+		//获取缓存
+		u.getStorage = function (key) {
+			let ls = uzStorage();
+			if (ls) {
+				let v = ls.getItem(key);
+				if (!v) {
+					return;
+				}
+				if (v.indexOf('obj-') === 0) {
+					v = v.slice(4);
+					return JSON.parse(v);
+				} else if (v.indexOf('str-') === 0) {
+					return v.slice(4);
+				}
+			}
+		};
+
+		/**加载车位列表*/
+		let loadParkList = function(parkList){
+			//加载页面
+			if(parkList.length > 0){
+				let parkingList_ = parkList;
+				for(let k = 0; k < parkingList_.length; k++){
+					$('#ppvModel_right_tbody').append('<tr onclick="trClick(this)"><td><input name="parking" type="radio" value="'
+							+parkingList_[k].code+'" />'+parkingList_[k].number+'</td>' +
+							'<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>');
+				}
+				//默认选中第一条
+				selectFirstTr();
+			}
+			/*加载车位位置信息*/
+			//服务区code
+			let serviceAreaCode = $('#serviceAreaDropDown').val();
+			//摄像机id
+			let cameraId = $('input[name="camera"]:checked').val();
+			//获取服务区数据
+			let ppvModel = u.getStorage("ppvModel");
+			for(let i = 0; i < ppvModel.length; i++) {
+				if(serviceAreaCode == ppvModel[i].code){
+					for(let j = 0; j < ppvModel[i].cameraList.length; j++){
+						if(cameraId == ppvModel[i].cameraList[j].id){
+							if(ppvModel[i].cameraList[j].parkPackJson != ""){
+								let parkPackJson = [];
+								try {
+									if(ppvModel[i].cameraList[j].parkPackJson == null || ppvModel[i].cameraList[j].parkPackJson == ""
+										|| ppvModel[i].cameraList[j].parkPackJson == undefined){
+										layer.msg("无可加载车位数据");
+										return ;
+									}
+									parkPackJson = JSON.parse(ppvModel[i].cameraList[j].parkPackJson);
+									let trs = $('#ppvModel_right tbody tr');//.childNodes[3].textContent
+									if(!trs || trs.length <= 0){
+										layer.msg("无车位");
+										return ;
+									}
+									for(let ke in parkPackJson){
+										//内置方法获取key
+										let keKV = parkPackJson[ke];
+										for(let k = 0; k < trs.length; k++){
+											//遍历车位位置信息
+											if(ke == trs[k].childNodes[0].textContent){
+												//trs[k].childNodes[0].textContent
+												//设置车位信息
+												let x = keKV.split(";");
+												for(let l = 0; l < x.length; l++){
+													let y = x[l].split(",");
+													trs[k].childNodes[l*2+1].textContent = y[0];
+													trs[k].childNodes[l*2+2].textContent = y[1];
+												}
+											}
+										}
+									}
+								} catch (e) {
+									layer.msg("车位数据解析异常【loadParkList:403】");
+								}
+							}
+						}
+					}
+				}
+			}
+		};
+
+		/**预览按钮*/
+		let previewCheckboxChange = function(ele){
+			p_model_store_s_fog.saveStatus();
+			initDrawPath();
+		};
+
+		/**
+		 * 选择摄像头
+		 */
+		let cameraClick = function(ele){
+			p_model_store_s_fog.saveStatus();
+			//清空车位
+			$('#ppvModel_right_tbody').empty();
+			//获取缓存服务区数据
+			let ppvModel = u.getStorage("ppvModel");
+			for(let i = 0; i < ppvModel.length; i++) {
+				if ($('#serviceAreaDropDown').val() == ppvModel[i].code) {
+					for(let j = 0; j < ppvModel[i].cameraList.length; j++){
+						if(ele.value == ppvModel[i].cameraList[j].id){
+							//加载车位列表
+							loadParkList(ppvModel[i].cameraList[j].parkList);
+							//加载背景图
+							document.getElementById("demoImg").src = ppvModel[i].cameraList[j].imageUrl;
+							//等待图片加载完毕，再绘画路径
+							imgLoad(demoImg, function() {
+								clearTrack();
+								initDrawPath();
+							});
+						}
+						loading.close();
+					}
+				} else {
+					loading.close();
+				}
+			}
+		};
+
+		/**
+		 * 选择服务区
+		 */
+		let serviceAreaDropDownChange = function(ele){
+			loading.open();
+			// console.log(u.getStorage("ppvModel"));
+			//清空摄像头
+			$("#firstCon label").remove();
+			//清空车位
+			$('#ppvModel_right_tbody').empty();
+			//获取缓存服务区数据
+			let ppvModel = u.getStorage("ppvModel");
+			for(let i = 0; i < ppvModel.length; i++){
+				if(ele.value == ppvModel[i].code){
+					if(ppvModel[i].cameraList.length > 0){
+						//取该服务区的摄像头列表
+						if(ppvModel[i].cameraList.length > 0){
+							for(let j = 0; j < ppvModel[i].cameraList.length; j++){
+								if(j == 0){
+									$("#firstCon").append("<label class='radio-inline'>" +
+											"<input name='camera' type='radio' value='"+ppvModel[i].cameraList[j].id+"' onclick='cameraClick(this)' checked/>"+ppvModel[i].cameraList[j].name+"</label>");
+									//加载背景图
+									document.getElementById("demoImg").src = ppvModel[i].cameraList[j].imageUrl;
+									//取第一个摄像头的车位列表
+									loadParkList(ppvModel[i].cameraList[j].parkList);
+									//等待图片加载完毕，再绘画路径
+									imgLoad(demoImg, function() {
+										initDrawPath();
+									});
+								} else {
+									$("#firstCon").append("<label class='radio-inline'>" +
+											"<input name='camera' type='radio' value='"+ppvModel[i].cameraList[j].id+"' onclick='cameraClick(this)' />"+ppvModel[i].cameraList[j].name+"</label>");
+								}
+								loading.close();
+							}
+						} else {
+							loading.close();
+						}
+					}
+				} else {
+					loading.close();
+				}
+			}
+			p_model_store_s_fog.saveStatus();
+		};
+
+		/**数据加载*/
+		let initLoad = function(ppvModel){
+			if(ppvModel.length > 0){
+				for(let i = 0; i < ppvModel.length; i++){
+					//加载服务区下拉框
+					$("#serviceAreaDropDown").append("<option value='"+ppvModel[i].code+"'>"+ppvModel[i].name+"</option>");
+					if(ppvModel[i].cameraList.length > 0){
+					    //取第一个服务区的摄像头列表
+						if(i == 0){
+							if(ppvModel[i].cameraList.length > 0){
+								for(let j = 0; j < ppvModel[i].cameraList.length; j++){
+									if(j == 0){
+										$("#firstCon").append("<label class='radio-inline'>" +
+											"<input name='camera' type='radio' value='"+ppvModel[i].cameraList[j].id+"' onclick='cameraClick(this)' checked/>"+ppvModel[i].cameraList[j].name+"</label>");
+										//加载背景图
+										document.getElementById("demoImg").src = ppvModel[i].cameraList[j].imageUrl;
+										// alert(ppvModel[i].cameraList[j].imageUrl);
+										//取第一个摄像头的车位列表
+										loadParkList(ppvModel[i].cameraList[j].parkList);
+										//等待图片加载完毕，再绘画路径
+										imgLoad(demoImg, function() {
+											initDrawPath();
+										});
+									} else {
+										$("#firstCon").append("<label class='radio-inline'>" +
+											"<input name='camera' type='radio' value='"+ppvModel[i].cameraList[j].id+"' onclick='cameraClick(this)' />"+ppvModel[i].cameraList[j].name+"</label>");
+									}
+									loading.close();
+								}
+							}
+						}
+					} else {
+						loading.close();
+					}
+				}
+			} else {
+				loading.close();
+			}
+		};
+
+		/**历史操作数据加载*/
+		let operationLoad = function(ppvModel){
+			if(ppvModel.length > 0){
+				for(let i = 0; i < ppvModel.length; i++){
+					//加载服务区下拉框
+					$("#serviceAreaDropDown").append("<option value='"+ppvModel[i].code+"'>"+ppvModel[i].name+"</option>");
+					if(ppvModel[i].code == p_model_store_s_fog.findServerAreaId() && ppvModel[i].cameraList.length > 0){
+						for(let j = 0; j < ppvModel[i].cameraList.length; j++){
+							if(ppvModel[i].cameraList[j].id == p_model_store_s_fog.findCameraId()){
+								$("#firstCon").append("<label class='radio-inline'>" +
+										"<input name='camera' type='radio' value='"+ppvModel[i].cameraList[j].id+"' onclick='cameraClick(this)' checked/>"+ppvModel[i].cameraList[j].name+"</label>");
+								//加载历史操作
+								loadMyOperation();
+								//加载背景图
+								document.getElementById("demoImg").src = ppvModel[i].cameraList[j].imageUrl;
+								// alert(ppvModel[i].cameraList[j].imageUrl);
+								//车位列表
+								loadParkList(ppvModel[i].cameraList[j].parkList);
+								//等待图片加载完毕，再绘画路径
+								imgLoad(demoImg, function() {
+									initDrawPath();
+								});
+							} else {
+								$("#firstCon").append("<label class='radio-inline'>" +
+										"<input name='camera' type='radio' value='"+ppvModel[i].cameraList[j].id+"' onclick='cameraClick(this)' />"+ppvModel[i].cameraList[j].name+"</label>");
+							}
+							loading.close();
+						}
+					} else {
+						loading.close();
+					}
+				}
+			} else {
+				loading.close();
+			}
+		};
+
+		/**弹框条件加载*/
+		let conditionLoad = function(ppvModel){
+			if(ppvModel.length > 0){
+				for(let i = 0; i < ppvModel.length; i++){
+					//加载服务区下拉框
+					$("#serviceAreaDropDown").append("<option value='"+ppvModel[i].code+"'>"+ppvModel[i].name+"</option>");
+					if(ppvModel[i].code == $('#param_area_code').val() && ppvModel[i].cameraList.length > 0){
+						for(let j = 0; j < ppvModel[i].cameraList.length; j++){
+							if(ppvModel[i].cameraList[j].id == $('#param_camera_id').val()){
+								$("#firstCon").append("<label class='radio-inline'>" +
+										"<input name='camera' type='radio' value='"+ppvModel[i].cameraList[j].id+"' onclick='cameraClick(this)' checked/>"+ppvModel[i].cameraList[j].name+"</label>");
+								//加载历史操作
+								loadMyCondition();
+								//加载背景图
+								document.getElementById("demoImg").src = ppvModel[i].cameraList[j].imageUrl;
+								// alert(ppvModel[i].cameraList[j].imageUrl);
+								//车位列表
+								loadParkList(ppvModel[i].cameraList[j].parkList);
+								//等待图片加载完毕，再绘画路径
+								imgLoad(demoImg, function() {
+									initDrawPath();
+								});
+							} else {
+								$("#firstCon").append("<label class='radio-inline'>" +
+										"<input name='camera' type='radio' value='"+ppvModel[i].cameraList[j].id+"' onclick='cameraClick(this)' />"+ppvModel[i].cameraList[j].name+"</label>");
+							}
+							loading.close();
+						}
+					} else {
+						loading.close();
+					}
+				}
+			} else {
+				loading.close();
+			}
+		};
+
+		/**弹框参数加载*/
+		let loadMyCondition = function(){
+			// {s:$('#serviceAreaDropDown').val(),c:,yc:document.getElementById('previewCheckbox').checked}
+			$('#serviceAreaDropDown').val($('#param_area_code').val());
+			let camera = $('input[name="camera"]');
+			let cameraId = $('#param_camera_id').val();
+			for(let i = 0; i < camera.length; i++){
+				if(camera[i].value == cameraId) {
+					camera[i].checked = true;
+				}
+			}
+			document.getElementById('previewCheckbox').checked = true;
+			//禁止选择
+			$("#firstCon").addClass("notClickKn");
+			//关闭loading层
+			loading.close();
+		};
+
+		/** 数据初始化 */
+		let initWebData = function(){
+			$.get("/ppv/model/getInitParkModelData",function(data,status){
+				if(data){
+					u.setStorage("ppvModel",data);
+					//操作
+					if($('#param_area_code').val() != "" && $('#param_camera_id').val() != ""){
+						//条件加载
+						conditionLoad(u.getStorage("ppvModel"));
+					} else if(u.getStorage("p_model_store_s_fog")){
+						//加载历史操作及关联数据
+						operationLoad(u.getStorage("ppvModel"));
+					} else {
+						initLoad(u.getStorage("ppvModel"));
+					}
+				}
+			});
+		};
+
+		function imgLoad(img, callback) {
+			let timer = setInterval(function() {
+				if (img.naturalWidth != 0 && img.naturalHeight != 0) {
+					callback(img);
+					clearInterval(timer);
+				}
+			}, 50)
+		}
+
+		/**加载历史操作*/
+		let loadMyOperation = function(){
+			// {s:$('#serviceAreaDropDown').val(),c:,yc:document.getElementById('previewCheckbox').checked}
+			$('#serviceAreaDropDown').val(p_model_store_s_fog.findServerAreaId());
+			$('input[name="camera"]:checked').val()
+			let camera = $('input[name="camera"]');
+			let cameraId = p_model_store_s_fog.findCameraId();
+			for(let i = 0; i < camera.length; i++){
+				if(camera[i].value == cameraId) {
+					camera[i].checked = true;
+				}
+			}
+			document.getElementById('previewCheckbox').checked = p_model_store_s_fog.findPreviewChecked();
+			//关闭loading层
+			loading.close();
+		};
+
+		let l_index;
+		//loading层
+		let loading = {
+			open:function(){
+				l_index = layer.load(1, {
+					shade: [0.1,'#fff'] //0.1透明度的白色背景
+				});
+			},
+			close:function(){
+				layer.close(l_index);
+			}
+		};
+		loading.open();
+		$(function(){
+			initWebData.call();
+		});
+	</script>
+</body>
+</html>

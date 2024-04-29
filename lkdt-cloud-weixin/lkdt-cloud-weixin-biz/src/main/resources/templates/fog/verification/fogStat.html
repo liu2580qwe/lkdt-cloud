@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<head th:include="include :: header"></head>
+<link href="/css/mui.min.css" rel="stylesheet" />
+<style type="text/css">
+	.jindu{
+		height: 20px;
+		width: 650px;
+		margin-left: 60px;
+	}
+</style>
+</head>
+
+<body style="background: none;">
+	<div id="segmentedControl" class="mui-segmented-control" style="width:15% ;margin-left: 60%;z-index: 9999;margin-top: 10px;display: none;">
+		<a class="mui-control-item mui-active" onclick="tabclick('1');" href="javascript:void(0)" id="m">盐城段</a>
+		<a class="mui-control-item" href="javascript:void(0)" onclick="tabclick('2');" id="j">南通段</a>
+	</div>
+	<div style="width:15% ;right:10%;top:20px;z-index: 9999;position: absolute;display: none;">
+		<div class="col-sm-12">
+			<!-- <input id="hwId" name="hwId" class="form-control" type="text"> -->
+			<input id="hwId" name="hwId" class="hidden"> <input
+				id="name" name="name" class="form-control" type="text"
+				style="cursor: pointer;" onclick="openHighway()"
+				readonly="readonly" placeholder="所属公路">
+		</div>
+	</div>
+	<div class="echarts" style="height: 35vw;width: 80%;margin-left: 10%;" id="echarts-line-chart"></div>
+	<div class="echarts" style="height: 450px;width: 1010px;display: block;" id="echarts-line-chart2"></div>
+	<div style="width:10% ;right:5%;top:10px;z-index: 9999;position: absolute;">
+		<button onclick="openHighway()" >切换公路</button>
+	</div>
+	
+</body>
+<script src="/lkdtWX/js/jquery.min.js?v=2.1.4"></script>
+<script src="/lkdtWX/js/mui.min.js"></script>
+<script src="/lkdtWX/js/plugins/echarts/echarts.min.js"></script>
+<script src="/lkdtWX/js/plugins/layer/layer.min.js"></script>
+<script type="text/javascript">
+var lineoption = {
+        title: {
+            top:'top',
+            text: "路段能见度统计",
+            textStyle:{
+                fontSize: 13,
+                color:'#fff'
+            }
+        },
+        tooltip: {//鼠标指上时的标线
+            trigger: 'axis',
+            axisPointer: {
+                type: 'cross',
+                label: {
+                    backgroundColor: '#283b56'
+                }
+            }
+        },
+        visualMap: {
+            show: false,
+            top: 'top',
+            left:'middle',
+            color:['#16DDFD'],
+            textStyle:{
+                color:'#fff'
+            },
+            pieces: [{
+                gt: 0,
+                lte: 30,
+                color: '#ff0000'
+            }, {
+                gt: 30,
+                lte: 50,
+                color: '#fd4a05'
+            }, {
+                gt: 50,
+                lte: 100,
+                color: '#eff321'
+            }, {
+                gt: 100,
+                lte: 200,
+                color: '#007eff'
+            }, {
+                gt: 200,
+                color: '#48ef8b'
+            }]
+        },
+        grid:{
+            x:35,
+            y:55,
+            x2:35,
+            y2:25,
+        },
+        xAxis: {
+            type: 'category',
+            //name: 'HH:ss',
+            data: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
+            boundaryGap: false,
+            axisLine: {
+                lineStyle: {
+                    color: '#57617B'
+                }
+            },
+            axisLabel: {
+                textStyle: {
+                    color:'#fff',
+                },
+            },
+            nameTextStyle:{
+                color: '#ffffff'
+            }
+        },
+        yAxis: {
+            type: 'value',
+            scale: true,
+            //name: '可见距离（米）',
+            max: 300,
+            min: 0,
+            axisTick: {
+                show: false
+            },
+            axisLine: {
+                lineStyle: {
+                    color: '#57617B',
+
+                }
+            },
+            axisLabel: {
+                margin: 10,
+                textStyle: {
+                    fontSize: 12
+                },
+                textStyle: {
+                    color:'#fff',
+                },
+            },
+            splitLine: {
+                lineStyle: {
+                    color: 'rgba(255,255,255,.2)',
+                    type:'dotted',
+                }
+            },
+            nameTextStyle:{
+                color: '#ffffff'
+            }
+        },
+        series: [{
+            name: '可见度',
+            type: 'line',
+            smooth: true,
+            lineStyle: {
+                normal: {
+                    width: 2
+                }
+            },
+            markLine: {
+                silent: true,
+                symbol:'none',
+                lineStyle:{
+                    color:'#42515d',
+                    width:2,
+                    type :'dotted'
+                },
+                data: [
+                	{
+                		yAxis: 200,
+    	            	label:{
+                            position:'end',
+                            formatter:"告警线",
+                            textStyle: {
+                                fontSize: 10
+                            },
+                            distance:0
+                        },
+                        lineStyle:{               //警戒线的样式  ，虚实  颜色
+                            type:"solid",
+                            color:"#3398DB",
+                        }
+    	            }
+                ],
+                label:{
+                    position :'start',
+                    color:'#fff'
+                }
+            },
+            areaStyle: {
+                normal: {
+                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                        offset: 0,
+                        color: '#48ef8b'
+                    },{
+                        offset: 0.5,
+                        color: '#007eff'
+                    },{
+                        offset: 0.75,
+                        color: '#fd4a05'
+                    }, {
+                        offset: 0.875,
+                        color: '#ff0000'
+                    }], false),
+                    shadowColor: 'rgba(0, 0, 0, 0.1)',
+                    shadowBlur: 10
+                }
+            },
+            data: []
+        }]
+};
+
+function getfogStat(hwId){
+	console.log(new Date);
+	$.getJSON('/fog/vef/getfogStat',{hwId:hwId},function(res){
+	    var lineChart = echarts.init(document.getElementById("echarts-line-chart"));
+	    var lineChart2 = echarts.init(document.getElementById("echarts-line-chart2"));
+	    var data1=[];
+	    var xAxisData1=[];
+	    var data2=[];
+	    var xAxisData2=[];
+	    for(var i=0;i<res.data.length;i++){
+	    	if(i<=54){
+	    		data1.push(res.data[i]);
+	    		xAxisData1.push(res.xAxisData[i]);
+	    	}else{
+	    		data2.push(res.data[i]);
+	    		xAxisData2.push(res.xAxisData[i]);
+	    	}
+	    }
+	    lineoption.series[0].data = data1;
+	    lineoption.xAxis.data = xAxisData1;
+	    /* lineoption.xAxis[1].axisLabel={
+	   		formatter: function (params) {
+				//if(clickcameraid=='002'||clickcameraid=='005'||clickcameraid=='006'){
+				//	return params;
+				//}else{
+					//return Math.floor(params/60);
+				//}
+				//凌晨，上午，下午，晚上
+				//var mins=Math.floor(params/60/60)+1;
+				var epid=params;
+				if(epid=='K901+717西'){
+					return '盐城段'
+				}
+				if(epid=='K1089+095西'){
+					return '南通段'
+				}
+				return '';
+				
+	              // return (showNames.indexOf(name) === -1 ? "" : name )
+	            
+	       	}
+	    } */
+	    lineChart.setOption(lineoption);
+	});
+}
+
+function tabclick(type){
+	if(type=='1'){
+		$("#echarts-line-chart").show();
+		$("#echarts-line-chart2").hide();
+	}
+	if(type=='2'){
+		$("#echarts-line-chart2").show();
+		$("#echarts-line-chart").hide();
+	}
+}
+tabclick("1");
+
+var openHighway = function(){
+	layer.open({
+		type:2,
+		title:"选择公路",
+		area : [ '300px', '450px' ],
+		content:"/system/highway/treeView"
+	})
+}
+openHighway();
+function loadHy( node ){
+	var	hwId = node.id;
+	var name = node.name;
+	$("#hwId").val(hwId);
+	$("#name").val(name);
+	if(hwId=="39"){
+		$("#segmentedControl").show();
+	}else{
+		$("#segmentedControl").hide();
+	}
+	getfogStat(hwId);
+	setInterval("getfogStat("+hwId+")",60000);
+}
+</script>
+</html>

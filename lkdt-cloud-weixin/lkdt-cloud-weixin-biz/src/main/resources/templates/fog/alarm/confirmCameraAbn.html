@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width"> -->
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+    <!-- iphone会把一串数字识别为电话号码，点击的时候会提示是否呼叫，屏蔽这功能则把telephone设置为no -->
+    <meta content="telephone=no" name="format-detection" />
+    <!-- iphone的私有标签，默认值为default（白色），可以定为black（黑色）和black-translucent（灰色半透明） -->
+    <meta content="black" name="apple-mobile-web-app-status-bar-style">
+    <!-- iphone设备的是有标签 允许全屏模式浏览，隐藏浏览器导航栏 -->
+    <meta content="yes" name="apple-mobile-web-app-capable" />
+    <!-- 全屏显示 -->
+    <meta content="yes" name="apple-touch-fullscreen" />
+    <!-- UC强制全屏 -->
+    <meta name="full-screen" content="yes">
+    <!-- QQ强制全屏 -->
+    <meta name="x5-fullscreen" content="true">
+    <!-- 屏蔽百度转码 -->
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <title>摄像头异常</title>
+    <!-- 引入 WeUI -->
+	<link rel="stylesheet" href="https://cdn.bootcss.com/weui/1.1.3/style/weui.min.css">
+	<link rel="stylesheet" href="https://cdn.bootcss.com/jquery-weui/1.2.1/css/jquery-weui.min.css">
+    <style>
+        a{text-decoration: none;}
+        a:hover{text-decoration: none;}
+    </style>
+</head>
+<body>
+	 <div class="weui-gallery" id="gallery">
+            <img class="weui-gallery__img" id="galleryImg"></img>
+        </div>
+	<div class="weui-form">
+        <form class="" action="#" id="signupForm">
+        	<input id="epId" name="epId" type="hidden" th:value="${epId}" />
+            <input id="imgpath" name="imgpath" type="hidden" th:value="${imgpath}" />
+			<div class="weui-cells weui-cells_form">
+	          <div class="weui-cell weui-cell_readonly">
+	            <!-- <div class="weui-cell__hd"><label class="weui-label">告警图片</label></div> -->
+	            <div class="weui-cell__bd">
+	                <img class='weui-jiaj-img' id='img1' alt="" onerror="this.src='/img/defalt.jpg;this.onerror=null'" onclick="imgclick()" style="width: 100%;height: 200px;"/>
+	            </div>
+	          </div>
+	          </div>
+        </form>
+        <a href="javascript:;" class="weui-btn weui-btn_primary" onclick="primaryClick(2)" id="submit">已处理</a>
+        <a href="javascript:;" class="weui-btn weui-btn_primary" onclick="bindBack()" id="submit">取消</a>
+	</div>
+    <!-- 引入 WeJS -->
+    <script src="https://cdn.bootcss.com/jquery/1.11.0/jquery.min.js"></script>
+	<script src="https://cdn.bootcss.com/jquery-weui/1.2.1/js/jquery-weui.min.js"></script>
+	<script src="/lkdtWX/plugins/weui/js/commonMap.js"></script>
+    <script>
+        //返回
+        function bindBack(){
+        	//window.history.back();
+        	window.location.href=('/weixin/alarm/cameraAbnormal');
+        }
+
+        /**提交*/
+        function primaryClick(state){
+        	if(!state){
+        		window.close();
+        	}
+        	$.ajax({
+    			url : "/weixin/equipment/update",
+    			type : "post",
+                headers: {
+                    "X-Access-Token": u.getStorage("token")
+                },
+    			data : {
+    				'epId' : $("#epId").val(),
+    				'state':state,
+    				'updater':u.getStorage("openid")
+    			},
+    			success : function(r) {
+    				if (r.code==0) {
+   						$.alert("已处理", function() {
+   							window.location.href=('/system/alarm/cameraAbnormal');
+         				});
+    				}
+    			}
+    		});
+        }
+
+        var iseffect=1;
+        var imgpath='';
+        var state=0;
+        $().ready(function() {
+        	imgpath=$("#imgpath").val();
+        	$("#img1").attr("src",imgpath);
+        		
+        	//th:src="@{{path}(path=${alarm.imgpath})}"
+        });
+        function imgclick(){
+        	 	$gallery = $("#gallery");
+        	 	$gallery.fadeIn(100);
+        	 	$gallery.on("click", function(){
+                    $gallery.fadeOut(100);
+                });
+        	  // $('.weui-gallery__del').remove();
+        	}
+
+
+    </script>
+</body>
+</html>

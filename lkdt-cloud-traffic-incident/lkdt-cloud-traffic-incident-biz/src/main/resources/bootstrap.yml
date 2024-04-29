@@ -1,0 +1,26 @@
+server:
+  port: 9527
+spring:
+  application:
+    name: @artifactId@
+  profiles:
+    active: @profiles.active@
+  cloud:
+    nacos:
+      discovery:
+        server-addr: lkdt-cloud-nacos:8848
+      config:
+        file-extension: yml
+        server-addr: ${spring.cloud.nacos.discovery.server-addr}
+        shared-dataids: application-lkdt-cloud-${spring.profiles.active}.yml,application-lkdt-cloud-traffic-incident-${spring.profiles.active}.yml
+feign:
+  sentinel:
+    enabled: true
+  hystrix:
+    enabled: true
+resttemplate:
+  sentinel:
+    enabled: true
+# Task scheduler configuration
+
+
