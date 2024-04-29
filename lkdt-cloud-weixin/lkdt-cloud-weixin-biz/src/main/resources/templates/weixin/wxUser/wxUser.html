@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<style>
+	.search-span{
+		height: 60px;
+		padding: 10px 10px;
+		display: inline-block;
+		float: right;
+	}
+	.search-span span{
+		display: inline-block;
+	}
+	
+	.search-span input{
+	display: inline-block;
+	}
+	input::-webkit-input-placeholder {
+	/* WebKit browsers */ 
+	color:#999!important;
+	}
+	input:-moz-placeholder {
+		/* Mozilla Firefox 4 to 18 */ 
+		color:#999!important;
+	}
+	input::-moz-placeholder {
+		/* Mozilla Firefox 19+ */ 
+		color:#999!important;
+	}
+	input:-ms-input-placeholder {
+		/* Internet Explorer 10+ */ 
+		color:#999!important;
+	}
+</style>
+<body class="gray-bg">
+	<div class="wrapper wrapper-content ">
+		<div class="col-sm-12">
+			<div class="ibox">
+				<div class="ibox-body">
+					<div class="fixed-table-toolbar">
+						<!-- <div class="columns pull-left">
+							<button type="button" class="btn  btn-primary" onclick="add()">
+								<i class="fa fa-plus" aria-hidden="true"></i>添加
+							</button>
+							<button  type="button" class="btn  btn-danger"
+								onclick="batchRemove()">
+								<i class="fa fa-trash" aria-hidden="true"></i>删除
+							</button>
+						</div> -->
+						
+						<div class="columns pull-right col-md-10 nopadding" style="margin-right: 30px;">
+							
+							<span class="search-span" style="">
+								<button class="btn btn-success" onclick="reLoad()">查询</button>
+							</span>
+							
+							<span class="search-span" style="">
+								<span>角色：</span>
+								<select id="role" name="role" data-placeholder="-- 选择角色 --" class="form-control chosen-select"
+									 style="width: 150px;display: inline;">
+									<option value="">全部</option>
+									<option th:each="dict:${dictList}" th:value="${dict.value}" th:text="${dict.name}" ></option>
+								</select>
+							</span>
+							
+							<span class="search-span" style="">
+								<span>手机号码：</span>
+								<input id="phone" type="text" class="form-control" style="width: 150px;"
+								placeholder="手机号码">
+							</span>
+							
+							<span class="search-span" style="">
+								<span>交警警号：</span>
+								<input id="policeId" type="text" class="form-control" style="width: 150px;"
+								placeholder="交警警号">
+							</span>
+						</div>
+						
+						
+					</div>
+					<table id="exampleTable" data-mobile-responsive="true">
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--shiro控制bootstraptable行内按钮看见性 来自bootdo的创新方案 -->
+		<div>
+			<script type="text/javascript">
+				var s_edit_h = 'hidden';
+				var s_remove_h = 'hidden';
+				var s_resetPwd_h = 'hidden';
+			</script>
+		</div>
+		<div >
+			<script type="text/javascript">
+				s_edit_h = '';
+			</script>
+		</div>
+		<div >
+			<script type="text/javascript">
+				var s_remove_h = '';
+			</script>
+		</div>
+		<div >
+			<script type="text/javascript">
+				var s_resetPwd_h = '';
+			</script>
+		</div>
+	</div>
+	<div th:include="include :: footer"></div>
+	<script type="text/javascript" src="/lkdtWX/js/appjs/weixin/wxUser/wxUser.js"></script>
+</body>
+</html>

@@ -1,0 +1,55 @@
+xxl:
+  job:
+    admin:
+      addresses: http://lkdt-cloud-xxljob-admin:8080/xxl-job-admin
+    accessToken:
+    executor:
+      appname: xxl-job-executor-weixin
+      address:
+      ip:
+      port:
+      logpath: /data/applogs/xxl-job/jobhandler1
+      logretentiondays: 30
+spring:
+  cloud:
+    function:
+      definition: windPushSend;checkSendNotice;threePartPushOutPut
+    stream:
+      bindings:
+        windPushSend-in-0:
+          destination: wind_push_channel #约定交换机通道名
+          binder: local_rabbit
+          group: wind_push_channel_group1 #指定分组名，解决重复消费问题
+        checkSendNotice-in-0:
+          destination: check_send_channel #约定交换机通道名
+          binder: local_rabbit
+          group: check_send_channel_group1 #指定分组名，解决重复消费问题
+        threePartPushOutPut-in-0:
+          destination: three_part_channel #约定交换机通道名
+          binder: local_rabbit
+          group: three_part_channe1_group1 #指定分组名，解决重复消费问题
+      binders:
+        local_rabbit:
+          type: rabbit
+          environment:
+            spring:
+              rabbitmq:
+                host: lkdt-cloud-rabbitmq
+                port: 5672
+                username: guest
+                password: guest
+                virtual-host: /
+  projectPath: 192.168.3.100:80
+wx:
+  minigram-appid: wxaededeb771ade34d
+  minigram-appsecret: 6780146879f82939911f325d3d53b950
+  appid: wxb0ed6d0dd97be25b
+  appsecret: dc99b722aba76588d7e1352663758e22
+  tousername: gh_c01bb21dc0c8
+  templatewarnid: ThvjDjKN-78xKzXPl-e39TwF7ftcnhDMuiLVgdfefCQ
+  templateclosedroadid: ThvjDjKN-78xKzXPl-e39TwF7ftcnhDMuiLVgdfefCQ
+  alarmpolicetemplateid: GKTpp4qXdkREZxaRv9pWZZb8YS4l7p5VoN2BoaZ2u1A
+  templatewindid: cuBJCSq7nhZ_E5sowQUY_ChqNTDSaRuv5NfoAlp__Eo
+  templateabnid: g4P57bI6nhhJPcTU1wil0jdd_F-yMLCK9BMniMY4DCI
+  policenoticetemplateid: ThECyCgR8-GCiO9duAst_avUr5pwryE0Qz5xJmmpt_Y #通知三方管制模板
+  relievepolicenoticetemplateid: Lkvo5FhcyQgWiHnEUdfCysPAnI3PhlBniG9ypRbgE0g #通知三方解除模板

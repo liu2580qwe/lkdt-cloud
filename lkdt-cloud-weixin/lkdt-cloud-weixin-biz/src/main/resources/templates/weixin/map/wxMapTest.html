@@ -1,0 +1,1577 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width"> -->
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+    <!-- iphone会把一串数字识别为电话号码，点击的时候会提示是否呼叫，屏蔽这功能则把telephone设置为no -->
+    <meta content="telephone=no" name="format-detection" />
+    <!-- iphone的私有标签，默认值为default（白色），可以定为black（黑色）和black-translucent（灰色半透明） -->
+    <meta content="black" name="apple-mobile-web-app-status-bar-style">
+    <!-- iphone设备的是有标签 允许全屏模式浏览，隐藏浏览器导航栏 -->
+    <meta content="yes" name="apple-mobile-web-app-capable" />
+    <!-- 全屏显示 -->
+    <meta content="yes" name="apple-touch-fullscreen" />
+    <!-- UC强制全屏 -->
+    <meta name="full-screen" content="yes">
+    <!-- QQ强制全屏 -->
+    <meta name="x5-fullscreen" content="true">
+    <!-- 屏蔽百度转码 -->
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <title>智高速</title>
+    <!-- 引入 bootstrap -->
+    <link rel="stylesheet" href="/lkdtWX/plugins/weui/css/bootstrap.my.icon.css">
+    <!-- 引入 WeUI -->
+    <link rel="stylesheet" href="/lkdtWX/plugins/weui/css/weui.css"/>
+    <link rel="stylesheet" href="/lkdtWX/plugins/weui/css/weuix.css"/>
+    <link rel="stylesheet" href="/lkdtWX/plugins/weui/zencdn/7.4.1/video-js.css"/>
+ 	<link rel="stylesheet" href="/lkdtWX/plugins/weui/css/gooey.min.css?v=1"/>
+    <style>
+        html{width: 100%;height: 100%;}
+        body{width: 100%;height: 100%;}
+        #container{width: 100%;height: 100%;}
+        #locbox .locicon.locok .icon {fill: #0091ff;height: 21px;width: 21px;padding: 6px;}
+        #locbox {width: 33px;height: 33px;cursor: pointer;}
+        /*地图样式*/
+        .amap-zoomcontrol{
+            display:none;
+        }
+        .camimg {
+			background: url("/lkdtWX/plugins/weui/img/cam.png");
+			background-size:100%;
+			height: 20px;
+			width: 20px;
+		}
+        .button-img {
+            width: 100%;
+        }
+       .locbox1-defind{
+       	padding: 5px;
+       }
+       .p-wind{
+	        line-height: 10vw;
+	    	padding-left: 5px;
+    	    font-size: 4vw;
+	    }
+    </style>
+</head>
+<body>
+<div id="container">
+
+	<input id="openid" th:value="${openid}" hidden>
+
+    <!--<div style="position: absolute;bottom:240px;z-index: 9999;">
+        <div class="amap-geolocation-con" style="position: absolute; z-index: 9999; left: 10px; bottom: 20px;">
+            <div class="locbox1-defind">
+                <span class="glyphicon glyphicon-book" aria-hidden="true" onclick="wxEquPop.test()"></span>
+            </div>
+        </div>
+    </div>-->
+    
+    		<nav id="gooey-h" style="position: absolute;bottom:10px;z-index: 9999;width: 50px;height:50px;left: 10px;" >
+			<input type="checkbox" class="menu-open" name="menu-open2" id="menu-open2"/>
+			<label class="open-button" for="menu-open2">
+			<span class="burger burger-1"></span>
+			<span class="burger burger-2"></span>
+			<span class="burger burger-3"></span>
+			</label>
+
+			<a href="#" class="gooey-menu-item" direction="horizontal"> 
+				 <div class="amap-geolocation-con">
+		            <div class="locbox1-defind">
+		                <img src="/lkdtWX/plugins/weui/img/buttons/yichangqingkuang.png" class="button-img" aria-hidden="true" onclick="btnFun.nofun()"></img>
+		            </div>
+		        </div>
+			</a>
+			<a href="#" class="gooey-menu-item" direction="horizontal"> 
+				 <div class="amap-geolocation-con">
+		            <div class="locbox1-defind">
+		                <img src="/lkdtWX/plugins/weui/img/buttons/daolubangding.png" class="button-img" aria-hidden="true" onclick="btnFun.settingFun()"></img>
+		            </div>
+		        </div>
+			</a>
+			<a href="#" class="gooey-menu-item" direction="horizontal">
+				<div class="amap-geolocation-con">
+		            <div class="locbox1-defind">
+		                 <img src="/lkdtWX/plugins/weui/img/buttons/antong.png" class="button-img" aria-hidden="true" onclick="btnFun.nofun()"></img>
+		            </div>
+		        </div>
+			</a>
+			
+			<a href="#" class="gooey-menu-item" direction="vertical">
+	        	 <div class="amap-geolocation-con">
+		            <div class="locbox1-defind">
+		                <img src="/lkdtWX/plugins/weui/img/buttons/luqiaobingxue_gray.png" class="button-img" aria-hidden="true" onclick="btnFun.nofun()"></img>
+		            </div>
+	        	</div>
+        	 </a>
+			
+			 <a href="#" class="gooey-menu-item" direction="vertical"> 
+			 	<div class="amap-geolocation-con">
+		            <div class="locbox1-defind">
+		                <img src="/lkdtWX/plugins/weui/img/buttons/dafeng.png" class="button-img" onclick="btnFun.showWindFun(this)"></img>
+		            </div>
+	        	</div>
+        	</a>
+			 
+			  <a href="#" class="gooey-menu-item" direction="vertical"> 
+	         <div class="amap-geolocation-con">
+	            <div class="locbox1-defind">
+	                <img src="/lkdtWX/plugins/weui/img/buttons/tufaweiqing_gray.png" class="button-img" aria-hidden="true" onclick="btnFun.nofun()"></img>
+	            </div>
+	        </div>
+	         </a>
+	         
+			 <a href="#" class="gooey-menu-item" direction="vertical"> 
+	        	<div class="amap-geolocation-con">
+		            <div class="locbox1-defind">
+		                <img src="/lkdtWX/plugins/weui/img/buttons/dinengjiandu.png" class="button-img" aria-hidden="true" onclick="btnFun.showFogFun(this, '现无低能见度事件')"></img>
+		            </div>
+		        </div>
+	        </a>
+			
+			 <a href="#" class="gooey-menu-item" direction="vertical"> 
+	        	 <div class="locbox1-defind">
+	                <img src="/lkdtWX/plugins/weui/img/buttons/tufatuanwu.png" class="button-img" aria-hidden="true" onclick="btnFun.showFogFun(this, '现无团雾事件')"></img>
+	            </div>
+	        </a>
+	        
+			<a href="#" class="gooey-menu-item" id="confirmList"  direction="vertical"> 
+			 <div class="amap-geolocation-con" >
+	            <div class="locbox1-defind">
+	                <img id="yichangjiankong" src="/lkdtWX/plugins/weui/img/buttons/yichangjiankong.png" class="button-img" aria-hidden="true" onclick="btnFun.cameraAbn()"></img>
+	            </div>
+	       	 </div> 
+	        </a>
+		</nav> 
+  
+    <!--<div style="position: absolute;bottom:80px;z-index: 9999;">
+        <div class="amap-geolocation-con" style="position: absolute; z-index: 9999; left: 10px; bottom: 20px;">
+            <div class="locbox1-defind">
+                <span id="showWindFun" class="glyphicon glyphicon-align-justify" aria-hidden="true" onclick="btnFun.showWindFun()"></span>
+            </div>
+        </div>
+    </div>
+    <div style="position: absolute;bottom:40px;z-index: 9999;">
+        <div class="amap-geolocation-con" style="position: absolute; z-index: 9999; left: 10px; bottom: 20px;">
+            <div class="locbox1-defind">
+                <span id="showServiceAreaFun" class="glyphicon glyphicon-cutlery" onclick="btnFun.showServiceAreaFun()" aria-hidden="true"></span>
+            </div>
+        </div>
+    </div>-->
+</div>
+
+
+<div id="wxEquPopDiv" style="display: none;position: fixed;top:0px;width:100%;background-color: #132535;z-index: 10000;">
+    <img src="/lkdtWX/img/youwu.jpg" class="img-max" onclick="wxEquPop.previewFun(this);return false;" style="width:100%;max-height: 300px;">
+    <div class="echarts" id="echarts-line-chart" style="height: 200px;"></div>
+    <a href="javascript:;" class="weui-btn weui-btn_danger" id="confirmPhoneMonual" style="background-color: #ed5565" onclick="confirmPhoneMonual()">手动告警</a>
+    <a href="javascript:;" class="weui-btn weui-btn_primary" onclick="wxEquPop.close()">关闭</a>
+</div>
+
+<div id="wxWindPopDiv" style="display: none;position: fixed;top:0px;width:100%;background-color: #132535;z-index: 10000;">
+   <div class="row" style="height: 20vw;width: 100%;    margin: 0;">
+		<div class="col-md-6" style="    background-color: #090a21;
+    color: #fff;  font-size: 15px;padding: 0px;height: 100%;    padding-left: 0px;width: 50%;float: left;    font-family: sans-serif;">
+			<span>
+				<p class="p-wind">当前风速：<span id="mi"></span>m/s（<span id="windLevel"></span>）</p>
+	 			<p class="p-wind">当前风向：<span id="fengxiang"></span> </p>
+			</span>
+		</div>
+		<div class="col-md-6" style="    background-color: #090a21;
+    color: #fff;  font-size: 15px;padding: 0px;height: 100%;    padding-left: 0px;width: 50%;float: left;    font-family: sans-serif;">
+			<span>
+				<p class="p-wind">今日最大风速：<span id="maxDay"></span>m/s </p>
+				<p class="p-wind">今日最小风速：<span id="minDay"></span>m/s </p>
+			</span>
+		</div>
+	</div>
+	<div class="row" style="height: 70%;width: 99%;margin-top: 3%;">
+		<div id="container2" class="echarts"  style="height: 100%;width: 100vw;height: 200px;"></div>
+	</div>
+    <a href="javascript:;" style="margin-top: 10px;" class="weui-btn weui-btn_primary" onclick="wxWindPop.close()">关闭</a>
+</div>
+<div id="wxEquPop_preview" class="weui-gallery" style="display: none; z-index: 10000;" onclick="wxEquPop.wxEquPop_preview_close()">
+    <span class="weui-gallery__img" style="background-image:url(/img/youwu.jpg)"></span>
+</div>
+
+<!--NT001测试：视频播放 start
+<div id="videoWindow" style="display:none;position: fixed;top:0px;width:100%;background-color: #132535;z-index: 10000;">
+    <video id="myVideo_NT001" class="video-js vjs-default-skin vjs-big-play-centered" data-setup='{}'
+           webkit-playsinline="" playsinline="" x5-playsinline="" x-webkit-airplay="allow"
+           style='width: 100%;max-height: 300px;' poster="/lkdtWX/plugins/weui/img/cameras/NT001.png" muted>
+        <source id="source" src="https://ainjdjc.jchc.cn/live_video_low/NT001.m3u8" type="application/x-mpegURL"></source>
+    </video>
+    <div class="echarts" id="echarts-line-chart-NT001" style="height: 200px;"></div>
+    <a href="javascript:;" class="weui-btn weui-btn_primary" onclick="closeVideo()">关闭</a>
+</div>-->
+<!--NT001测试：视频播放 end -->
+
+<!-- 引入 WeJS -->
+<script src="/lkdtWX/plugins/weui/js/commonMap.js"></script>
+<script src="/lkdtWX/plugins/weui/js/zepto.min.js"></script>
+<script src="/lkdtWX/plugins/weui/js/zepto.weui.js"></script>
+<script src="/lkdtWX/plugins/weui/js/php.js"></script>
+<script src="/lkdtWX/plugins/weui/js/axios.min.js"></script>
+<script src="/lkdtWX/plugins/weui/js/lrz.min.js"></script>
+<!--<script src="/lkdtWX/plugins/weui/js/echarts-all.js"></script>-->
+<script src="/lkdtWX/js/plugins/echarts/echarts.min.js"></script>
+<script src="/lkdtWX/js/common-options.js"></script>
+<script language="javascript" src="https://webapi.amap.com/maps?v=1.4.14&key=0fb99186996b7bff85d606c80d16f224&plugin=Map3D,AMap.DistrictSearch"></script>
+<!-- UI组件库 1.0 -->
+<script src="https://webapi.amap.com/ui/1.0/main.js?v=1"></script>
+<script src="/lkdtWX/plugins/weui/jweixin/jweixin-1.4.0.js"></script>
+
+<script src="/lkdtWX/plugins/weui/js/gooey.min.js?v=1"></script>
+
+<!--视频播放-->
+<!--<script src="/lkdtWX/plugins/weui/zencdn/7.4.1/video.js"></script>-->
+<!-- script src="/lkdtWX/plugins/weui/zencdn/videojs-contrib-hls-5.15.0/videojs-contrib-hls.min.js"></script-->
+<!--debuger-->
+<!--<script src="/lkdtWX/plugins/weui/js/eruda.js"></script>-->
+<script>
+	var clickepId='';
+	function initMenu(){
+    	$("#gooey-h").gooeymenu({
+    		bgColor: "white",
+    		contentColor: "black",
+    		style: "horizontal",
+    		bounce:false,  
+    		horizontal: {
+    			menuItemPosition: "glue"
+    		},
+    		circle: {
+    			radius: 80
+    		},
+    		margin: "small",
+    		size: 80,
+    		bounce: true,
+    		bounceLength: "small",
+    		transitionStep: 100  
+    	});
+    	$("#menu-open2").click();
+	}
+    $(function(){
+    	initMenu();
+    	$("#confirmList").hide();
+    	$("#confirmPhoneMonual").hide();
+        //轮询告警信息
+        alarmHandle();
+        setInterval(alarmHandle,60*1000);
+        windTestInit();
+    });
+
+    let wxEquPop = {
+        test:function(){},
+        /**弹出框能见度*/
+        pop:function(equObj){
+            $.showLoading();
+            try{
+                //获取图片
+				let $src = equObj.imgpath;
+                clickepId = equObj.epId;
+                $('#wxEquPopDiv').find('img')[0].src = $src;
+                $('#wxEquPop_preview').find('span')[0].style.backgroundImage = 'url("'+$src+'")';
+                //摄像头能见度统计
+                let date = new Date(new Date().getTime()-24*60*60*1000).Format('yyyy-MM-dd hh:mm:ss');
+                //摄像头能见度统计
+                axios.post('/weixin/map/getDisplayDistanceByEqu',{openid:u.getStorage("openid"),epId:equObj.epId,date:date})//也可以直接拼接在url
+                    .then(function(rs){
+                        if(rs.data){
+                            $('#videoWindow').hide();
+                            $('#wxEquPopDiv').show();
+                            let lineChart = echarts.init(document.getElementById("echarts-line-chart"));
+                            common_options2.title.text = equObj.equName;
+                            let currDistance = rs.data.series.split(",")[rs.data.series.split(",").length - 1];
+                            if(currDistance != "" && currDistance != null && currDistance != undefined){
+                                common_options2.title.text += "【当前:"+currDistance+"米】";
+                            }
+                            common_options2.xAxis[0].data = rs.data.xAxis.split(",");
+                            common_options2.series[0].data = rs.data.series.split(",");
+                            lineChart.setOption(common_options2);
+                            try{
+                                let imgpathsjson=rs.data.imgpaths;
+                                lineChart.getZr().on('click', function (params) {
+                                    let pointInPixel= [params.offsetX, params.offsetY];
+                                    if (lineChart.containPixel('grid',pointInPixel)) {
+                                        /*此处添加具体执行代码*/
+                                        let pointInGrid = lineChart.convertFromPixel({seriesIndex:0},pointInPixel);
+                                        //X轴序号
+                                        let xIndex = pointInGrid[0];
+                                        //获取当前图表的option
+                                        let op = lineChart.getOption();
+                                        //获得图表中我们想要的数据
+                                        let time = op.xAxis[0].data[xIndex];
+                                        let value = op.series[0].data[xIndex];
+                                        time=time.replace(":","");
+                                        let date = new Date();
+                                        var hour = date.getHours();
+                                        var minute = date.getMinutes()<10? "0"+date.getMinutes(): date.getMinutes();
+                                        var hm=hour+""+minute;
+                                        if(Number(hm)<Number(time)){
+                                            var yesterdaytime=(new Date).getTime()-24*60*60*1000;
+                                            date=new Date(yesterdaytime);
+                                        }
+                                        let dateStr=date.getFullYear()+'-'+(date.getMonth()+1)+'-'+date.getDate();
+                                        $src = imgpathsjson[time];
+                                        $('#wxEquPopDiv').find('img')[0].src = $src;
+                                        $('#wxEquPop_preview').find('span')[0].style.backgroundImage = 'url("'+$src+'")';
+                                    }
+                                });
+                            } catch (e) {
+                                console.log(e);
+                            }
+                        }
+                        $.hideLoading();
+                    }).catch(function(e){
+                    $.hideLoading();
+                });
+            } catch (e) {
+                $.toast("ERROR:PO215网络异常", "forbidden");
+            }
+
+        },
+        previewFun:function(ele){
+            $('#wxEquPop_preview').show();
+        },
+        wxEquPop_preview_close:function(){
+            $('#wxEquPop_preview').hide();
+        },
+        close:function(){
+            $('#wxEquPopDiv').hide();
+        },
+    };
+
+    let markEqu = null;
+    let markFog = null;
+    let markFogEnd = null;
+
+    let sdkLocationMarker = null;
+
+    //加载等待
+    $.showLoading();
+    let map$zoom = 7;
+    let map$center = [119.167147,32.952384];//初始地图中心点 江苏
+    //创建地图
+    let map = new AMap.Map('container', {
+        cursor: 'default',
+        resizeEnable: true,
+        zoom: map$zoom,
+        center: map$center,
+        mapStyle: "amap://styles/1de1ab4a6f3d6b4a31d558771f073fa2"
+    });
+
+    map.on("zoomchange",function(){
+    	 var zoom = map.getZoom(); //获取当前地图级别
+        // alert(map.getZoom());
+        let massMarkers = u.getStorage("mass-markers");
+		massMarkers = [{"lnglat":["119.21095","35.06069"],"lng":"119.21095","equLocation":"G15连云港段","epId":"K767X-7","equName":"K767+000下行-7","lat":"35.06069","equCode":"48-EA-63-08-FD-10+1"},{"lnglat":["119.1760958","35.00935278"],"lng":"119.1760958","equLocation":"G15连云港段","epId":"K774+700X","equName":"K774+700下","lat":"35.00935278","equCode":"1721611118+1"},{"lnglat":["119.1592114","34.97847065"],"lng":"119.1592114","equLocation":"G15连云港段","epId":"K778+485S-1","equName":"K778+485上","lat":"34.97847065","equCode":"1721611120+1"},{"lnglat":["119.1396357","34.94534001"],"lng":"119.1396357","equLocation":"G15连云港段","epId":"K782+580X","equName":"K782+580下-","lat":"34.94534001","equCode":"74-39-24+1"},{"lnglat":["119.1335143","34.93580083"],"lng":"119.1335143","equLocation":"G15连云港段","epId":"K783+750S","equName":"K783+750上","lat":"34.93580083","equCode":"20190618+1"},{"lnglat":["119.1285143","34.92580083"],"lng":"119.1285143","equLocation":"G15连云港段","epId":"K784+985X-1","equName":"K784+985下-","lat":"34.92580083","equCode":"74-39-2C+1"},{"lnglat":["119.1218612","34.91257815"],"lng":"119.1218612","equLocation":"G15连云港段","epId":"K786+570X","equName":"K786+570下","lat":"34.91257815","equCode":"74-39-1E+1"},{"lnglat":["119.1129663","34.88431264"],"lng":"119.1129663","equLocation":"G15连云港段","epId":"K789+800S","equName":"K789+800上","lat":"34.88431264","equCode":"74-39-20+1"},{"lnglat":["119.1021142","34.8697581"],"lng":"119.1021142","equLocation":"G15连云港段","epId":"K791+700X","equName":"K791+700下","lat":"34.8697581","equCode":"74-39-38+1"},{"lnglat":["119.0975064","34.86064849"],"lng":"119.0975064","equLocation":"G15连云港段","epId":"K792+700X","equName":"K792+700下行","lat":"34.86064849","equCode":"20190715"},{"lnglat":["119.0935064","34.85164849"],"lng":"119.0935064","equLocation":"G15连云港段","epId":"K793+870X","equName":"K793+870下","lat":"34.85164849","equCode":"74-39-32+1"},{"lnglat":["119.09017","34.835112"],"lng":"119.09017","equLocation":"G15连云港段","epId":"K795+730X","equName":"K795+730下","lat":"34.835112","equCode":"74-39-2A+1"},{"lnglat":["119.0873392","34.75370532"],"lng":"119.0873392","equLocation":"G15连云港段","epId":"K804X-7","equName":"K804+000下-7-","lat":"34.75370532","equCode":"74-39-3E+1"},{"lnglat":["119.0882262","34.73536538"],"lng":"119.0882262","equLocation":"G15连云港段","epId":"K806+S","equName":"K806+000+上","lat":"34.73536538","equCode":"74-39-36+1"},{"lnglat":["119.0889561","34.70170063"],"lng":"119.0889561","equLocation":"G15连云港段","epId":"K810S-1","equName":"K810+000上-1","lat":"34.70170063","equCode":"74-38-E0+1"},{"lnglat":["119.0850466","34.63822974"],"lng":"119.0850466","equLocation":"G15连云港段","epId":"K817X-7","equName":"K817+000下-7-","lat":"34.63822974","equCode":"74-38-CE+1"},{"lnglat":["119.0873341","34.59775405"],"lng":"119.0873341","equLocation":"G15连云港段","epId":"K822+S-2","equName":"K822+000+港西互通上-2-","lat":"34.59775405","equCode":"17216995+1"},{"lnglat":["119.090098","34.58349896"],"lng":"119.090098","equLocation":"G15连云港段","epId":"K823-2","equName":"K823+000中央隔离带","lat":"34.58349896","equCode":"2018823+1"},{"lnglat":["119.09064","34.577375"],"lng":"119.09064","equLocation":"G15","epId":"1a6dd154-a1a1-4733-b2cb-57e261eaea80","equName":"K823+750门架标识站","lat":"34.577375","equCode":"1a6dd154-a1a1-4733-b2cb-57e261eaea80"},{"lnglat":["119.0901411","34.57069771"],"lng":"119.0901411","equLocation":"G15连云港段","epId":"K824S","equName":"K824上","lat":"34.57069771","equCode":"74-39-22+1"},{"lnglat":["119.0901974","34.55469771"],"lng":"119.0901974","equLocation":"G15连云港段","epId":"K826+900X-1","equName":"K826+900下","lat":"34.55469771","equCode":"74-38-D2+1"},{"lnglat":["119.0945279","34.53706095"],"lng":"119.0945279","equLocation":"G15连云港段","epId":"K828+900X-2","equName":"K828+900下","lat":"34.53706095","equCode":"74-39-1A+1"},{"lnglat":["119.1003047","34.51968055"],"lng":"119.1003047","equLocation":"G15连云港段","epId":"K830X","equName":"K830下行","lat":"34.51968055","equCode":"39-A9-2F+1"},{"lnglat":["119.1031931","34.51968035"],"lng":"119.1031931","equLocation":"G15连云港段","epId":"K831-1","equName":"K831+000+锦屏互通下","lat":"34.51968035","equCode":"74-39-30+1"},{"lnglat":["119.1418866","34.4875449"],"lng":"119.1418866","equLocation":"G15连云港段","epId":"K836+X-6","equName":"K836+000+新坝互通下-6-","lat":"34.4875449","equCode":"74-39-34+1"},{"lnglat":["119.1658751","34.46265122"],"lng":"119.1658751","equLocation":"G15连云港段","epId":"K839+650X-8","equName":"K839+650下-8","lat":"34.46265122","equCode":"74-39-0E+1"},{"lnglat":["119.1766913","34.45303823"],"lng":"119.1766913","equLocation":"G15连云港段","epId":"K841X-9","equName":"K841+000下-9-","lat":"34.45303823","equCode":"172164174+1"},{"lnglat":["118.8223869249","34.867614977608"],"lng":"118.8223869249","equLocation":"G25连云港段","epId":"K1646+000X","equName":"K1646+000下","lat":"34.867614977608","equCode":"20191013"},{"lnglat":["119.038147424582","34.7945755340561"],"lng":"119.038147424582","equLocation":"G25连云港段","epId":"K1667X","equName":"K1667+600下","lat":"34.7945755340561","equCode":"20191107"},{"lnglat":["119.1496357","34.96034001"],"lng":"119.1496357","equLocation":"G15连云港段","epId":"K780+050X","equName":"K780+050海头互通下","lat":"34.96034001","equCode":"91-F2-6C+1"},{"lnglat":["119.0909247","34.81397702"],"lng":"119.0909247","equLocation":"G15连云港段","epId":"K798+S","equName":"K798+000+赣榆互通上","lat":"34.81397702","equCode":"91-F2-78+1"},{"lnglat":["119.0900721","34.80565903"],"lng":"119.0900721","equLocation":"G15连云港段","epId":"K799+X","equName":"K799+下","lat":"34.80565903","equCode":"91-F2-70+1"},{"lnglat":["119.0892262","34.77742631"],"lng":"119.0892262","equLocation":"G15连云港段","epId":"K802+S-1","equName":"K802+000+上-","lat":"34.77742631","equCode":"91-F2-76+1"},{"lnglat":["119.0892262","34.77742631"],"lng":"119.0892262","equLocation":"G15连云港段","epId":"K802+S-2","equName":"K802+000+上行枪机","lat":"34.77742631","equCode":"83-0B-39+1"},{"lnglat":["119.0883896","34.67870787"],"lng":"119.0883896","equLocation":"G15连云港段","epId":"K813S-4","equName":"K813+000上-4","lat":"34.67870787","equCode":"91-F2-84+1"},{"lnglat":["119.0883896","34.67870787"],"lng":"119.0883896","equLocation":"G15连云港段","epId":"K813+S","equName":"K813+000+上行枪机","lat":"34.67870787","equCode":"83-0B-36+1"},{"lnglat":["119.0852788","34.62840194"],"lng":"119.0852788","equLocation":"G15连云港段","epId":"K818+X","equName":"K818+000+下行枪机","lat":"34.62840194","equCode":"83-0A-FC+1"},{"lnglat":["119.090098","34.58349896"],"lng":"119.090098","equLocation":"G15连云港段","epId":"K823-1","equName":"K823+000+中枪机","lat":"34.58349896","equCode":"83-0B-77+1"},{"lnglat":["119.1031931","34.51968035"],"lng":"119.1031931","equLocation":"G15连云港段","epId":"K831-3","equName":"K831+000连徐至汾灌互通匝道枪机","lat":"34.51968035","equCode":"83-0B-38+1"},{"lnglat":["119.1549447","34.47549024"],"lng":"119.1549447","equLocation":"G15连云港段","epId":"K837+S-7","equName":"K837+000+上-7-","lat":"34.47549024","equCode":"91-F2-6E+1"},{"lnglat":["119.201302","34.438577"],"lng":"119.201302","equLocation":"G15连云港段","epId":"K844+050-02","equName":"K844+050灌云枢纽01枪机","lat":"34.438577","equCode":"83-0B-06+1"},{"lnglat":["118.868155262042","34.856929601442"],"lng":"118.868155262042","equLocation":"G25连云港段","epId":"K1650S","equName":"K1650上行","lat":"34.856929601442","equCode":"91-F2-62+1"},{"lnglat":["118.891794629836","34.8458611900683"],"lng":"118.891794629836","equLocation":"G25连云港段","epId":"K1653+000X","equName":"K1653+000下","lat":"34.8458611900683","equCode":"91-F2-7C+1"},{"lnglat":["119.098409210085","34.7696821574838"],"lng":"119.098409210085","equLocation":"G25连云港段","epId":"K1673+850X","equName":"K1673+850下","lat":"34.7696821574838","equCode":"83-0B-35+1"},{"lnglat":["119.1278349","34.75663366"],"lng":"119.1278349","equLocation":"G25连云港段","epId":"K1676+400X-1","equName":"K1676+400下-","lat":"34.75663366","equCode":"91-F2-60+1"},{"lnglat":["119.164053","34.747944"],"lng":"119.164053","equLocation":"G25连云港段","epId":"K1680+370X","equName":"K1680+370下-","lat":"34.747944","equCode":"91-F2-72+1"},{"lnglat":["119.187914953645","34.7168678439252"],"lng":"119.187914953645","equLocation":"G25连云港段","epId":"K1685+400X","equName":"K1685+400下","lat":"34.7168678439252","equCode":"91-F2-6A+1"},{"lnglat":["119.203914953645","34.6768678439252"],"lng":"119.203914953645","equLocation":"G25连云港段","epId":"K1689+480S","equName":"K1689+480上","lat":"34.6768678439252","equCode":"83-0B-3E+1"},{"lnglat":["119.230177","34.598123"],"lng":"119.230177","equLocation":"G25连云港段","epId":"K1693+100S","equName":"K1693+100上","lat":"34.598123","equCode":"91-F2-86+1"},{"lnglat":["119.087983","34.66294055"],"lng":"119.087983","equLocation":"G15连云港段","epId":"K814-1","equName":"K814+000+港北互通","lat":"34.66294055","equCode":"91-F2-9C+1"},{"lnglat":["119.090744","34.574996"],"lng":"119.090744","equLocation":"G15","epId":"c2d7b63a-17a3-44c0-ab68-188968e5e653","equName":"K823+850门架标识站","lat":"34.574996","equCode":"c2d7b63a-17a3-44c0-ab68-188968e5e653"},{"lnglat":["119.1031931","34.51968035"],"lng":"119.1031931","equLocation":"G15连云港段","epId":"K831-2","equName":"K831+000连徐至汾灌互通匝道-","lat":"34.51968035","equCode":"91-F2-C0+1"},{"lnglat":["119.10865","34.51154"],"lng":"119.10865","equLocation":"G15连云港段","epId":"K832+-3","equName":"K832+000+汾灌至连徐互通匝道-3","lat":"34.51154","equCode":"91-F2-96+1"},{"lnglat":["118.992154747356","34.8096723625218"],"lng":"118.992154747356","equLocation":"G25连云港段","epId":"K1663+050X","equName":"K1663+050下","lat":"34.8096723625218","equCode":"91-F2-FA+1"},{"lnglat":["119.1472527","34.75246682"],"lng":"119.1472527","equLocation":"G25连云港段","epId":"K1678+750X","equName":"K1678+750下","lat":"34.75246682","equCode":"91-F2-DC+1"},{"lnglat":["119.1792794","34.73121231"],"lng":"119.1792794","equLocation":"G25连云港段","epId":"K1682+750X","equName":"K1682+750下","lat":"34.73121231","equCode":"91-F2-9A+1"},{"lnglat":["118.807238","34.874489"],"lng":"118.807238","equLocation":"G25连云港段","epId":"K1644+750S-1","equName":"K1644+750上","lat":"34.874489","equCode":"k1644+1"},{"lnglat":["118.873266","34.855292"],"lng":"118.873266","equLocation":"G25连云港段","epId":"K1651+700S-1","equName":"K1651+700上","lat":"34.855292","equCode":"k1651+1"},{"lnglat":["119.078409210085","34.7766821574838"],"lng":"119.078409210085","equLocation":"G25连云港段","epId":"k1671+800X-1","equName":"k1671+800下","lat":"34.7766821574838","equCode":"k1671+800+1"},{"lnglat":["119.195914953645","34.6968678439252"],"lng":"119.195914953645","equLocation":"G25连云港段","epId":"k1687+850S","equName":"k1687+850上","lat":"34.6968678439252","equCode":"k1687+1"},{"lnglat":["119.089292","34.777911"],"lng":"119.089292","equLocation":"G15连云港段","epId":"K802+550S","equName":"K802+550上","lat":"34.777911","equCode":"k801+1"},{"lnglat":["119.087242","34.65083515"],"lng":"119.087242","equLocation":"G15连云港段","epId":"K816+200S","equName":"K816+200上","lat":"34.65083515","equCode":"k816+1"},{"lnglat":["119.0852788","34.62840194"],"lng":"119.0852788","equLocation":"G15连云港段","epId":"K818+700X","equName":"K818+700下","lat":"34.62840194","equCode":"k818+1"},{"lnglat":["119.211179","34.434735"],"lng":"119.211179","equLocation":"G15连云港段","epId":"K845-1","equName":"K845+000宁连至汾灌互通匝道","lat":"34.434735","equCode":"nl-fg+1"}];
+		if(markEqu){markEqu.clear();}
+        markEqu = mapBatchMarkSetStyle(massMarkers);
+    });
+
+    AMapUI.loadUI(['geo/DistrictExplorer'], function(DistrictExplorer) {
+        initPage(DistrictExplorer);
+    });
+
+    function initPage(DistrictExplorer) {
+        //创建一个实例getOpenFid
+        let districtExplorer = new DistrictExplorer({
+            map: map
+        });
+        let countryCode = 100000, //全国
+            provCodes = [
+                320000 //江苏
+                // 640000 // 宁夏回族自治区
+            ],
+            cityCodes = [];
+        districtExplorer.loadMultiAreaNodes([countryCode].concat(cityCodes),//只需加载全国和市，全国的节点包含省级
+            function(error, areaNodes) {
+                let countryNode = areaNodes[0], cityNodes = areaNodes.slice(1);
+                let path = [];
+                //首先放置背景区域，这里是大陆的边界
+                path.push(getLongestRing(countryNode.getParentFeature()));
+                for (var i = 0, len = provCodes.length; i < len; i++) {
+                    //逐个放置需要镂空的省级区域
+                    path.push.apply(path, getAllRings(countryNode.getSubFeatureByAdcode(provCodes[i])));
+                }
+                for (var i = 0, len = cityNodes.length; i < len; i++) {
+                    //逐个放置需要镂空的市级区域
+                    path.push.apply(path, getAllRings(cityNodes[i].getParentFeature()));
+                }
+                //绘制带环多边形
+                //https://lbs.amap.com/api/javascript-api/reference/overlay#Polygon
+                let polygon = new AMap.Polygon({
+                    bubble: true,
+                    lineJoin: 'round',
+                    strokeColor: 'white', //线颜色
+                    strokeOpacity: 1, //线透明度
+                    strokeWeight: 0, //线宽
+                    fillColor: 'black', //填充色
+                    fillOpacity: 0.80, //填充透明度
+                    map: map,
+                    path: path
+                });
+            }
+        );
+    }
+
+    function getLongestRing(feature) {
+        let rings = getAllRings(feature);
+        rings.sort(function(a, b) {
+            return b.length - a.length;
+        });
+        return rings[0];
+    }
+
+    function getAllRings(feature) {
+        let coords = feature.geometry.coordinates,
+            rings = [];
+        for (let i = 0, len = coords.length; i < len; i++) {
+            rings.push(coords[i][0]);
+        }
+        return rings;
+    }
+
+    map.plugin([
+        'AMap.ToolBar',
+    ], function(){
+        // 在图面添加工具条控件，工具条控件集成了缩放、平移、定位等功能按钮在内的组合控件
+        map.addControl(new AMap.ToolBar({
+            // 简易缩放模式，默认为 false
+            liteStyle: true
+        }));
+    });
+
+    //定位按钮
+    let locationButton = '<div id="locbox" class="zdeps-1 usel">' +
+        ' <div class="icon locicon locok">' +
+        '  <svg class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5112" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200">' +
+        '   <defs>' +
+        '    <style type="text/css"></style>' +
+        '    </defs>' +
+        '   <path d="M639.297829 382.7712c-17.2032-17.173943-37.829486-30.954057-60.328229-40.257829-22.498743-9.303771-46.811429-14.1312-' +
+        '71.153371-14.1312-24.341943 0-48.683886 4.827429-71.153371 14.1312-22.498743 9.303771-43.125029 23.054629-60.328229 40.257829-17.2032 ' +
+        '17.173943-30.983314 37.800229-40.316343 60.240457-9.303771 22.469486-14.160457 46.752914-14.160457 71.0656 0 24.312686 4.827429 ' +
+        '48.596114 14.160457 71.0656 9.303771 22.469486 23.083886 43.066514 40.316343 60.240457 17.2032 17.173943 37.829486 30.954057 60.328229 ' +
+        '40.257829 22.469486 9.303771 46.811429 14.1312 71.153371 14.1312 24.341943 0 48.654629-4.827429 71.153371-14.1312 22.469486-9.303771 ' +
+        '43.125029-23.054629 60.328229-40.257829 17.2032-17.173943 30.983314-37.770971 40.287086-60.240457 9.303771-22.440229 14.160457-46.752914 ' +
+        '14.160457-71.0656 0-24.312686-4.856686-48.596114-14.160457-71.0656C670.3104 420.571429 656.530286 399.9744 639.297829 382.7712zM918.557257 ' +
+        '467.529143c-16.647314-199.533714-162.962286-348.3648-362.788571-362.203429L555.768686 0l-85.4016 0 0 106.7008C276.128914 124.693943 ' +
+        '122.090057 272.149943 105.442743 467.529143L0 467.529143l0 87.127771 105.442743 0c16.647314 195.3792 168.842971 343.2448 363.081143 ' +
+        '362.642286L468.523886 1024l87.215543 0 0-105.325714c199.797029-13.867886 346.141257-164.512914 362.788571-364.046629L1024 554.627657 ' +
+        '1024 467.529143 918.557257 467.529143zM512 847.082057c-184.5248 0-334.848-151.464229-334.848-334.379886 0-182.915657 151.698286-336.223086 ' +
+        '334.848-336.223086 184.554057 0 334.848 153.307429 334.848 336.223086C846.848 695.588571 696.5248 847.082057 512 847.082057z" p-id="5113" ' +
+        'data-spm-anchor-id="0.0.0.i0.42e51c4evj849p"></path>' +
+        '  </svg>' +
+        ' </div>' +
+        '</div>';
+
+    map.plugin('AMap.Geolocation', function () {
+        //gaode-api
+        let options = {
+            enableHighAccuracy: true,//是否使用高精度定位，默认:true
+            timeout: 3000,          //超过10秒后停止定位，默认：无穷大
+            maximumAge: 0,           //定位结果缓存0毫秒，默认：0
+            convert: true,           //自动偏移坐标，偏移后的坐标为高德坐标，默认：true
+           // buttonDom:locationButton,
+            showButton: false,//是否显示定位按钮
+            buttonPosition: 'LB',//定位按钮的位置/* LT LB RT RB */
+            buttonOffset: new AMap.Pixel(10, 20),//定位按钮距离对应角落的距离
+            showMarker: true,//是否显示定位点
+            // markerOptions:{//自定义定位点样式，同Marker的Options
+            //     offset: new AMap.Pixel(-18, -36),
+            //     content:'<img src="https://a.amap.com/jsapi_demos/static/resource/img/user.png" style="width:36px;height:36px"/>'
+            // },
+            showCircle: true,//是否显示定位精度圈
+            panToLocation: false,     //定位成功后将定位到的位置作为地图中心点，默认：true
+            zoomToAccuracy:false,      //定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：false
+            circleOptions: {//定位精度圈的样式
+                strokeColor: '#0093FF',
+                noSelect: true,
+                strokeOpacity: 0.5,
+                strokeWeight: 1,
+                fillColor: '#02B0FF',
+                fillOpacity: 0.25
+            }
+        };
+        let geolocation = new AMap.Geolocation(options);
+        map.addControl(geolocation);
+        geolocation.getCurrentPosition();
+        AMap.event.addListener(geolocation, 'complete', onComplete);//返回定位信息
+        AMap.event.addListener(geolocation, 'error', onError);      //返回定位出错信息
+        function onComplete(result){
+            map.setZoomAndCenter(map$zoom, map$center);
+            $.hideLoading();
+            $.toast("定位成功", 300);
+        }
+        function onError(result){
+            // alert(JSON.stringify(result));
+            $.hideLoading();
+            $.showLoading('正在定位......');
+            // $.toast("定位失败", "forbidden");
+            //js-sdk
+            wx.ready(function(){
+                // config信息验证后会执行ready方法，所有接口调用都必须在config接口获得结果之后，config是一个客户端的异步操作，所以如果需要在页面加载时就调用相关接口，则须把相关接口放在ready函数中调用来确保正确执行。对于用户触发时才调用的接口，则可以直接调用，不需要放在ready函数中。
+                wx.getLocation({
+                    type: 'wgs84', // 默认为wgs84的gps坐标，如果要返回直接给openLocation用的火星坐标，可传入'gcj02'
+                    success: function (res) {
+                        try{
+                            let latitude = res.latitude; // 纬度，浮点数，范围为90 ~ -90
+                            let longitude = res.longitude; // 经度，浮点数，范围为180 ~ -180。
+                            let speed = res.speed; // 速度，以米/每秒计
+                            let accuracy = res.accuracy; // 位置精度
+                            if(sdkLocationMarker != null){
+                                //移除原先定位标记
+                                sdkLocationMarker.setMap(null);
+                            }
+                            map.setZoomAndCenter(map$zoom, map$center);
+                            sdkLocationMarker = sdkLocationFunc(longitude,latitude);
+                            $.hideLoading();
+                            $.toast("定位成功");
+                        } catch (e) {
+                            $.toast("重定位失败", "forbidden");
+                        }
+
+                    }
+                });
+            });
+        }
+    });
+
+    /**
+     * js-sdk重定位
+     * */
+    function sdkLocationFunc(lon,lat){
+        try{
+            //定位标记
+            let marker = new AMap.Marker({
+                position: new AMap.LngLat(lon, lat),
+                content: `<img style="position:relative;cursor:pointer;" width="20px" height="20px"
+                        src="https://webapi.amap.com/theme/v1.3/markers/b/loc.png">`,
+                offset: new AMap.Pixel(-10, -10),
+                draggable: false,// 设置是否可拖拽
+                cursor: 'move'
+            });
+            marker.setMap(map);
+            return marker;
+        } catch (e) {
+            console.log(e);
+        }
+
+    }
+
+    //js-sdk
+    wx.error(function(res){
+        // config信息验证失败会执行error函数，如签名过期导致验证失败，具体错误信息可以打开config的debug模式查看，也可以在返回的res参数中查看，对于SPA可以在这里更新签名。
+        $.toast("ERROR:PO216微信授权异常", "forbidden");
+    });
+
+    //设置
+    let btnFun = {
+   		nofun:function(){
+   		 $.toast("系统优化中", "cancel");
+   		},
+    	confirmList:function(){
+            window.location.replace("/system/alarm/confirmList");
+        },
+        cameraAbn:function(){
+            window.location.replace("/system/alarm/cameraAbnormal");
+        },
+        settingFun:function(){
+            window.location.replace("/weixin/map/bindRoadMulti_v2");
+            return;
+        },
+        toggle:function(btn) {
+        	var pgname = btn.attr("src");
+        	if (btnFun.isEctive(btn)) {
+        		pgname = pgname.replace(".png","_gray.png");
+        	} else {
+        		pgname = pgname.replace("_gray.png",".png");
+        	}
+        	btn.attr("src", pgname);
+        },
+        isEctive:function(btn){
+        	var pgname = btn.attr("src");
+        	if (pgname.indexOf("_gray.png")> 0) {
+        		return false;
+        	}
+        	return true;
+        },
+        showLoading:function(){
+            $.showLoading("");
+            setTimeout(function() {
+                $.hideLoading();
+            }, 300);
+        },
+
+        /**展示雾*/
+        showFogFun:function(btn, msg){
+            btnFun.showLoading();
+            var btn = $(btn);
+            btnFun.toggle(btn);
+            var isEctive = btnFun.isEctive(btn);
+            if(isEctive){
+                alarmHandle(true, msg);
+            } else {
+                //清空警告点
+                if(markFog && markFog["30"]){markFog["30"].clear();}
+                if(markFog && markFog["50"]){markFog["50"].clear();}
+                if(markFog && markFog["200"]){markFog["200"].clear();}
+                if(markFogEnd){markFogEnd.clear();}
+            }
+            
+          
+        },
+        /**展示风*/
+        showWindFun:function(btn){
+        	var btn = $(btn);
+            var pgname = btn.attr("src");
+            btnFun.toggle(btn);
+        	if (!btnFun.isEctive(btn)) {
+        		if(windMarkers){
+        			windMarkers["blue"].hide();
+        			windMarkers["yellow"].hide();
+        			windMarkers["red"].hide();
+        		}
+        	} else {
+        		if(windMarkers){
+        			windMarkers["blue"].show();
+        			windMarkers["yellow"].show();
+        			windMarkers["red"].show();
+       			}
+        	}
+        },
+        /**展示摄像头*/
+        showVideoFun:function(){
+            btnFun.showLoading();
+            if($('#showVideoFun').css('color') != 'gray'){
+                // if(markEqu){markEqu.clear();}
+                if(markEqu){markEqu.hide();}
+                $('#showVideoFun').css("color","gray");
+            } else {
+                // equipmentList(u.getStorage("openid"));
+                if(markEqu){markEqu.show();}
+                $('#showVideoFun').css("color","");
+            }
+        },
+        /**展示服务区*/
+        showServiceAreaFun:function(){
+            btnFun.showLoading();
+            alert("暂无服务区数据");
+        },
+        showSettingIsShowAttention:function(){
+            equipmentList(u.getStorage("openid"));
+            if(btnFun.getShowSetting('isShowAttention')){
+                $('#showVideoFun').css("color","");
+            } else {
+                $('#showVideoFun').css("color","gray");
+            }
+        },
+    };
+
+    //初始化openid
+	//初始化openid
+	u.setStorage("openid",$("#openid").val());
+	//获取路段摄像头数据
+	equipmentList($("#openid").val());
+
+    //初始化code
+    // let code = getURLParameter("code");
+    // let signUrl = window.location.href.split('#')[0];
+    // if(code){
+    //     axios.post('/weixin/map/getOpenFid',{code:code,url:signUrl})//也可以直接拼接在url
+    //         .then(function(rs){
+    //             if(rs.data && rs.data.openid){
+    //                 try{
+    //                     wx.config({
+    //                         debug: false,
+    //                         appId: rs.data.config.appId,
+    //                         timestamp: rs.data.config.timestamp,
+    //                         nonceStr: rs.data.config.nonceStr,
+    //                         signature: rs.data.config.signature,
+    //                         jsApiList: ['openLocation'],
+    //                     });
+    //                 } catch(e){
+    //                     console.log(e);
+    //                 }
+    //                 let tagid_list = rs.data.userInfo.tagid_list;
+    //                 if (tagid_list.indexOf('101') > -1 || tagid_list == '101') {
+    //                 	$("#confirmList").show();
+    //                 	$("#confirmPhoneMonual").show();
+    //                 	u.setStorage("isAdmin",1);
+    //                 }
+    //                 //初始化code
+    //                 u.setStorage("code",code);
+    //                 //初始化openid
+    //                 u.setStorage("openid",rs.data.openid);
+    //                 //获取路段摄像头数据
+    //                 equipmentList(rs.data.openid);
+    //             } else {
+    //                 clearCode();
+    //                 alert('500 请求失效，请重新打开');
+    //                 isfollowqr(undefined,true,'请关注公众号获取数据','智高速');
+    //             }
+    //         }).catch(function(e){
+    //             clearCode();
+    //             alert('404 网络错误');
+    //             isfollowqr(undefined,true,'请关注公众号获取数据','智高速');
+    //         });
+    // }
+
+    /**清空code,openid*/
+    function clearCode(){
+        //清空code,openid
+        u.setStorage("code","");
+        u.setStorage("openid","");
+    }
+
+    //TODO 待删除
+    //equipmentList(u.getStorage("openid"));
+
+	let getDistance = function(lat1, lng1, lat2, lng2){
+		var radLat1 = lat1*Math.PI / 180.0;
+		var radLat2 = lat2*Math.PI / 180.0;
+		var a = radLat1 - radLat2;
+		var b = lng1*Math.PI / 180.0 - lng2*Math.PI / 180.0;
+		var s = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin(a/2),2) +
+				Math.cos(radLat1)*Math.cos(radLat2)*Math.pow(Math.sin(b/2),2)));
+		s = s *6378.137 ;// EARTH_RADIUS;
+		s = Math.round(s * 10000) / 10000;
+		return s;
+	}
+
+    /**
+     * 图层过滤
+     * */
+    function filterByZoom(arrayData){
+        if(arrayData == undefined || arrayData == null || arrayData == ""){
+            return [];
+        }
+        if(arrayData.length < 30){
+            return arrayData;
+        }
+		arrayData.sort(function (x, y) {//比较函数
+			try{
+				//return x.equLocation.replace(/[^0-9]/ig,"") - y.index;
+				return x.equLocation.replace(/[^0-9]/ig,"") - y.equLocation.replace(/[^0-9]/ig,"")
+			} catch (e) {
+				return 0;
+			}
+
+		});
+		//7,8,9,10,11
+        let zoom = map.getZoom();
+        let filteredData = [];
+        let equLocationTemp = "";
+        if(zoom <= 7){
+            arrayData.forEach(function(item,index,array){
+            	if(equLocationTemp == item.equLocation && index % 5 == 0){
+					filteredData.push(item);
+				} else if(equLocationTemp != item.equLocation){
+					filteredData.push(item);
+				}
+				equLocationTemp = item.equLocation;
+            });
+        } else if(zoom == 8){
+            arrayData.forEach(function(item,index,array){
+				if(equLocationTemp == item.equLocation && index % 3 == 0){
+					filteredData.push(item);
+				} else if(equLocationTemp != item.equLocation){
+					filteredData.push(item);
+				}
+				equLocationTemp = item.equLocation;
+            });
+        } else if(zoom == 9){
+            arrayData.forEach(function(item,index,array){
+				if(equLocationTemp == item.equLocation && index % 2 == 0){
+					filteredData.push(item);
+				} else if(equLocationTemp != item.equLocation){
+					filteredData.push(item);
+				}
+				equLocationTemp = item.equLocation;
+            });
+        } else if(zoom == 10){
+            arrayData.forEach(function(item,index,array){
+				if(equLocationTemp == item.equLocation && index % 1 == 0){
+					filteredData.push(item);
+				} else if(equLocationTemp != item.equLocation){
+					filteredData.push(item);
+				}
+				equLocationTemp = item.equLocation;
+            });
+        } else {
+            //显示所有
+            filteredData = arrayData;
+        }
+        return filteredData;
+    }
+
+    // 实例化 AMap.MassMarks
+    let massMarks = null;
+    let massMarks_alarm = {"30":null,"50":null,"200":null};
+    let massMarks_alarm_end = null;
+    let massMarks_video = null;
+
+    /**
+     * 1.根据已关注路段获取摄像头数据
+     * 2.获取所有路段摄像头数据
+     * @param hwId 路段id
+     */
+    function equipmentList(openid){
+        //验证
+        if(openid){
+            let url = "";///weixin/map/getEquWWxxAll，/weixin/map/getEquWWxxByHw
+            url = "/weixin/map/getEquWWxxByHw";
+            axios.post(url,{openid:openid}) //也可以直接拼接在url
+                .then(function(rs){
+                    $.toptip('摄像头数据加载成功','success');
+                    if(markEqu){markEqu.clear();}
+                    if(rs.data.length > 0){
+                        markEqu = mapBatchMark(rs.data);
+                        //设置缩放级别和中心点
+                        map.setZoomAndCenter(map$zoom, map$center);
+                        u.setStorage("mass-markers",rs.data);
+                    } else {
+                        url = "/weixin/map/getEquWWxxAll";
+                        axios.post(url,{openid:openid}) //也可以直接拼接在url
+                            .then(function(rs){
+                                if(markEqu){markEqu.clear();}
+                                markEqu = mapBatchMark(rs.data);
+                                //设置缩放级别和中心点
+                                map.setZoomAndCenter(map$zoom, map$center);
+                                u.setStorage("mass-markers",rs.data);
+                            }).catch(function(e){
+                            $.toptip('摄像头数据请求失败-1','error');
+                        });
+                    }
+                }).catch(function(e){
+                    $.toptip('摄像头数据请求失败-0','error');
+                });
+        } else {
+            isfollowqr(undefined,true,'请关注公众号获取数据','智高速');
+        }
+        /**标记信息*/
+        let infoWindow = new AMap.InfoWindow({offset: new AMap.Pixel(0, 0)});
+
+        /**批量标记*/
+        function mapBatchMark(arrayData){
+			arrayData = [{"lnglat":["119.21095","35.06069"],"lng":"119.21095","equLocation":"G15连云港段","epId":"K767X-7","equName":"K767+000下行-7","lat":"35.06069","equCode":"48-EA-63-08-FD-10+1"},{"lnglat":["119.1760958","35.00935278"],"lng":"119.1760958","equLocation":"G15连云港段","epId":"K774+700X","equName":"K774+700下","lat":"35.00935278","equCode":"1721611118+1"},{"lnglat":["119.1592114","34.97847065"],"lng":"119.1592114","equLocation":"G15连云港段","epId":"K778+485S-1","equName":"K778+485上","lat":"34.97847065","equCode":"1721611120+1"},{"lnglat":["119.1396357","34.94534001"],"lng":"119.1396357","equLocation":"G15连云港段","epId":"K782+580X","equName":"K782+580下-","lat":"34.94534001","equCode":"74-39-24+1"},{"lnglat":["119.1335143","34.93580083"],"lng":"119.1335143","equLocation":"G15连云港段","epId":"K783+750S","equName":"K783+750上","lat":"34.93580083","equCode":"20190618+1"},{"lnglat":["119.1285143","34.92580083"],"lng":"119.1285143","equLocation":"G15连云港段","epId":"K784+985X-1","equName":"K784+985下-","lat":"34.92580083","equCode":"74-39-2C+1"},{"lnglat":["119.1218612","34.91257815"],"lng":"119.1218612","equLocation":"G15连云港段","epId":"K786+570X","equName":"K786+570下","lat":"34.91257815","equCode":"74-39-1E+1"},{"lnglat":["119.1129663","34.88431264"],"lng":"119.1129663","equLocation":"G15连云港段","epId":"K789+800S","equName":"K789+800上","lat":"34.88431264","equCode":"74-39-20+1"},{"lnglat":["119.1021142","34.8697581"],"lng":"119.1021142","equLocation":"G15连云港段","epId":"K791+700X","equName":"K791+700下","lat":"34.8697581","equCode":"74-39-38+1"},{"lnglat":["119.0975064","34.86064849"],"lng":"119.0975064","equLocation":"G15连云港段","epId":"K792+700X","equName":"K792+700下行","lat":"34.86064849","equCode":"20190715"},{"lnglat":["119.0935064","34.85164849"],"lng":"119.0935064","equLocation":"G15连云港段","epId":"K793+870X","equName":"K793+870下","lat":"34.85164849","equCode":"74-39-32+1"},{"lnglat":["119.09017","34.835112"],"lng":"119.09017","equLocation":"G15连云港段","epId":"K795+730X","equName":"K795+730下","lat":"34.835112","equCode":"74-39-2A+1"},{"lnglat":["119.0873392","34.75370532"],"lng":"119.0873392","equLocation":"G15连云港段","epId":"K804X-7","equName":"K804+000下-7-","lat":"34.75370532","equCode":"74-39-3E+1"},{"lnglat":["119.0882262","34.73536538"],"lng":"119.0882262","equLocation":"G15连云港段","epId":"K806+S","equName":"K806+000+上","lat":"34.73536538","equCode":"74-39-36+1"},{"lnglat":["119.0889561","34.70170063"],"lng":"119.0889561","equLocation":"G15连云港段","epId":"K810S-1","equName":"K810+000上-1","lat":"34.70170063","equCode":"74-38-E0+1"},{"lnglat":["119.0850466","34.63822974"],"lng":"119.0850466","equLocation":"G15连云港段","epId":"K817X-7","equName":"K817+000下-7-","lat":"34.63822974","equCode":"74-38-CE+1"},{"lnglat":["119.0873341","34.59775405"],"lng":"119.0873341","equLocation":"G15连云港段","epId":"K822+S-2","equName":"K822+000+港西互通上-2-","lat":"34.59775405","equCode":"17216995+1"},{"lnglat":["119.090098","34.58349896"],"lng":"119.090098","equLocation":"G15连云港段","epId":"K823-2","equName":"K823+000中央隔离带","lat":"34.58349896","equCode":"2018823+1"},{"lnglat":["119.09064","34.577375"],"lng":"119.09064","equLocation":"G15","epId":"1a6dd154-a1a1-4733-b2cb-57e261eaea80","equName":"K823+750门架标识站","lat":"34.577375","equCode":"1a6dd154-a1a1-4733-b2cb-57e261eaea80"},{"lnglat":["119.0901411","34.57069771"],"lng":"119.0901411","equLocation":"G15连云港段","epId":"K824S","equName":"K824上","lat":"34.57069771","equCode":"74-39-22+1"},{"lnglat":["119.0901974","34.55469771"],"lng":"119.0901974","equLocation":"G15连云港段","epId":"K826+900X-1","equName":"K826+900下","lat":"34.55469771","equCode":"74-38-D2+1"},{"lnglat":["119.0945279","34.53706095"],"lng":"119.0945279","equLocation":"G15连云港段","epId":"K828+900X-2","equName":"K828+900下","lat":"34.53706095","equCode":"74-39-1A+1"},{"lnglat":["119.1003047","34.51968055"],"lng":"119.1003047","equLocation":"G15连云港段","epId":"K830X","equName":"K830下行","lat":"34.51968055","equCode":"39-A9-2F+1"},{"lnglat":["119.1031931","34.51968035"],"lng":"119.1031931","equLocation":"G15连云港段","epId":"K831-1","equName":"K831+000+锦屏互通下","lat":"34.51968035","equCode":"74-39-30+1"},{"lnglat":["119.1418866","34.4875449"],"lng":"119.1418866","equLocation":"G15连云港段","epId":"K836+X-6","equName":"K836+000+新坝互通下-6-","lat":"34.4875449","equCode":"74-39-34+1"},{"lnglat":["119.1658751","34.46265122"],"lng":"119.1658751","equLocation":"G15连云港段","epId":"K839+650X-8","equName":"K839+650下-8","lat":"34.46265122","equCode":"74-39-0E+1"},{"lnglat":["119.1766913","34.45303823"],"lng":"119.1766913","equLocation":"G15连云港段","epId":"K841X-9","equName":"K841+000下-9-","lat":"34.45303823","equCode":"172164174+1"},{"lnglat":["118.8223869249","34.867614977608"],"lng":"118.8223869249","equLocation":"G25连云港段","epId":"K1646+000X","equName":"K1646+000下","lat":"34.867614977608","equCode":"20191013"},{"lnglat":["119.038147424582","34.7945755340561"],"lng":"119.038147424582","equLocation":"G25连云港段","epId":"K1667X","equName":"K1667+600下","lat":"34.7945755340561","equCode":"20191107"},{"lnglat":["119.1496357","34.96034001"],"lng":"119.1496357","equLocation":"G15连云港段","epId":"K780+050X","equName":"K780+050海头互通下","lat":"34.96034001","equCode":"91-F2-6C+1"},{"lnglat":["119.0909247","34.81397702"],"lng":"119.0909247","equLocation":"G15连云港段","epId":"K798+S","equName":"K798+000+赣榆互通上","lat":"34.81397702","equCode":"91-F2-78+1"},{"lnglat":["119.0900721","34.80565903"],"lng":"119.0900721","equLocation":"G15连云港段","epId":"K799+X","equName":"K799+下","lat":"34.80565903","equCode":"91-F2-70+1"},{"lnglat":["119.0892262","34.77742631"],"lng":"119.0892262","equLocation":"G15连云港段","epId":"K802+S-1","equName":"K802+000+上-","lat":"34.77742631","equCode":"91-F2-76+1"},{"lnglat":["119.0892262","34.77742631"],"lng":"119.0892262","equLocation":"G15连云港段","epId":"K802+S-2","equName":"K802+000+上行枪机","lat":"34.77742631","equCode":"83-0B-39+1"},{"lnglat":["119.0883896","34.67870787"],"lng":"119.0883896","equLocation":"G15连云港段","epId":"K813S-4","equName":"K813+000上-4","lat":"34.67870787","equCode":"91-F2-84+1"},{"lnglat":["119.0883896","34.67870787"],"lng":"119.0883896","equLocation":"G15连云港段","epId":"K813+S","equName":"K813+000+上行枪机","lat":"34.67870787","equCode":"83-0B-36+1"},{"lnglat":["119.0852788","34.62840194"],"lng":"119.0852788","equLocation":"G15连云港段","epId":"K818+X","equName":"K818+000+下行枪机","lat":"34.62840194","equCode":"83-0A-FC+1"},{"lnglat":["119.090098","34.58349896"],"lng":"119.090098","equLocation":"G15连云港段","epId":"K823-1","equName":"K823+000+中枪机","lat":"34.58349896","equCode":"83-0B-77+1"},{"lnglat":["119.1031931","34.51968035"],"lng":"119.1031931","equLocation":"G15连云港段","epId":"K831-3","equName":"K831+000连徐至汾灌互通匝道枪机","lat":"34.51968035","equCode":"83-0B-38+1"},{"lnglat":["119.1549447","34.47549024"],"lng":"119.1549447","equLocation":"G15连云港段","epId":"K837+S-7","equName":"K837+000+上-7-","lat":"34.47549024","equCode":"91-F2-6E+1"},{"lnglat":["119.201302","34.438577"],"lng":"119.201302","equLocation":"G15连云港段","epId":"K844+050-02","equName":"K844+050灌云枢纽01枪机","lat":"34.438577","equCode":"83-0B-06+1"},{"lnglat":["118.868155262042","34.856929601442"],"lng":"118.868155262042","equLocation":"G25连云港段","epId":"K1650S","equName":"K1650上行","lat":"34.856929601442","equCode":"91-F2-62+1"},{"lnglat":["118.891794629836","34.8458611900683"],"lng":"118.891794629836","equLocation":"G25连云港段","epId":"K1653+000X","equName":"K1653+000下","lat":"34.8458611900683","equCode":"91-F2-7C+1"},{"lnglat":["119.098409210085","34.7696821574838"],"lng":"119.098409210085","equLocation":"G25连云港段","epId":"K1673+850X","equName":"K1673+850下","lat":"34.7696821574838","equCode":"83-0B-35+1"},{"lnglat":["119.1278349","34.75663366"],"lng":"119.1278349","equLocation":"G25连云港段","epId":"K1676+400X-1","equName":"K1676+400下-","lat":"34.75663366","equCode":"91-F2-60+1"},{"lnglat":["119.164053","34.747944"],"lng":"119.164053","equLocation":"G25连云港段","epId":"K1680+370X","equName":"K1680+370下-","lat":"34.747944","equCode":"91-F2-72+1"},{"lnglat":["119.187914953645","34.7168678439252"],"lng":"119.187914953645","equLocation":"G25连云港段","epId":"K1685+400X","equName":"K1685+400下","lat":"34.7168678439252","equCode":"91-F2-6A+1"},{"lnglat":["119.203914953645","34.6768678439252"],"lng":"119.203914953645","equLocation":"G25连云港段","epId":"K1689+480S","equName":"K1689+480上","lat":"34.6768678439252","equCode":"83-0B-3E+1"},{"lnglat":["119.230177","34.598123"],"lng":"119.230177","equLocation":"G25连云港段","epId":"K1693+100S","equName":"K1693+100上","lat":"34.598123","equCode":"91-F2-86+1"},{"lnglat":["119.087983","34.66294055"],"lng":"119.087983","equLocation":"G15连云港段","epId":"K814-1","equName":"K814+000+港北互通","lat":"34.66294055","equCode":"91-F2-9C+1"},{"lnglat":["119.090744","34.574996"],"lng":"119.090744","equLocation":"G15","epId":"c2d7b63a-17a3-44c0-ab68-188968e5e653","equName":"K823+850门架标识站","lat":"34.574996","equCode":"c2d7b63a-17a3-44c0-ab68-188968e5e653"},{"lnglat":["119.1031931","34.51968035"],"lng":"119.1031931","equLocation":"G15连云港段","epId":"K831-2","equName":"K831+000连徐至汾灌互通匝道-","lat":"34.51968035","equCode":"91-F2-C0+1"},{"lnglat":["119.10865","34.51154"],"lng":"119.10865","equLocation":"G15连云港段","epId":"K832+-3","equName":"K832+000+汾灌至连徐互通匝道-3","lat":"34.51154","equCode":"91-F2-96+1"},{"lnglat":["118.992154747356","34.8096723625218"],"lng":"118.992154747356","equLocation":"G25连云港段","epId":"K1663+050X","equName":"K1663+050下","lat":"34.8096723625218","equCode":"91-F2-FA+1"},{"lnglat":["119.1472527","34.75246682"],"lng":"119.1472527","equLocation":"G25连云港段","epId":"K1678+750X","equName":"K1678+750下","lat":"34.75246682","equCode":"91-F2-DC+1"},{"lnglat":["119.1792794","34.73121231"],"lng":"119.1792794","equLocation":"G25连云港段","epId":"K1682+750X","equName":"K1682+750下","lat":"34.73121231","equCode":"91-F2-9A+1"},{"lnglat":["118.807238","34.874489"],"lng":"118.807238","equLocation":"G25连云港段","epId":"K1644+750S-1","equName":"K1644+750上","lat":"34.874489","equCode":"k1644+1"},{"lnglat":["118.873266","34.855292"],"lng":"118.873266","equLocation":"G25连云港段","epId":"K1651+700S-1","equName":"K1651+700上","lat":"34.855292","equCode":"k1651+1"},{"lnglat":["119.078409210085","34.7766821574838"],"lng":"119.078409210085","equLocation":"G25连云港段","epId":"k1671+800X-1","equName":"k1671+800下","lat":"34.7766821574838","equCode":"k1671+800+1"},{"lnglat":["119.195914953645","34.6968678439252"],"lng":"119.195914953645","equLocation":"G25连云港段","epId":"k1687+850S","equName":"k1687+850上","lat":"34.6968678439252","equCode":"k1687+1"},{"lnglat":["119.089292","34.777911"],"lng":"119.089292","equLocation":"G15连云港段","epId":"K802+550S","equName":"K802+550上","lat":"34.777911","equCode":"k801+1"},{"lnglat":["119.087242","34.65083515"],"lng":"119.087242","equLocation":"G15连云港段","epId":"K816+200S","equName":"K816+200上","lat":"34.65083515","equCode":"k816+1"},{"lnglat":["119.0852788","34.62840194"],"lng":"119.0852788","equLocation":"G15连云港段","epId":"K818+700X","equName":"K818+700下","lat":"34.62840194","equCode":"k818+1"},{"lnglat":["119.211179","34.434735"],"lng":"119.211179","equLocation":"G15连云港段","epId":"K845-1","equName":"K845+000宁连至汾灌互通匝道","lat":"34.434735","equCode":"nl-fg+1"}];
+			if(arrayData.length == 0){
+                return;
+            }
+            // <div class="amap-marker" style="top: -9px; left: 112px; z-index: 100; transform: rotate(0deg); transform-origin: 7px 7px; display: block;"><div class="amap-marker-content" style="opacity: 1;"><div style="background-color: hsla(180, 100%, 50%, 0.4); height: 14px; width: 14px; border: 1px solid hsl(180, 100%, 40%); border-radius: 12px; box-shadow: hsl(180, 100%, 50%) 0px 0px 1px;"></div></div></div>
+            arrayData.forEach(function(item,index,array){
+                item.style = 0;
+            });
+            let zoom = map.getZoom() > 6? (map.getZoom()-6): 0;
+            let massMarksOptions = {
+                opacity:0.8,
+                zIndex:120,
+                cursor:'pointer',
+                style: [{
+                    //url:'/fog/cameral.png',
+                    url: '/plugins/weui/img/cam.png',
+                    anchor: new AMap.Pixel(5.5 + zoom/2,5.5 + zoom/2),
+                    size: new AMap.Size(11 + zoom, 11 + zoom),
+                }],
+            };
+            if(massMarks == null){
+                massMarks = new AMap.MassMarks(filterByZoom(arrayData),massMarksOptions);
+                massMarks.setMap(map);
+                massMarks.on('click',function(e){
+                    wxEquPop.pop(e.data);//e.data.equName+" NO."+e.data.epId
+                    // infoWindow.setContent(e.data.equName+" NO."+e.data.epId);
+                    // infoWindow.open(map, e.data.lnglat);
+                });
+            } else {
+                massMarks.setData(filterByZoom(arrayData));
+                //massMarks.setStyle(massMarksOptions.style);
+                massMarks.setMap(map);
+                massMarks.on('click',function(e){
+                    wxEquPop.pop(e.data);//e.data.equName+" NO."+e.data.epId
+                });
+            }
+            return massMarks;
+        }
+    }
+
+    /**批量标记*/
+    function mapBatchMarkSetStyle(arrayData){
+        let zoom = map.getZoom();
+        var size = 10;
+        if (zoom > 11) {
+        	size = 3*zoom;
+        } else if (zoom > 9) {
+        	size = 20;
+        }
+        let style = [{
+            url: '/plugins/weui/img/cam.png',
+            anchor: new AMap.Pixel(5.5 + zoom/2,5.5 + zoom/2),
+            size: new AMap.Size(size, size),
+        }];
+        if(massMarks != null){
+            massMarks.setData(filterByZoom(arrayData));
+            massMarks.setStyle(style);
+            massMarks.setMap(map);
+            massMarks.on('click',function(e){
+                wxEquPop.pop(e.data);//e.data.equName+" NO."+e.data.epId
+            });
+        }
+        return massMarks;
+    }
+
+    //初始化获取所有路段
+    axios.post('/weixin/map/getHighways',{hwId:0})//也可以直接拼接在url
+        .then(function(rs){
+            if(rs.data && rs.data.highways){
+                u.setStorage("highways",rs.data.highways);
+                $.toptip('路段信息加载成功','success');
+            } else {
+                $.toptip('无路段数据','success');
+            }
+        }).catch(function(e){
+        $.toptip('路段请求失败','error');
+    });
+
+    /**
+     * 告警处理
+     */
+    function alarmHandle(showFlg, msg){
+        //初始化获取所有路段
+        axios.post('/weixin/map/getWXAlarm',{openid:u.getStorage("openid")})//也可以直接拼接在url
+            .then(function(rs){
+                if(rs.data){
+                    let alarms = rs.data.alarms || [];
+                    let ends = rs.data.ends;
+                    //清空警告点
+                    if(markFog && markFog["30"]){markFog["30"].clear();}
+                    if(markFog && markFog["50"]){markFog["50"].clear();}
+                    if(markFog && markFog["200"]){markFog["200"].clear();}
+                    if(markFogEnd){markFogEnd.clear();}
+                    //显示警告点
+                    try{
+                        markFog = mapBatchMarkFog(alarms);
+                    } catch (e) {console.log(e);}
+                    try{
+                        markFogEnd = mapBatchMarkFogEnd(ends);
+                    } catch (e) {console.log(e);}
+                    // $.toptip('ALARM TEST','success');
+                    if (showFlg && alarms.length == 0) {
+                    	 $.toast(msg,2000);
+                    }
+                }
+
+            }).catch(function(e){
+                console.log("解析错误");
+                console.log(e);
+            });
+        /**标记信息*/
+        let infoWindow = new AMap.InfoWindow({offset: new AMap.Pixel(0, 0)});
+        /**告警标记*/
+        function mapBatchMarkFog(arrayData1){
+            let arrayData = arrayData1;
+
+            let massMarksOptions = {
+                opacity:1,
+                zIndex:123,
+                cursor:'pointer',
+                style: [{
+                    url: "/lkdtWX/plugins/weui/img/wumai_red.png",
+                    anchor: new AMap.Pixel(11,11),
+                    size: new AMap.Size(22, 22),
+                },{
+                    url: "/lkdtWX/plugins/weui/img/wumai_light_red.png",
+                    anchor: new AMap.Pixel(11,11),
+                    size: new AMap.Size(22, 22),
+                },{
+                    url: "/lkdtWX/plugins/weui/img/wumai_yellow.png",
+                    anchor: new AMap.Pixel(11,11),
+                    size: new AMap.Size(22, 22),
+                }],
+            };
+            let data30 = [], data50 = [], data200 = [];
+            arrayData.forEach(function(item,index,array){
+                if(item.distance <= 30) {
+                    item.style = 0;
+                    data30.push(item);
+                } else if(item.distance <= 50) {
+                    item.style = 1;
+                    data50.push(item);
+                } else {
+                    item.style = 2;
+                    data200.push(item);
+                }
+            });
+
+            massMarksAlarm("30",data30);
+            massMarksAlarm("50",data50);
+            massMarksAlarm("200",data200);
+            function massMarksAlarm(alarmIndex,data){
+                if(massMarks_alarm[alarmIndex] == null){
+                    massMarks_alarm[alarmIndex] = new AMap.MassMarks(data,massMarksOptions);
+                    if(data.length > 0){
+                        massMarks_alarm[alarmIndex].setMap(map);//TODO:待定
+                    }
+                    massMarks_alarm[alarmIndex].on('click',function(e){
+                        wxEquPop.pop(e.data);//e.data.equName+" NO."+e.data.epId
+                    });
+                } else {
+                    massMarks_alarm[alarmIndex].setData(data);
+                    //massMarks_alarm[alarmIndex].setStyle(massMarksOptions.style);
+                    if(data.length > 0){
+                        massMarks_alarm[alarmIndex].setMap(map);//TODO:待定
+                    }
+                    massMarks_alarm[alarmIndex].on('click',function(e){
+                        wxEquPop.pop(e.data);//e.data.equName+" NO."+e.data.epId
+                    });
+                }
+            }
+            return massMarks_alarm;
+        }
+
+        /**散雾标记*/
+        function mapBatchMarkFogEnd(arrayData1){
+            let arrayData = arrayData1;
+            let massMarksOptions = {
+                opacity:1,
+                zIndex:122,
+                cursor:'pointer',
+                style: [{
+                    //url: 'https://a.amap.com/jsapi_demos/static/images/mass2.png',
+                    url: "/lkdtWX/plugins/weui/img/wumai_nofog.png",
+                    anchor: new AMap.Pixel(11,11),
+                    size: new AMap.Size(22, 22),
+                }],
+            };
+            if(massMarks_alarm_end == null){
+                massMarks_alarm_end = new AMap.MassMarks(arrayData,massMarksOptions);
+                if(arrayData.length > 0){
+                    massMarks_alarm_end.setMap(map);//TODO:待定
+                }
+                massMarks_alarm_end.on('click',function(e){
+                    wxEquPop.pop(e.data);//e.data.equName+" NO."+e.data.epId
+                });
+            } else {
+                massMarks_alarm_end.setData(arrayData);
+                //massMarks_alarm_end.setStyle(massMarksOptions.style);
+                if(arrayData.length > 0){
+                    massMarks_alarm_end.setMap(map);//TODO:待定
+                }
+                massMarks_alarm_end.on('click',function(e){
+                    wxEquPop.pop(e.data);//e.data.equName+" NO."+e.data.epId
+                });
+            }
+            return massMarks_alarm_end;
+        }
+    }
+    function confirmPhoneMonual(){
+    	window.location.replace("/system/alarm/confirmPhoneMonual/"+clickepId);
+    }
+    
+    var date = new Date();
+    var hour = date.getHours();
+    var dom2 = document.getElementById("container2");
+    var myChart2 = echarts.init(dom2);
+    
+    let wxWindPop = {
+            test:function(){},
+            /**弹出框*/
+            pop:function(equObj){
+                try{
+                	$('#videoWindow').hide();
+                    $('#wxWindPopDiv').show();
+                    var url = encodeURI("/system/equipment/lookup/updateWinds/"+equObj.epId)
+                	$.ajax({
+                        type: "post",
+                        url: url,
+                        success(message) {
+                            var imgdata=message;
+                            var p = imgdata.path;
+                            $("#mi").html((imgdata.fMeter||0).toFixed(1));
+                            $("#fengxiang").html(getWindd(imgdata.windd)||'无');
+                            $("#windLevel").html(getWindLevel(imgdata.fMeter)||'无');
+                            /* if(imgdata.fMeter>=200){
+                            	 $("#zhuangtai").html("晴朗");
+                            }else if(imgdata.fMeter>=100){
+                            	$("#zhuangtai").html("大雾");
+                            }else if(imgdata.fMeter>=50){
+                            	$("#zhuangtai").html("浓雾");
+                            }else if(imgdata.fMeter>=30){
+                            	$("#zhuangtai").html("强浓雾");
+                            }else if(imgdata.fMeter<30){
+                            	$("#zhuangtai").html("特强浓雾");
+                            } */
+                        }
+                    });
+                    var date = new Date(new Date().getTime()-12*60*60*1000).Format('yyyy-MM-dd hh:mm:ss');
+            		//获取统计图
+                    $.ajax({
+                        type: "get",
+                        url: "/system/alarm/distanceStatisticWind",
+                        dataType:'json',
+                        data: {epId:equObj.epId,date:date},
+                        success(data) {
+                            if (option2 && typeof option2 === "object") {
+                                option2.series[0].data = data.intList;
+                                option2.xAxis.data = data.xAxis.split(",");
+                                myChart2.setOption(option2, false);
+                                var intList=data.intList;
+                                var minwind = intList[0][2];
+                                var maxwind = intList[0][2];
+                                for(var i=0;i<data.intList.length;i++){
+                                	if(intList[i][2]<minwind){
+                                		minwind=intList[i][2];
+                                	}
+                                	if(intList[i][2]>maxwind){
+                                		maxwind=intList[i][2];
+                                	}
+                                }
+                               	$("#maxDay").html(maxwind||'0');
+                               	$("#minDay").html(minwind||'0');
+                                
+                            }
+                        }
+                    });
+                } catch (e) {
+                    $.toast("ERROR:PO215网络异常", "forbidden");
+                }
+
+            },
+            close:function(){
+                $('#wxWindPopDiv').hide();
+            },
+        };
+
+    /**
+                 * 大风测试标记
+     * @param map
+     */
+    let windMarkers = null;
+    let pointCollection;//海量点
+    function windTestInit(){
+        $.ajax({url:'/fog/fogTrack/windTest',type:'post',data:{hwId:'1'},dataType:'json',
+            success(data){
+            	/**批量标记*/
+            	windMarkers = mapBatchMarkWind(data);
+            }
+        });
+    }
+    
+    
+    function mapBatchMarkWind(arrayDataWind){
+        if(arrayDataWind.length == 0){
+            return;
+        }
+        let zoom = map.getZoom() > 6? (map.getZoom()-6): 0;
+        let massMarksOptions = {
+    		opacity:0.8,
+            zIndex:120,
+            cursor:'pointer',
+            style: [{
+                url: "/lkdtWX/plugins/windImg/wind-blue.png",
+                anchor: new AMap.Pixel(16,16),
+                size: new AMap.Size(21 + zoom, 21 + zoom),
+            },{
+                url: "/lkdtWX/plugins/windImg/wind-yellow.png",
+                anchor: new AMap.Pixel(16,16),
+                size: new AMap.Size(21 + zoom, 21 + zoom),
+            },{
+                url: "/lkdtWX/plugins/windImg/wind-red.png",
+                anchor: new AMap.Pixel(16,16),
+                size: new AMap.Size(21 + zoom, 21 + zoom),
+            }],
+        };
+        let datablue = [], datayellow = [], datared = [];
+        arrayDataWind.forEach(function(item,index,array){
+            if(item.windLevel == -1) {
+                item.style = 0;
+                datablue.push(item);
+            } else if(item.windLevel == 2 || item.windLevel == 3) {
+                item.style = 1;
+                datayellow.push(item);
+            } else if(item.windLevel == 0 || item.windLevel == 1){
+                item.style = 2;
+                datared.push(item);
+            }
+        });
+
+        windMarkers("blue",datablue);
+        windMarkers("yellow",datayellow);
+        windMarkers("red",datared);
+        function windMarkers(alarmIndex,data){
+            if(windMarkers[alarmIndex] == null){
+            	windMarkers[alarmIndex] = new AMap.MassMarks(data,massMarksOptions);
+                if(data.length > 0){
+                	windMarkers[alarmIndex].setMap(map);//TODO:待定
+                }
+                windMarkers[alarmIndex].on('click',function(e){
+                	wxWindPop.pop(e.data);//e.data.equName+" NO."+e.data.epId
+                });
+            } else {
+            	windMarkers[alarmIndex].setData(data);
+                //massMarks_alarm[alarmIndex].setStyle(massMarksOptions.style);
+                if(data.length > 0){
+                	windMarkers[alarmIndex].setMap(map);//TODO:待定
+                }
+                windMarkers[alarmIndex].on('click',function(e){
+                	wxWindPop.pop(e.data);//e.data.equName+" NO."+e.data.epId
+                });
+            }
+        }
+        return windMarkers;
+       /*  arrayDataWind.forEach(function(item,index,array){
+            item.style = 0;
+        });
+        let zoom = map.getZoom() > 6? (map.getZoom()-6): 0;
+        var imgurl = "/lkdtWX/plugins/windImg/wind-blue.png";
+        let massMarksWindOptions = {
+            opacity:0.8,
+            zIndex:120,
+            cursor:'pointer',
+            style: [{
+                //url:'/fog/cameral.png',
+                url: imgurl,
+                anchor: new AMap.Pixel(5.5 + zoom/2,5.5 + zoom/2),
+                size: new AMap.Size(11 + zoom, 11 + zoom),
+            }],
+        };
+        if(windMarkers == null){
+        	windMarkers = new AMap.MassMarks(arrayDataWind,massMarksWindOptions);
+        	windMarkers.setMap(map);
+        	windMarkers.on('click',function(e){
+                wxWindPop.pop(e.data);//e.data.equName+" NO."+e.data.epId
+                // infoWindow.setContent(e.data.equName+" NO."+e.data.epId);
+                // infoWindow.open(map, e.data.lnglat);
+            });
+        } else {
+        	windMarkers.setData(arrayDataWind);
+            //massMarks.setStyle(massMarksOptions.style);
+            windMarkers.setMap(map);
+            windMarkers.on('click',function(e){
+            	wxWindPop.pop(e.data);//e.data.equName+" NO."+e.data.epId
+            });
+        }
+        return windMarkers; */
+    }
+    
+  //获取风向
+	function getWindd(windd){
+		if(windd>337.5||windd<=22.5){
+			return "北";
+		}else if(windd>22.5&&windd<=67.5){
+			return "东北";
+		}else if(windd>67.5&&windd<=112.5){
+			return "东";
+		}else if(windd>112.5&&windd<=157.5){
+			return "东南";
+		}else if(windd>157.5&windd<=202.5){
+			return "南";
+		}else if(windd>202.5&&windd<=247.5){
+			return "西南";
+		}else if(windd>247.5&&windd<=292.5){
+			return "西";
+		}else if(windd>292.5&&windd<=337.5){
+			return "西北";
+		}
+		return null;
+	}
+	//获取风向值
+	function getWinddVal(windd){
+		if(windd==4){
+			return "北";
+		}else if(windd==5){
+			return "东北";
+		}else if(windd==6){
+			return "东";
+		}else if(windd==7){
+			return "东南";
+		}else if(windd==0){
+			return "南";
+		}else if(windd==1){
+			return "西南";
+		}else if(windd==2){
+			return "西";
+		}else if(windd==3){
+			return "西北";
+		}
+		return null;
+	}
+	//获取风等级
+	function getWindLevel(winds){
+		if(winds<1.5){
+			return "1级";
+		}else if(winds<=3.3){
+			return "2级";
+		}else if(winds<=5.4){
+			return "3级";
+		}else if(winds<=7.9){
+			return "4级";
+		}else if(winds<=10.7){
+			return "5级";
+		}else if(winds<=13.8){
+			return "6级";
+		}else if(winds<=17.1){
+			return "7级";
+		}else if(winds<=20.7){
+			return "8级";
+		}else if(winds<=24.4){
+			return "9级";
+		}else if(winds<=28.4){
+			return "10级";
+		}else if(winds<=32.6){
+			return "11级";
+		}else if(winds<=36.9){
+			return "12级";
+		}else if(winds<=41.4){
+			return "13级";
+		}else if(winds<=46.1){
+			return "14级";
+		}else if(winds>=46.1){
+			return "15级";
+		}
+		return null;
+	}
+	
+	var option2 = {
+		    title: {
+		        text: '24h风速风向图',
+		        subtext: '圆的大小和颜色表示风速',
+		        textStyle: {
+	                color: '#ffffff',
+	                fontSize:18,
+	            },
+	            left: 'center'
+		    },
+		    grid:{
+	            x:45,
+	            x2:47,
+	            y:70,
+	            y2:20
+	        },
+		    tooltip: {
+		        formatter: function (params) {
+		            return '当前风速:'+params.value[2] + 'm/s</br>当前风向:'+ getWinddVal(params.value[0]);
+		        }
+		    },
+		    xAxis: {
+	            type: 'category',
+	            name: 'HH:ss',
+	            data: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
+	            boundaryGap: false,
+	            axisLine: {
+	                lineStyle: {
+	                    color: '#57617B'
+	                }
+	            },
+	            axisLabel: {
+	                textStyle: {
+	                    color:'#fff',
+	                },
+	            },
+	            nameTextStyle:{
+	           	 color: '#ffffff'
+	           },
+	           splitLine: {
+	               lineStyle: {
+	                   type: 'dashed'
+	               }
+	           }
+	        },
+		       yAxis: {
+		            type: 'value',
+		            scale: true,
+		            name: '风向',
+		            max: 7,
+		            min: 0,
+		            interval:1,
+			        axisLabel:{
+			        	textStyle: {
+			                color:'#fff',
+			                fontSize:14
+			            },
+			            rotate: 0,
+			        	formatter:function (value) {
+			        	    if(value == 1) {
+			        	    	return '西南';
+			        	    }else if(value == 2) {
+			        	    	return '西';
+			        	    }else if(value == 3) {
+			        	    	return '西北';
+			        	    }else if(value == 4) {
+			        	    	return '北';
+			        	    }else if(value == 5) {
+			        	    	return '东北';
+			        	    }else if(value == 6) {
+			        	    	return '东';
+			        	    }else if(value == 7) {
+			        	    	return '东南';
+			        	    }else if(value == 0) {
+			        	    	return '南';
+			        	    }
+
+			        	}
+			        },
+	            axisTick: {
+	                show: false
+	            },
+	            axisLine: {
+	                lineStyle: {
+	                    color: '#57617B',
+
+	                }
+	            },
+	            splitLine: {
+	                lineStyle: {
+	                    color: 'rgba(255,255,255,.2)',
+	                    type:'dotted',
+	                }
+	            },
+	            nameTextStyle:{
+	           	 color: '#ffffff'
+	           }
+	        },
+		    series: [{
+		        name: 'Punch Card',
+		        type: 'scatter',
+		        encode: {
+		            x: 1,      // 表示维度 3、1、5 映射到 x 轴。
+		            y: 0,              // 表示维度 2 映射到 y 轴。
+		            tooltip: [1, 2, 3] // 表示维度 3、2、4 会在 tooltip 中显示。
+		        },
+		        symbolSize: function (val) {
+		            return val[2] *5;
+		        },
+		        animationDelay: function (idx) {
+		            return idx * 5;
+		        },
+		        itemStyle:{
+		        	color:function (val) {
+		        		var winds=val.data[2];
+		        		if(winds>=0&&winds<10){
+		        			return '#48ef8b';
+		        		}else if(winds>=10&&winds<14){
+		        			return '#007eff';
+		        		}else if(winds>=14&&winds<20){
+		        			return '#fd4a05';
+		        		}else if(winds>=20){
+		        			return '#ff0000';
+		        		}
+		        		return '#fff';
+		        		
+			        }
+		        }
+		    }]
+		};
+	
+	Date.prototype.Format = function(fmt){
+        var o = {
+            "M+" : this.getMonth()+1,                 //月份
+            "d+" : this.getDate(),                    //日
+            "h+" : this.getHours(),                   //小时
+            "m+" : this.getMinutes(),                 //分
+            "s+" : this.getSeconds(),                 //秒
+            "q+" : Math.floor((this.getMonth()+3)/3), //季度
+            "S"  : this.getMilliseconds()             //毫秒
+        };
+        if(/(y+)/.test(fmt)) {
+            fmt=fmt.replace(RegExp.$1, (this.getFullYear()+"").substr(4 - RegExp.$1.length));
+        }
+        for(var k in o) {
+            if(new RegExp("("+ k +")").test(fmt)){
+                fmt = fmt.replace(RegExp.$1, (RegExp.$1.length==1) ? (o[k]) : (("00"+ o[k]).substr((""+ o[k]).length)));
+            }
+        }
+        return fmt;
+    };
+    
+    //TODO: NT001测试 start
+    // setTimeout(markerNT001,1000,120.302328,33.34689);
+    // let myVideo_NT001 = videojs('myVideo_NT001', {
+    //     bigPlayButton: false,
+    //     textTrackDisplay: false,
+    //     posterImage: true,
+    //     errorDisplay: true,
+    // });
+    // function markerNT001(lng,lat){
+    //     let massMarksOptions = {
+    //         opacity:0.8,
+    //         zIndex:121,
+    //         cursor:'pointer',
+    //         style: [{
+    //             url: '/plugins/weui/img/cameral.png',
+    //             anchor: new AMap.Pixel(10,10),
+    //             size: new AMap.Size(20, 20),
+    //         }],
+    //     };
+    //     if(massMarks_video == null){
+    //         massMarks_video = new AMap.MassMarks([{"lnglat":[lng,lat]}],massMarksOptions);
+    //         massMarks_video.setMap(map);
+    //         massMarks_video.on('click',function(e){
+    //             showVideo();
+    //         });
+    //     } else {
+    //         massMarks_video.setData([{"lnglat":[lng,lat]}]);
+    //         massMarks_video.setStyle(massMarksOptions.style);
+    //         massMarks_video.setMap(map);
+    //         massMarks_video.on('click',function(e){
+    //             showVideo();
+    //         });
+    //     }
+    // }
+    // function showVideo(){
+    //     myVideo_NT001.src({
+    //         src: "https://ainjdjc.jchc.cn/live_video_low/NT001.m3u8?random_m="+Math.random(),
+    //         type: 'application/x-mpegURL' //在重新添加视频源的时候需要给新的type的值
+    //     });
+    //     myVideo_NT001.play();
+    //     $('#wxEquPopDiv').hide();
+    //     $('#videoWindow').show();
+    //     getfogStat();
+    // }
+    // function closeVideo(){
+    //     myVideo_NT001.pause();
+    //     $('#videoWindow').hide();
+    // }
+    // function getfogStat(){
+    //     $.ajax({
+    //         type: "GET",
+    //         url: "https://ainjdjc.jchc.cn/public/getfogStat?jsonpCallback=jsonpCallback2",
+    //         data: {},
+    //         dataType:"jsonp",  //数据格式设置为jsonp
+    //         jsonp:"jsonpCallback2",  //Jquery生成验证参数的名称
+    //         success: function(data){
+    //         }
+    //     })
+    // }
+    // function jsonpCallback2(res){
+    //     let equObj = {epId:"NT001",equName:"NT001_new"};
+    //     //摄像头能见度统计
+    //     let date = new Date(new Date().getTime()-24*60*60*1000).Format('yyyy-MM-dd hh:mm:ss');
+    //     //摄像头能见度统计
+    //     axios.post('/weixin/map/getDisplayDistanceByEqu',{openid:u.getStorage("openid"),epId:equObj.epId,date:date})//也可以直接拼接在url
+    //         .then(function(rs){
+    //             if(rs.data){
+    //                 $('#wxEquPopDiv').hide();
+    //                 $('#videoWindow').show();
+    //                 let lineChart = echarts.init(document.getElementById("echarts-line-chart-NT001"));
+    //                 wxEquPop.lineOption.title.text = equObj.equName;
+    //                 let currDistance = rs.data.series.split(",")[rs.data.series.split(",").length - 1];
+    //                 if(currDistance != "" && currDistance != null && currDistance != undefined){
+    //                     wxEquPop.lineOption.title.text += "【当前:"+currDistance+"米】";
+    //                 }
+    //                 wxEquPop.lineOption.xAxis[0].data = rs.data.xAxis.split(",");
+    //                 wxEquPop.lineOption.series[0].data = rs.data.series.split(",");
+    //                 lineChart.setOption(wxEquPop.lineOption);
+    //             }
+    //         }).catch(function(e){
+    //         console.log("能见度统计异常");
+    //         console.log(e);
+    //         $.hideLoading();
+    //     });
+    // }
+    //TODO: NT001测试 end
+</script>
+</body>
+</html>

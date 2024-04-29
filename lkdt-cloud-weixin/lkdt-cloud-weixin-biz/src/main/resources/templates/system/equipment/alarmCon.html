@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<!-- 新 Bootstrap 核心 CSS 文件 -->
+<link href="/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+<style>
+</style>
+<body class="gray-bg" style="height: 97%;    overflow: hidden;padding: 5px;">
+	<div class="col-md-4" style="padding:0px 5px 0px 5px;border-radius: 5px;">
+		<div id="equipAlarmStatistics" style="width:100%;height: 300px;float: left;clear: right;"></div>
+		<div id="equipAlarmStatistics-btn" style="position: absolute;right: 10px;">
+			<button class="btn btn-default dropdown-toggle glyphicon glyphicon-list"
+					style="padding: 0 3px;background-color: rgba(6,21,55,0.1);border-color: rgba(6,21,55,0.1);color: #07A6FF;"
+					type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+			</button>
+			<ul id="equipAlarmStatistics-dropdown-menu" class="dropdown-menu" aria-labelledby="dropdownMenu2"
+				style="position: relative;">
+				<li><a href="##" data="alarm24" onclick="getEquipAlarmConStatistic_switchFunc(24)">24小时以内</a></li>
+				<li><a href="##" data="alarm48" onclick="getEquipAlarmConStatistic_switchFunc(48)">48小时以内</a></li>
+				<li><a href="##" data="alarm72" onclick="getEquipAlarmConStatistic_switchFunc(72)">72小时以内</a></li>
+			</ul>
+		</div>
+	</div>
+</body>
+<script src="/lkdtWX/js/jquery.min.js?v=2.1.4"></script>
+<script src="/lkdtWX/js/bootstrap.min.js"></script>
+<script src="/lkdtWX/js/plugins/echarts/echarts.min.js"></script>
+<script type="text/javascript">
+    var getEquipAlarmConStatistic_data;
+    var getEquipAlarmConStatistic_index;//告警统计
+    var getEquipAlarmConStatistic_index_num = 24;
+    //设备告警情况统计
+     var dom3 = document.getElementById("equipAlarmStatistics");
+     var myChart3 = echarts.init(dom3);
+     option3 = {
+         backgroundColor:'rgba(6,21,55,0.1)',
+         title: {
+             text: '设备告警情况统计-24小时以内',
+             subtext: '',
+             left: 'center',
+             textStyle:{
+                 fontSize: 13,
+                 color:'#fff'
+             }
+         },
+         tooltip : {
+             trigger: 'item',
+             formatter: "{a} <br/>{b} : {c} ({d}%)"
+         },
+         legend: {
+             // orient: 'vertical',
+             // top: 'middle',
+             bottom: 10,
+             left: 'center',
+             data: ['有效', '无效','未确认'],
+             textStyle:{
+                 color:'#fff'
+             }
+         },
+         series : [
+             {
+                 name:'设备告警情况',
+                 type: 'pie',
+                 radius : '65%',
+                 center: ['50%', '50%'],
+                 selectedMode: 'single',
+                 data:[
+                     {value:535, name: '有效'},
+                     {value:510, name: '无效'},
+                     {value:510, name: '未确认'}
+                 ],
+                 itemStyle: {
+                     normal:{
+                         color:function(params) {
+                             //自定义颜色
+                             var colorList = ['#2BB949', '#C23531', 'gray'];
+                             return colorList[params.dataIndex]
+                         }
+                     },
+                     emphasis: {
+                         shadowBlur: 10,
+                         shadowOffsetX: 0,
+                         shadowColor: 'rgba(0, 0, 0, 0.5)'
+                     }
+                 }
+             }
+         ]
+     };
+     myChart3.setOption(option3, true);
+
+    /**
+     * 切换告警统计
+     * @param index
+     */
+    function getEquipAlarmConStatistic_switchFunc(data){
+        if(data == 24){
+            getEquipAlarmConStatistic_index = "alarm24";
+        } else if(data == 48){
+            getEquipAlarmConStatistic_index = "alarm48";
+        } else if(data == 72){
+            getEquipAlarmConStatistic_index = "alarm72";
+        }
+        getEquipAlarmConStatistic_index_num = data;
+        option3.title.text = '设备告警情况统计-'+getEquipAlarmConStatistic_index_num+'小时以内';
+        option3.series[0].data = getEquipAlarmConStatistic_data[getEquipAlarmConStatistic_index];
+        myChart3.setOption(option3, true);
+    }
+
+    //设备告警情况统计
+    $.ajax({url:'/fog/fogTrack/getEquipAlarmConStatistic',type:'post',data:{},dataType:'json',
+        success:function(data){
+            getEquipAlarmConStatistic_data = data;
+            getEquipAlarmConStatistic_switchFunc(getEquipAlarmConStatistic_index_num);
+        }
+    });
+</script>
+</html>

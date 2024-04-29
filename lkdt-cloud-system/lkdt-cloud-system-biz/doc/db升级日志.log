@@ -1,0 +1,28 @@
+
+-- author:taoyan--------date:20200528---for: gateway 路由配置管理
+INSERT INTO `sys_permission`(`id`, `parent_id`, `name`, `url`, `component`, `component_name`, `redirect`, `menu_type`, `perms`, `perms_type`, `sort_no`, `always_show`, `icon`, `is_route`, `is_leaf`, `keep_alive`, `hidden`, `description`, `create_by`, `create_time`, `update_by`, `update_time`, `del_flag`, `rule_flag`, `status`, `internal_or_external`) VALUES ('1265162119913824258', 'd7d6e2e4e2934f2c9385a623fd98c6f3', 'gateway路由管理', '/isystem/gatewayroute', 'system/SysGatewayRouteList', NULL, NULL, 1, NULL, '1', 1.00, 0, NULL, 1, 1, 0, 0, NULL, NULL, '2020-05-26 14:05:30', NULL, NULL, 0, 0, '1', 0);
+
+DROP TABLE IF EXISTS `sys_gateway_route`;
+CREATE TABLE `sys_gateway_route`  (
+  `id` varchar(36) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `name` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '服务名',
+  `uri` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '服务地址',
+  `predicates` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT '断言',
+  `filters` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT '过滤器',
+  `retryable` int(3) NULL DEFAULT NULL COMMENT '是否重试:0-否 1-是',
+  `strip_prefix` int(3) NULL DEFAULT NULL COMMENT '是否忽略前缀0-否 1-是',
+  `persist` int(3) NULL DEFAULT NULL COMMENT '是否为保留数据:0-否 1-是',
+  `show_api` int(3) NULL DEFAULT NULL COMMENT '是否在接口文档中展示:0-否 1-是',
+  `status` int(3) NULL DEFAULT NULL COMMENT '状态:0-无效 1-有效',
+  `create_by` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '创建人',
+  `create_time` datetime(0) NULL DEFAULT NULL COMMENT '创建日期',
+  `update_by` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '更新人',
+  `update_time` datetime(0) NULL DEFAULT NULL COMMENT '更新日期',
+  `sys_org_code` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '所属部门',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
+
+INSERT INTO `sys_gateway_route` VALUES ('jeecg-cloud-demo-biz', 'jeecg-cloud-demo-biz', 'lb://jeecg-cloud-demo-biz', '[{\"args\":{\"_genkey_0\":\"/demo/**\"},\"name\":\"Path\"}]', NULL, NULL, NULL, NULL, NULL, 1, NULL, '2020-05-28 14:01:32', NULL, NULL, NULL);
+INSERT INTO `sys_gateway_route` VALUES ('jeecg-cloud-system-biz', 'jeecg-cloud-system-biz', 'lb://jeecg-cloud-system-biz', '[{\"args\":{\"_genkey_0\":\"/sys/**\",\"_genkey_5\":\"/bigscreen/**\",\"_genkey_6\":\"/webSocketApi/**\",\"_genkey_1\":\"/test/**\",\"_genkey_2\":\"/online/**\",\"_genkey_3\":\"/api/**\",\"_genkey_4\":\"/big/screen/**\"},\"name\":\"Path\"}]', NULL, NULL, NULL, NULL, NULL, 1, NULL, '2020-05-28 14:01:32', NULL, NULL, NULL);
+INSERT INTO `sys_gateway_route` VALUES ('jeecg-cloud-websocket', 'jeecg-cloud-websocket', 'lb:ws://jeecg-cloud-system-biz', '[{\"args\":{\"_genkey_0\":\"/websocket/**\"},\"name\":\"Path\"}]', NULL, NULL, NULL, NULL, NULL, 1, NULL, '2020-05-28 14:01:32', NULL, NULL, NULL);
+-- author:taoyan--------date:20200528---for: gateway 路由配置管理

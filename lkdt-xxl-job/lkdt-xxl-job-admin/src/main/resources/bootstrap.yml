@@ -1,0 +1,15 @@
+server:
+  port: 8091
+spring:
+  profiles:
+    active: @profiles.active@
+  application:
+    name: @artifactId@
+  cloud:
+    nacos:
+      discovery:
+        server-addr: lkdt-cloud-nacos:8848
+      config:
+        file-extension: properties
+        server-addr: ${spring.cloud.nacos.discovery.server-addr}
+        shared-dataids: application-lkdt-cloud-xxl-job-admin-${spring.profiles.active}.properties

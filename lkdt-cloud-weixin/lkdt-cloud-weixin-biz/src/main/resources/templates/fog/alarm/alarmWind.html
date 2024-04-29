@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<link href="/css/plugins/fullcalendar/fullcalendar.min.css" rel="stylesheet">
+  <link href="/css/plugins/fullcalendar/fullcalendar.print.css" rel="stylesheet" media="print">
+<style>
+p{
+    font-size: 3.5vw;
+    color: #f1a908;
+    height: 5vw;
+    line-height: 5vw;
+}
+.col-md-4{
+	width: 33.33%;
+	float: left;
+}
+.fc-icon-x:after {
+    font-size: 290%;
+}
+</style>
+<script>
+    function nofind(_this){
+        _this.src="/fog/nofind.jpg";
+    }
+</script>
+<body class="gray-bg" style="height: 97%;    overflow: hidden;padding: 5px;background: #132535;">
+	<input id="epId" name="epId" type="hidden" th:value="${epId}">
+	<input id="beginTime" name="beginTime" type="hidden" th:value="${beginTime}">
+	<input id="endTime" name="endTime" type="hidden" th:value="${endTime}">
+	
+	<div class="row" style="height: 14vw;width: 100%;">
+		<div class="col-md-12" style="background-color: #090a21;
+    padding:5px 150px 5px 40px ;width: 100%; font-family: sans-serif;">
+			<span>
+				<p>开始时间：<span th:text="${beginTime}"></span> </p>
+				<p>结束时间：<span th:text="${endTimeText}"></span> </p>
+			</span>
+		</div>
+	</div>
+	<div class="row" style="height: 80%;width: 99%;">
+		<div class="col-md-12" style="height: 100%;">
+			<div id="container2" style="height: 100%;width:100%;"></div>
+		</div>
+	</div>
+	
+	<!-- ECharts -->
+	<script src="/lkdtWX/js/plugins/echarts/echarts.min.js"></script>
+	<script type="text/javascript" src="/lkdtWX/js/jquery.min.js" ></script>
+	<script src="/lkdtWX/js/ckplayer/ckplayer.min.js"></script>
+	<!-- FastClick -->
+	<script src="/lkdtWX/js/fastclick.js"></script>
+</body>
+<script type="text/javascript">
+    
+    //统计
+    var option = {
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'cross',
+                    label: {
+                        backgroundColor: '#283b56'
+                    }
+                }
+            },
+            grid:{
+                x:45,
+                x2:47,
+                y:50,
+                y2:20
+            },
+    		visualMap: {
+    			 show: false,
+	            top: 'top',
+	            left:'middle',
+	            color:['#16DDFD'],
+	            textStyle:{
+	                color:'#fff'
+	            },
+	            pieces: [{
+	                gt: 0,
+	                lte: 10,
+	                color: '#48ef8b'
+	            }, {
+	                gt: 10,
+	                lte: 14,
+	                color: '#007eff'
+	            }, {
+	                gt: 14,
+	                lte: 20,
+	                color: '#fd4a05'
+	            }, {
+	                gt: 20,
+	                color: '#ff0000'
+	            }]
+	        },
+            xAxis: {
+                type: 'category',
+                name: 'HH:ss',
+                data: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
+                boundaryGap: false,
+                axisLine: {
+                    lineStyle: {
+                        color: '#57617B'
+                    }
+                },
+                axisLabel: {
+                    textStyle: {
+                        color:'#fff',
+                    },
+                },
+                nameTextStyle:{
+               	 color: '#ffffff'
+               }
+            },
+            yAxis: {
+                type: 'value',
+                scale: true,
+                name: '风速（m/s）',
+                max: 40,
+                min: 0,
+                axisTick: {
+                    show: false
+                },
+                axisLine: {
+                    lineStyle: {
+                        color: '#57617B',
+                    }
+                },
+                axisLabel: {
+                    margin: 10,
+                    textStyle: {
+                        fontSize: 14
+                    },
+                    textStyle: {
+                        color:'#fff',
+                    },
+                    formatter : function(params) {
+						console.log(params);
+			            if (params == 40) {
+			              return '+∞';
+			            }else{
+			            	return params;
+			            }
+			        }
+                },
+                splitLine: {
+                    lineStyle: {
+                        color: 'rgba(255,255,255,.2)',
+                        type:'dotted',
+                    }
+                },
+                nameTextStyle:{
+               	 color: '#ffffff'
+               }
+            },
+            series: [{
+                data: [1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000],
+                type: 'line',
+                name:'风速',
+
+                smooth: true,
+                lineStyle: {
+                    normal: {
+                        width: 2
+                    }
+                },
+                areaStyle: {
+                    normal: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                            offset: 1,
+                            color: '#48ef8b'
+                        },{
+                            offset: 0.695,
+                            color: '#007eff'
+                        },{
+                            offset: 0.620,
+                            color: '#fd4a05'
+                        },{
+                            offset: 0.5,
+                            color: '#ff0000'
+                        }, {
+                            offset: 0,
+                            color: '#ff0000'
+                        }], true),
+                        shadowColor: 'rgba(0, 0, 0, 0.1)',
+                        shadowBlur: 10
+                    }
+                }
+            }]
+        };
+    var date = new Date();
+    var hour = date.getHours();
+    var dom2 = document.getElementById("container2");
+    var myChart2 = echarts.init(dom2);
+	//var days2 = ['北', '东北', '东','东南', '南', '西南', '西','西北'];
+	
+	//var data2 = [1,[200,1,1],[300,2,0],[200,3,0],[200,4,3],[200,5,3],[200,6,4],[100,7,2],[360,8,4],[2,9,4],[5,10,5],[3,11,3],[2,12,5],[4,13,1],[4,14,1],[4,15,3],[2,16,4],[3,17,6],[5,18,4],[7,19,4],[9,20,3],[8,21,3],[7,22,2],[6,23,5],[5,24,7]];
+
+	var option2 = {
+	    title: {
+	        text: '告警时段风速风向图',
+	        subtext: '圆的大小和颜色表示风速',
+	        textStyle: {
+                color: '#ffffff',
+                fontSize:18,
+            },
+            left: 'center'
+	    },
+	    grid:{
+            x:45,
+            x2:47,
+            y:70,
+            y2:20
+        },
+	    tooltip: {
+	        formatter: function (params) {
+	            return params.value[1]+'</br>当前风速:'+params.value[2] + 'm/s</br>当前风向:'+ getWinddVal(params.value[0]);
+	        }
+	    },
+	    xAxis: {
+            type: 'category',
+            name: 'HH:ss',
+            data: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
+            boundaryGap: false,
+            axisLine: {
+                lineStyle: {
+                    color: '#57617B'
+                }
+            },
+            axisLabel: {
+                textStyle: {
+                    color:'#fff',
+                },
+            },
+            nameTextStyle:{
+           	 color: '#ffffff'
+           },
+           splitLine: {
+               lineStyle: {
+                   type: 'dashed'
+               }
+           }
+        },
+	       yAxis: {
+	            type: 'value',
+	            scale: true,
+	            name: '风向',
+	            max: 7,
+	            min: 0,
+	            interval:1,
+		        axisLabel:{
+		        	textStyle: {
+		                color:'#fff',
+		                fontSize:14
+		            },
+		            rotate: 0,
+		            formatter:function (value) {
+		        	    if(value == 1) {
+		        	    	return '西南';
+		        	    }else if(value == 2) {
+		        	    	return '西';
+		        	    }else if(value == 3) {
+		        	    	return '西北';
+		        	    }else if(value == 4) {
+		        	    	return '北';
+		        	    }else if(value == 5) {
+		        	    	return '东北';
+		        	    }else if(value == 6) {
+		        	    	return '东';
+		        	    }else if(value == 7) {
+		        	    	return '东南';
+		        	    }else if(value == 0) {
+		        	    	return '南';
+		        	    }
+
+		        	}
+		        },
+            axisTick: {
+                show: false
+            },
+            axisLine: {
+                lineStyle: {
+                    color: '#57617B',
+
+                }
+            },
+            splitLine: {
+                lineStyle: {
+                    color: 'rgba(255,255,255,.2)',
+                    type:'dotted',
+                }
+            },
+            nameTextStyle:{
+           	 color: '#ffffff'
+           }
+        },
+	    series: [{
+	        name: 'Punch Card',
+	        type: 'scatter',
+	        encode: {
+	            x: 1,      // 表示维度 3、1、5 映射到 x 轴。
+	            y: 0,              // 表示维度 2 映射到 y 轴。
+	            tooltip: [1, 2, 3] // 表示维度 3、2、4 会在 tooltip 中显示。
+	        },
+	        symbolSize: function (val) {
+	            return val[2] *5;
+	        },
+	        animationDelay: function (idx) {
+	            return idx * 5;
+	        },
+	        itemStyle:{
+	        	color:function (val) {
+	        		var winds=val.data[2];
+	        		if(winds>=0&&winds<10){
+	        			return '#48ef8b';
+	        		}else if(winds>=10&&winds<14){
+	        			return '#007eff';
+	        		}else if(winds>=14&&winds<20){
+	        			return '#fd4a05';
+	        		}else if(winds>=20){
+	        			return '#ff0000';
+	        		}
+	        		return '#fff';
+	        		
+		        }
+	        }
+	    }]
+	};
+    function show(id) {
+        var objDiv = $("#"+id+"");
+        $(objDiv).css("display","block");
+    }
+    $(function() {
+        updateImgPath();
+    });
+
+    /**
+	 * 更新数据
+     */
+	function updateImgPath(){
+		//获取统计图
+        $.ajax({
+            type: "get",
+            url: "/system/alarm/alarmDistanceStatisticWind",
+            dataType:'json',
+        	data: {epId:$("#epId").val(),beginTime:$("#beginTime").val(),endTime:$("#endTime").val()}
+        }).success(function(data) {
+            if (option && typeof option === "object") {
+            	
+                //option.title.text = date;
+                option.xAxis.data = data.xAxis.split(",");
+                option.series[0].data = data.series.split(",");
+                //myChart1.setOption(option, false);
+                option2.series[0].data = data.intList;
+                option2.xAxis.data = data.xAxis.split(",");
+                myChart2.setOption(option2, false);
+                
+            }
+        }).fail(function(err){
+            console.log(err);
+        });
+	}
+	$('.fc-close').bind('click',function(event){
+        hide('mydiv1');
+    });
+	function hide(id) {
+        var objDiv = $("#"+id+"");
+        $(objDiv).css("display", "none");
+    }
+
+	//获取风向
+	function getWindd(windd){
+		if(windd>337.5||windd<=22.5){
+			return "北";
+		}else if(windd>22.5&&windd<=67.5){
+			return "东北";
+		}else if(windd>67.5&&windd<=112.5){
+			return "东";
+		}else if(windd>112.5&&windd<=157.5){
+			return "东南";
+		}else if(windd>157.5&windd<=202.5){
+			return "南";
+		}else if(windd>202.5&&windd<=247.5){
+			return "西南";
+		}else if(windd>247.5&&windd<=292.5){
+			return "西";
+		}else if(windd>292.5&&windd<=337.5){
+			return "西北";
+		}
+		return null;
+	}
+	//获取风向值
+	function getWinddVal(windd){
+		if(windd==4){
+			return "北";
+		}else if(windd==5){
+			return "东北";
+		}else if(windd==6){
+			return "东";
+		}else if(windd==7){
+			return "东南";
+		}else if(windd==0){
+			return "南";
+		}else if(windd==1){
+			return "西南";
+		}else if(windd==2){
+			return "西";
+		}else if(windd==3){
+			return "西北";
+		}
+		return null;
+	}
+	//获取风等级
+	function getWindLevel(winds){
+		if(winds<1.5){
+			return "1级";
+		}else if(winds<=3.3){
+			return "2级";
+		}else if(winds<=5.4){
+			return "3级";
+		}else if(winds<=7.9){
+			return "4级";
+		}else if(winds<=10.7){
+			return "5级";
+		}else if(winds<=13.8){
+			return "6级";
+		}else if(winds<=17.1){
+			return "7级";
+		}else if(winds<=20.7){
+			return "8级";
+		}else if(winds<=24.4){
+			return "9级";
+		}else if(winds<=28.4){
+			return "10级";
+		}else if(winds<=32.6){
+			return "11级";
+		}else if(winds<=36.9){
+			return "12级";
+		}else if(winds<=41.4){
+			return "13级";
+		}else if(winds<=46.1){
+			return "14级";
+		}else if(winds>=46.1){
+			return "15级";
+		}
+		return null;
+	}
+
+</script>
+</html>

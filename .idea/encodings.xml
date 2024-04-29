@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/lkdt-cloud-fog/lkdt-cloud-fog-api/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/lkdt-cloud-fog/lkdt-cloud-fog-biz/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/lkdt-cloud-gateway/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/lkdt-cloud-monitor/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/lkdt-cloud-radar/lkdt-cloud-radar-api/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/lkdt-cloud-radar/lkdt-cloud-radar-biz/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/lkdt-cloud-system/lkdt-cloud-system-api/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/lkdt-cloud-system/lkdt-cloud-system-biz/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/lkdt-cloud-traffic-incident/lkdt-cloud-traffic-incident-api/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/lkdt-cloud-traffic-incident/lkdt-cloud-traffic-incident-biz/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/lkdt-cloud-weixin/lkdt-cloud-weixin-api/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/lkdt-cloud-weixin/lkdt-cloud-weixin-biz/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/lkdt-common/lkdt-common-cloud/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/lkdt-common/lkdt-common-core/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/lkdt-common/lkdt-common-job/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/lkdt-xxl-job/lkdt-xxl-job-admin/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/lkdt-xxl-job/lkdt-xxl-job-core/src/main/java" charset="UTF-8" />
+  </component>
+</project>

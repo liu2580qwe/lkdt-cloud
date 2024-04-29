@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<link rel="stylesheet" href="/editor-app/libs/bootstrap_3.1.1/css/bootstrap-table-pagejump.css" />
+<script	src="/lkdtWX/js/plugins/laydate/laydate.js"></script>
+
+
+<style>
+	.search-span{
+		height: 60px;
+		padding: 10px 10px;
+		display: -webkit-inline-box;
+	}
+</style>
+<body class="gray-bg">
+	<div class="wrapper wrapper-content ">
+		<div class="col-sm-12">
+			<div class="ibox">
+				<div class="ibox-body">
+					<div class="fixed-table-toolbar">
+						<div class="columns pull-right col-md-10 nopadding" style=" width:100%">
+						<input type="hidden" id="picUrl" name="picUrl">
+						    <span class="search-span" style="">
+								<span>告警时间：</span>
+					            <input type="text" class="layui-input" id="starttime" placeholder="yyyy-MM-dd HH:mm:ss" lay-verify="date" autocomplete="off" style="width: 140px;">
+					            <span>--</span>
+					            <input type="text" class="layui-input" id="endtime" placeholder="HH:mm:ss" lay-verify="date" autocomplete="off" style="width: 120px;">
+			                </span>
+							<span class="search-span" style="">
+								<span>所属公路：</span>
+								<input id="hwId" name="hwId" class="hidden">
+								<input id="name" name="name" class="form-control" type="text"
+									style="cursor: pointer;width: 120px;" onclick="openHighway()"
+									readonly="readonly" placeholder="所属公路">
+							</span>
+							<span class="search-span" style="">
+								<span>摄像头：</span>
+								<input id="epid" name="epid" class="hidden">
+								<input id="camName" type="text" class="form-control" style="width: 160px;"
+								readonly="readonly" placeholder="选择摄像头"  onclick="openCamera()">
+							</span>
+							<span class="search-span" style="">
+								<button class="btn btn-success" onclick="reLoad()">查询</button>
+								<button class="btn btn-success" onclick="reset()">重置</button>
+								<button class="btn btn-success" onclick="exportExcel()">导出</button>
+							</span>
+							<div class="columns pull-right">
+							</div>
+						</div>
+					</div>
+					<table id="exampleTable" data-mobile-responsive="true">
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--shiro控制bootstraptable行内按钮看见性 来自bootdo的创新方案 -->
+		<div>
+			<script type="text/javascript">
+				var s_edit_h = 'hidden';
+				var s_remove_h = 'hidden';
+				var s_resetPwd_h = 'hidden';
+			</script>
+		</div>
+		<div shiro:hasPermission="system:alarm:edit">
+			<script type="text/javascript">
+				s_edit_h = '';
+			</script>
+		</div>
+		<div shiro:hasPermission="system:alarm:remove">
+			<script type="text/javascript">
+				var s_remove_h = '';
+			</script>
+		</div>
+		<div shiro:hasPermission="system:alarm:resetPwd">
+			<script type="text/javascript">
+				var s_resetPwd_h = '';
+			</script>
+		</div>
+	</div>
+	<div th:include="include :: footer"></div>
+	<script type="text/javascript" src="/editor-app/libs/bootstrap_3.1.1/js/bootstrap-table-pagejump.js"></script>
+	<script type="text/javascript" src="/lkdtWX/js/appjs/fog/alarm/alarmLog.js?v=1"></script>
+	
+</body>
+</html>

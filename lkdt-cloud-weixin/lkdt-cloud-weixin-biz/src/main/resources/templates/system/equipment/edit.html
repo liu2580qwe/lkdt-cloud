@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<link href="/lkdtWX/js/plugins/range/jquery.range.css" rel="stylesheet"/>
+<style type="text/css">
+	.guicss{display: block;}
+	ins {
+		background-color: unset;
+	}
+</style>
+<body class="gray-bg">
+	<div class="wrapper wrapper-content ">
+		<div class="row">
+			<div class="col-sm-4">
+				<img id='img1' th:src="" style="width: 100%;height: auto;margin: auto;">
+			</div>
+			<div class="col-sm-8">
+				<div class="ibox float-e-margins">
+					<div class="ibox-content">
+						<form class="form-horizontal m-t" id="signupForm">
+							<input id="epId" name="epId" th:value="${equipment.epId}"  type="hidden">
+							<!--<input id="createTime" name="createTime" th:value="${equipment.createTime}"  type="hidden">-->
+							<input id="creator" name="creator" th:value="${equipment.creator}"  type="hidden">
+							<div class="form-group">
+								<label class="col-sm-3 control-label">清晰度：</label>
+								<input id="clarity" th:value="${equipment.clarity}" hidden>
+								<div class="col-sm-6">
+									<input type="hidden" class="single-slider3" th:value="15"/>
+								</div>
+								<div class="col-sm-3">
+									<input type="number" name="clarity" class="ipgs" value="15" style="width: 100px;">
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-3 control-label">设备编码：</label>
+								<div class="col-sm-8">
+									<input id="equCode" name="equCode" th:value="${equipment.equCode}" class="form-control" type="text">
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-3 control-label">设备名称：</label>
+								<div class="col-sm-8">
+									<input id="equName" name="equName" th:value="${equipment.equName}" class="form-control" type="text">
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-3 control-label">设备位置：</label>
+								<div class="col-sm-8">
+									<input id="equLocation" name="equLocation" th:value="${equipment.equLocation}" class="form-control" type="text">
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-3 control-label">纬度：</label>
+								<div class="col-sm-8">
+									<input id="lat" name="lat" th:value="${equipment.lat}" class="form-control" type="text">
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-3 control-label">经度：</label>
+								<div class="col-sm-8">
+									<input id="lon" name="lon" th:value="${equipment.lon}" class="form-control" type="text">
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-3 control-label">所属公路：</label>
+								<div class="col-sm-8">
+									<!-- <input id="hwId" name="hwId" th:value="${equipment.hwId}" class="form-control" type="text"> -->
+									<input id="hwId" name="hwId" class="hidden" th:value="${equipment.hwId}">
+									 <input id="name" name="name"	class="form-control" type="text" style="cursor: pointer;"
+										onclick="openHighway()" readonly="readonly" placeholder="所属公路"  th:value="${equipment.hwName}">
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-3 control-label">是否高危路段</label>
+								<div class="col-sm-8">
+									<!-- <input id="isdanger" name="isdanger" class="form-control" type="text"> -->
+									<div class="col-sm-8">
+										<label class="radio-inline"> <input type="radio" th:field="${equipment.isdanger}"
+											name="isdanger" value="1" /> 是
+										</label> <label class="radio-inline"> <input type="radio" th:field="${equipment.isdanger}"
+											name="isdanger" value="0" /> 否
+										</label>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-sm-8 col-sm-offset-3">
+										<button type="submit" class="btn btn-primary">提交</button>
+									</div>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div th:include="include::footer"></div>
+
+	<script src="/lkdtWX/js/plugins/range/jquery.range.js"></script>
+	<script src="/lkdtWX/js/appjs/system/equipment/edit.js"></script>
+
+</body>
+</html>

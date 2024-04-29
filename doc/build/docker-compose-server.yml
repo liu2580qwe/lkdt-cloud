@@ -1,0 +1,250 @@
+#### 镜像上传
+# lkdtcloud/springcloud
+#mvn clean package
+#docker-compose -f ./docker-compose.yml build
+# docker仓库
+#docker tag mongo:latest lkdtcloud/lkdt-cloud-mongodb:1.0
+#docker tag nginx:stable-alpine lkdtcloud/lkdt-cloud-nginx:1.0
+#docker tag rabbitmq:3-management lkdtcloud/lkdt-cloud-rabbitmq:1.0
+#docker tag mysql:5.7.34 lkdtcloud/lkdt-cloud-mysql:1.0
+#docker tag redis:5 lkdtcloud/lkdt-cloud-redis:1.0
+#docker tag nacos/nacos-server lkdtcloud/lkdt-cloud-nacos:1.0
+#docker tag lkdt-cloud-xxljob-admin lkdtcloud/lkdt-cloud-xxljob-admin:1.0
+#docker tag lkdt-cloud-gateway lkdtcloud/lkdt-cloud-gateway:1.0
+#docker tag lkdt-cloud-system lkdtcloud/lkdt-cloud-system:1.0
+#docker tag lkdt-cloud-fog lkdtcloud/lkdt-cloud-fog:1.0
+#docker tag lkdt-cloud-weixin lkdtcloud/lkdt-cloud-weixin:1.0
+#docker tag lkdt-cloud-traffic-incident lkdtcloud/lkdt-cloud-traffic-incident:1.0
+#docker tag lkdt-cloud-monitor lkdtcloud/lkdt-cloud-monitor:1.0
+#docker tag lkdt-cloud-radar lkdtcloud/lkdt-cloud-radar:1.0
+
+#docker push lkdtcloud/lkdt-cloud-mongodb:1.0
+#docker push lkdtcloud/lkdt-cloud-nginx:1.0
+#docker push lkdtcloud/lkdt-cloud-rabbitmq:1.0
+#docker push lkdtcloud/lkdt-cloud-mysql:1.0
+#docker push lkdtcloud/lkdt-cloud-redis:1.0
+#docker push lkdtcloud/lkdt-cloud-nacos:1.0
+#docker push lkdtcloud/lkdt-cloud-xxljob-admin:1.0
+#docker push lkdtcloud/lkdt-cloud-gateway:1.0
+#docker push lkdtcloud/lkdt-cloud-system:1.0
+#docker push lkdtcloud/lkdt-cloud-fog:1.0
+#docker push lkdtcloud/lkdt-cloud-weixin:1.0
+#docker push lkdtcloud/lkdt-cloud-traffic-incident:1.0
+#docker push lkdtcloud/lkdt-cloud-monitor:1.0
+#docker push lkdtcloud/lkdt-cloud-radar:1.0
+#docker-compose  up -d lkdt-cloud-nginx lkdt-cloud-mysql lkdt-cloud-redis lkdt-cloud-rabbitmq lkdt-cloud-mongodb
+#docker-compose  up -d lkdt-cloud-nacos lkdt-cloud-monitor
+#docker-compose up -d lkdt-cloud-xxljob-admin lkdt-cloud-gateway lkdt-cloud-system lkdt-cloud-fog lkdt-cloud-weixin lkdt-cloud-traffic-incident
+
+version: '2'
+services:
+#  lkdt-cloud-mysql:
+#    image: lkdtcloud/lkdt-cloud-mysql:1.0
+#    environment:
+#      MYSQL_ROOT_PASSWORD: root
+#    restart: always
+#    container_name: lkdt-cloud-mysql
+#    command:
+#      --character-set-server=utf8mb4
+#      --collation-server=utf8mb4_general_ci
+#      --explicit_defaults_for_timestamp=true
+#      --lower_case_table_names=1
+#      --max_allowed_packet=128M
+#    ports:
+#      - 3306:3306
+  lkdt-cloud-mysql:
+    image: lkdtcloud/lkdt-cloud-mysql:1.0
+    restart: always
+    network_mode: "host"
+    container_name: lkdt-cloud-mysql
+    privileged: true
+#    ports:
+#      - "3306:3306"
+    volumes:
+      - ./mydir:/mydir
+      - ./datadir:/var/lib/mysql
+      - ./conf/my.cnf:/etc/my.cnf
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    command: [
+        '--character-set-server=utf8mb4',
+        '--collation-server=utf8mb4_unicode_ci',
+        '--max_connections=3000'
+    ]
+    environment:
+      MYSQL_ROOT_PASSWORD: "root"
+
+  lkdt-cloud-redis:
+    image: lkdtcloud/lkdt-cloud-redis:1.0
+    privileged: true
+    network_mode: "host"
+#    ports:
+#      - 6379:6379
+    restart: always
+    container_name: lkdt-cloud-redis
+    hostname: lkdt-cloud-redis
+    command: redis-server /usr/local/etc/redis/redis.conf
+    volumes:
+      - ./data:/data
+      - ./conf/redis.conf:/usr/local/etc/redis/redis.conf
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+  lkdt-cloud-mongodb:
+    image: lkdtcloud/lkdt-cloud-mongodb:1.0
+    container_name: lkdt-cloud-mongodb
+    restart: always
+    network_mode: "host"
+    environment:
+      - MONGO_DATA_DIR=/data/db
+      - MONGO_LOG_DIR=/data/logs
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=NJzzy123
+    volumes:
+      - ./mongodb/data:/data/db
+      - ./mongodb/logs:/data/logs
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+#    ports:
+#      - 27017:27017
+
+  lkdt-cloud-xxljob-admin:
+    image: lkdtcloud/lkdt-cloud-xxljob-admin:1.0
+    container_name: lkdt-cloud-xxljob-admin
+    hostname: lkdt-cloud-xxljob-admin
+    network_mode: "host"
+    volumes:
+      - /opt/middleware/xxljob/applogs:/data/applogs
+      - /etc/localtime:/etc/localtime
+#    ports:
+#      - 8080:8080
+    environment:
+      TZ: Asia/Shanghai
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200m"
+        max-file: "100"
+
+  lkdt-cloud-monitor:
+    image: lkdtcloud/lkdt-cloud-monitor:1.0
+    restart: always
+    network_mode: "host"
+#    ports:
+#      - 9111:9111
+    container_name: lkdt-cloud-monitor
+    hostname: lkdt-cloud-monitor
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      - ./html/monitor-logs:/ROOT/logs
+  lkdt-cloud-nacos:
+    image: lkdtcloud/lkdt-cloud-nacos:1.0
+    restart: always
+    container_name: lkdt-cloud-nacos
+    hostname: lkdt-cloud-nacos
+    network_mode: "host"
+#    ports:
+#      - 8848:8848
+    environment:
+      SPRING_DATASOURCE_PLATFORM: mysql
+      MYSQL_SERVICE_HOST: 192.168.3.72
+      MYSQL_SERVICE_PORT: 3306
+      MYSQL_SERVICE_DB_NAME: lkdt-nacos
+      MYSQL_SERVICE_USER: root
+      MYSQL_SERVICE_PASSWORD: root
+      MODE: standalone
+      MYSQL_SERVICE_DB_PARAM: characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+
+  lkdt-cloud-gateway:
+    image: lkdtcloud/lkdt-cloud-gateway:1.0
+    restart: always
+    network_mode: "host"
+#    ports:
+#      - 9999:9999
+    container_name: lkdt-cloud-gateway
+    hostname: lkdt-cloud-gateway
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      - ./html/gateway-logs:/ROOT/logs
+
+  lkdt-cloud-system:
+    image: lkdtcloud/lkdt-cloud-system:1.0
+    restart: always
+    network_mode: "host"
+    container_name: lkdt-cloud-system
+    hostname: lkdt-cloud-system
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      - ./html/system-logs:/ROOT/logs
+
+  lkdt-cloud-fog:
+    image: lkdtcloud/lkdt-cloud-fog:1.0
+    restart: always
+    network_mode: "host"
+#    ports:
+#      - 8095:8095
+    container_name: lkdt-cloud-fog
+    hostname: lkdt-cloud-fog
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      - ./html/fog-logs:/ROOT/logs
+
+#  lkdt-cloud-weixin:
+#    image: lkdtcloud/lkdt-cloud-weixin:1.0
+#    restart: always
+#    network_mode: "host"
+#    ports:
+#      - 8096:8096
+#    container_name: lkdt-cloud-weixin
+#    hostname: lkdt-cloud-weixin
+#    volumes:
+#      - /etc/timezone:/etc/timezone:ro
+#      - /etc/localtime:/etc/localtime:ro
+#      - ./html/weixin-logs:/ROOT/logs
+
+  lkdt-cloud-traffic-incident:
+    image: lkdtcloud/lkdt-cloud-traffic-incident:1.0
+    restart: always
+    network_mode: "host"
+    container_name: lkdt-cloud-traffic-incident
+    hostname: lkdt-cloud-traffic-incident
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      - ./html/traffic-incident-logs:/ROOT/logs
+
+  lkdt-cloud-rabbitmq:
+    image: lkdtcloud/lkdt-cloud-rabbitmq:1.0
+    network_mode: "host"
+#    ports:
+#      - 5672:5672
+#      - 15672:15672
+    restart: always
+    container_name: lkdt-cloud-rabbitmq
+    hostname: lkdt-cloud-rabbitmq
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+
+  lkdt-cloud-nginx:
+    image: lkdtcloud/lkdt-cloud-nginx:1.0
+    container_name: lkdt-cloud-nginx
+    restart: always
+    privileged: true
+    network_mode: "host"
+    environment:
+      - TZ=Asia/Shanghai
+#    ports:
+#      - 80:80
+#      - 443:443
+    volumes:
+      #- ./conf/proxy.conf:/etc/nginx/proxy.conf
+      - ./conf/nginx.conf:/etc/nginx/nginx.conf
+      #- ./conf/conf.d/:/etc/nginx/conf.d/
+      - /etc/docker/html:/etc/nginx/html
+      - /etc/docker/logs:/var/log/nginx
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro

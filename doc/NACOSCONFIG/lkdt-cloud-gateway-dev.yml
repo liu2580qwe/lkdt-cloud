@@ -1,0 +1,73 @@
+spring:
+  redis:
+    host: 192.168.3.100
+    password: '123456'
+    port: 6379
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowCredentials: true
+            allowedOriginPatterns: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+      routes:
+        #nacos
+        - id: lkdt-cloud-demo-biz
+          uri: lb://lkdt-cloud-demo-biz
+          predicates:
+          - Path=/demo/**
+          #限流配置
+          filters:
+          - name: RequestRateLimiter
+            args:
+              key-resolver: '#{@ipKeyResolver}'
+              redis-rate-limiter.replenishRate: 10
+              redis-rate-limiter.burstCapacity: 20
+          #降级配置
+          - name: Hystrix
+            args:
+              name: default
+              fallbackUri: 'forward:/fallback'
+        - id: lkdt-cloud-system-biz
+          uri: lb://lkdt-cloud-system-biz
+          predicates:
+          - Path=/sys/**,/test/**,/online/**,/api/**,/big/screen/**,/bigscreen/**,/webSocketApi/**,/message/**
+          #限流配置
+          filters:
+          - name: RequestRateLimiter
+            args:
+              key-resolver: '#{@ipKeyResolver}'
+              redis-rate-limiter.replenishRate: 10
+              redis-rate-limiter.burstCapacity: 20
+          #降级配置
+          - name: Hystrix
+            args:
+              name: default
+              fallbackUri: 'forward:/fallback'
+        - id: lkdt-cloud-websocket
+          uri: lb:ws://lkdt-cloud-system-biz
+          predicates:
+            - Path=/websocket/**
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+# hystrix 信号量隔离，3秒后自动超时
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          strategy: SEMAPHORE
+          thread:
+            timeoutInMilliseconds: 3000
+  shareSecurityContext: true
+# 验证配置生效
+lkdt:
+  test: 123456

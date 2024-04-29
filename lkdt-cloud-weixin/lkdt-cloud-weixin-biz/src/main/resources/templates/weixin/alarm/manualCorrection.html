@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width"> -->
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+    <!-- iphone会把一串数字识别为电话号码，点击的时候会提示是否呼叫，屏蔽这功能则把telephone设置为no -->
+    <meta content="telephone=no" name="format-detection" />
+    <!-- iphone的私有标签，默认值为default（白色），可以定为black（黑色）和black-translucent（灰色半透明） -->
+    <meta content="black" name="apple-mobile-web-app-status-bar-style">
+    <!-- iphone设备的是有标签 允许全屏模式浏览，隐藏浏览器导航栏 -->
+    <meta content="yes" name="apple-mobile-web-app-capable" />
+    <!-- 全屏显示 -->
+    <meta content="yes" name="apple-touch-fullscreen" />
+    <!-- UC强制全屏 -->
+    <meta name="full-screen" content="yes">
+    <!-- QQ强制全屏 -->
+    <meta name="x5-fullscreen" content="true">
+    <!-- 屏蔽百度转码 -->
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <title>人工校正</title>
+    <!-- 引入 WeUI -->
+	<link rel="stylesheet" href="https://cdn.bootcss.com/weui/1.1.3/style/weui.min.css">
+	<link rel="stylesheet" href="https://cdn.bootcss.com/jquery-weui/1.2.1/css/jquery-weui.min.css">
+    <style>
+        a{text-decoration: none;}
+        a:hover{text-decoration: none;}
+        html{
+        	background: #eaeaea;
+        }
+        .hd_line{
+        	background: #eaeaea;
+       	    margin-top: 0;
+    		line-height: 30px;
+        }
+        
+        .mcc{
+        	position: absolute;
+        	top: 0px;
+        	bottom: 0px;
+        	left: 0px;
+        	right: 0px;
+        	z-index: 98;
+        	background: rgba(0, 0, 0, 0.5);
+        	display: none;
+        }
+        .mcc_cnt{
+        	width: 90%;
+        	height: 50%;
+        	margin: 40% auto 0px auto;
+        	background: #f9f9f9;
+        	border-radius: 8px;
+        	z-index: 99;
+        	opacity: 1;
+        }
+        .mcc_cnt .ts{
+        	width:96%;
+        	font-size: 5vw;
+        	margin: 0 auto;
+        	padding-top: 15px;
+        }
+        .mcc_cnt .btns{
+        	margin-top: 120px;
+        	margin-left: 5vw;
+        }
+        .mcc_cnt .btns a{
+        	display: -webkit-inline-box;
+        	background-color: #1aad19;
+        	border-radius: 5px;
+        	padding: 1vw 3vw;
+        	font-size: 4.5vw;
+        	color: #fff;
+        }
+        #levelName{
+        	color: red;
+        }
+        
+        .subs{
+        	width: 65%;
+        	margin: 15px auto;
+        }
+        
+        .weui-btn{
+        	display: -webkit-inline-box;
+        	
+        }
+        .weui-btn+.weui-btn{
+        	margin-top: 0px;
+        }
+    </style>
+</head>
+<body>
+	 <div class="weui-gallery" id="gallery">
+            <img class="weui-gallery__img" id="galleryImg"></img>
+        </div>
+	<div class="weui-form">
+        <form class="" action="#" id="signupForm">
+			<input id="epId" name="epId" type="hidden" th:value="${alarm.epId}" />
+			<input id="state" name="state" type="hidden" th:value="${state}" />
+			<input id="imgtime" name="imgtime" type="hidden" th:value="${#dates.format(alarm.imgtime, 'yyyy-MM-dd HH:mm:ss')}" />
+			<input id="imgpath" name="imgpath" type="hidden" th:value="${alarm.imgpath}" />
+			<input id="isFogNow" name="isFogNow" type="hidden" th:value="${isFogNow}" />
+			<div class="weui-cells weui-cells_form">
+	          <div class="weui-cell weui-cell_readonly">
+	            <div class="weui-cell__hd"><label class="weui-label">摄像头：</label></div>
+	            <div class="weui-cell__bd">
+	                <input class="weui-input" id="equName" name="equName" th:value="${alarm.equName}" readonly/>
+	            </div>
+	          </div>
+	          <div class="weui-cell weui-cell_readonly">
+	            <div class="weui-cell__hd"><label class="weui-label">地址：</label></div>
+	            <div class="weui-cell__bd">
+	                <input class="weui-input" id="address" name="address" th:value="${alarm.address}" readonly/>
+	            </div>
+	          </div>
+	          <div class="weui-cell weui-cell_readonly">
+	            <div class="weui-cell__bd">
+	                <img class='weui-jiaj-img' id='img1' alt="" onerror="this.src='/img/defalt.jpg;this.onerror=null'" onclick="imgclick()" style="width: 100%;height: 200px;"/>
+	            </div>
+	          </div>
+	          <div class="weui-cell weui-cell_switch">
+			    <div class="weui-cell__bd">摄像头异常</div>
+			    <div class="weui-cell__ft" id="ycsxt">
+			      <input class="weui-switch" id="button1" type="checkbox" >
+			    </div>
+			  </div>
+	        <div class="weui-cell" id="js_cell">
+	            <div class="weui-cell__hd"><label class="weui-label">可见距离</label></div>
+		            <div class="weui-cell__bd">
+		                <input class="weui-input" autofocus type="number" pattern="[0-9]*" placeholder="请输入可见距离" id="distance" name="distance" th:value="${alarm.distance}" />
+		            </div>
+	          </div>
+	        </div>
+        </form>
+        
+        <div class="subs" style="margin-bottom: 150px;">
+        	<a href="javascript:;" class="weui-btn weui-btn_primary" onclick="primaryClick()" id="submit" style="float: left;">点击提交</a>
+        	<a href="javascript:;" class="weui-btn weui-btn_primary" onclick="colseClick()" style="float: right;">关闭页面</a>
+        </div>
+	</div>
+	
+	<div id="manualCorrectionConfirm" class="mcc">
+		<div class="mcc_cnt">
+			<div class="ts">本次提交会触发路段【<span th:text="${alarm.address}" ></span>】发送<span id="levelName" ></span>信息，确认是否发送消息？</div>
+			<div class="btns">
+				<a class="btn weui-btn" href="javascript:;" id="weixin" name="weixin" onclick="weixin()" >微信消息</a>
+				<a class="btn weui-btn" href="javascript:;" id="weixin_duanxin" name="weixin_duanxin" onclick="weixin_duanxin()" >微信和短信消息</a>
+				<a class="btn weui-btn" href="javascript:;" id="qvxiao" name="qvxiao" onclick="qvxiao()" >取消</a>
+			</div>
+		</div>
+	</div>
+	
+    <!-- 引入 WeJS -->
+    <script src="https://cdn.bootcss.com/jquery/1.11.0/jquery.min.js"></script>
+	<script src="https://cdn.bootcss.com/jquery-weui/1.2.1/js/jquery-weui.min.js"></script>
+	<script src="/lkdtWX/plugins/weui/js/commonMap.js"></script>
+    <script>
+    
+	    var iseffect=1;
+	    var imgpath='';
+	    var state=0;
+	    var sendsms=0;
+	    var manualCorrectionBack = u.getStorage("manualCorrectionBack");
+	    
+        //返回
+        function bindBack(){
+        	$.showLoading();
+        	window.parent.closePage();
+            //window.location.replace("/weixin/map/wxMapJump?pubOpenId="+u.getStorage("openid"));
+        }
+        
+        /**取消操作**/
+        function colseClick(){
+        	if(manualCorrectionBack != "confirmList"){
+        		bindBack();
+        	}else{
+        		backConfirmList();
+        	}
+        }
+
+        /**提交*/
+        function primaryClick(){
+            var postdata = {};
+            postdata.epId = $("#epId").val();
+            postdata.distance = $("#distance").val();
+            
+        	$.ajax({
+        		type : "POST",
+        		url : "/weixin/alarm/checkAlarmRoad",
+				contentType: 'application/json;charset=utf-8',
+        		data : JSON.stringify(postdata),
+				headers: {
+					"X-Access-Token": u.getStorage("token")
+				},
+        		error : function(request) {
+        			 $.toast("网络异常", "cancel");
+        		},
+        		success : function(data) {
+        			if (data.code == 200) {
+        				 //弹出再次确认框
+        				 if(data.msg == "解除"){
+        					 $("#levelName").text(data.message+"告警");
+        				 }else{
+        					 $("#levelName").text(data.message+"级告警");
+        				 }
+        				$("#manualCorrectionConfirm").show();
+        				 
+        			} else {
+        				//checkAlarmRoad方法把可视距离写入内存并更新路段信息
+        				send(0,"");
+        				
+        				//$.toast("人工校正完成", "success");
+        				//bindBack();
+        			}
+
+        		}
+        	});
+        }
+        
+        /**发送微信消息***/
+        function weixin(){
+        	$("#weixin").attr("onclick","");
+			$("#weixin").addClass("weui-btn_disabled");
+
+        	send(0,"");
+        	
+        }
+        
+        /**发送微信+短信消息****/
+        function weixin_duanxin(){
+        	$("#weixin_duanxin").attr("onclick","");
+			$("#weixin_duanxin").addClass("weui-btn_disabled");
+        	//send(1,"13961390789,13605136679,13812439099,15861239996,15861237119,18795552729,13775590699,18861306898,13505132588,15861237512,15861237267,15861236972,15861238566,13605138222,15861237339,15061360902,15950715388,15861236889,15861237368,15861287700,15751206000,13905139382,13812330058,15996496542,13814028556,13813985212,18626453870,17625925627,18096493329");
+        	// send(1,"18096493329");
+			send(0,"");
+        }
+        
+        function send(sendsms,phones){
+			var postdata = {};
+        	
+        	postdata.epId = $("#epId").val();
+        	postdata.distance = $("#distance").val();
+        	postdata.iseffective = 1;
+        	postdata.imgtime = $("#imgtime").val();
+        	postdata.imgpath = $("#imgpath").val();
+        	
+            postdata.sendsms = sendsms;
+            postdata.phones = phones;
+            postdata.openid = u.getStorage("openid");
+            
+            $.ajax({
+        		type : "POST",
+        		url : "/weixin/alarm/confirm?epId=" + epId,
+				contentType: 'application/json;charset=utf-8',
+        		data : JSON.stringify(postdata),
+				headers: {
+					"X-Access-Token": u.getStorage("token")
+				},
+        		error : function(request) {
+        			 $.toast("网络异常", "cancel");
+        		},
+        		success : function(data) {
+        			if (data.code == 200) {
+        				if(manualCorrectionBack != "confirmList"){
+        					$.alert("发送成功", function() {
+        						$("#submit").attr("onclick","");
+                           		$("#weixin").attr("onclick","");
+                           		$("#weixin_duanxin").attr("onclick","");
+            					bindBack();
+    						});
+        				}else{
+        					$.alert("发送成功", function() {
+                 				//点击确认后的回调函数
+                               	$("#submit").attr("onclick","");
+                           		$("#weixin").attr("onclick","");
+                           		$("#weixin_duanxin").attr("onclick","");
+    							// window.close();
+    							//跳转
+    							backConfirmList();
+    							
+    						});
+        				}
+        			} else {
+        				$.toast("发送失败", "cancel");
+        			}
+        		}
+        	});
+        }
+        
+        
+        function backConfirmList(){
+        	try{
+    			let confirmList = u.getStorage("confirmList");
+    			if(confirmList){
+    				let epId_ = $('#epId').val();
+    				for(let ii = 0; ii < confirmList.length; ii++){
+    					if(confirmList[ii].epId == epId_){
+    						confirmList.splice(ii,1);
+    						break;
+    					}
+    				}
+    				u.setStorage("confirmList",confirmList);
+    			}
+    		} catch (e) {
+    			console.log(e);
+    		}
+    		window.parent.closePage();
+    		//window.location.replace('/system/alarm/confirmList?isRefresh=1');
+    		//window.location.replace('/system/alarm/confirmList?isRefresh=1');
+    		//window.location.replace('/system/alarm/confirmList/'+u.getStorage("openid")+'?isRefresh=1');
+        }
+		
+        
+        /**取消***/
+        function qvxiao(){
+        	//$("#manualCorrectionConfirm").hide();
+        	window.parent.closePage();
+        }
+
+        $().ready(function() {
+        	if($("#state").val()!='0'){
+        		$.alert("异常摄像头", function() {
+   				  //点击确认后的回调函数
+        			//window.close();
+        			window.parent.closePage();
+   				});
+        		return;
+        	}
+        	
+        	initBtn();
+        	
+        	
+        	//var fname=$("#fname").val();
+        	//$("#imgpath").val($("#fname").val());
+        	imgpath=$("#imgpath").val();
+        	$("#img1").attr("src",imgpath);
+        	$("#galleryImg").attr("src",imgpath);
+        	
+        });
+        
+        function initBtn(){
+        	$("#button1").bind("click", function () {
+        		var isFogNow = $("#isFogNow").val();
+        		if(isFogNow == '1'){
+        			$.alert("请先解除该摄像头的告警状态");
+    				closeAS();
+    				return;
+        		}
+        		$.prompt("请输入密码", function(text) {
+        			if(text!='155222'){
+        				$.alert("密码错误");
+        				closeAS();
+        				return;
+        			}else{
+        				let isChecked = $("#button1").is(':checked');
+                      	if(state==0){
+                      		if(!isChecked) return ;
+                    	  	$.actions({
+                    	  		title:"请选择异常类型",
+                    	  	  	actions: [{
+        	            	  	    text: "摄像头污损、遮盖",
+        	            	  	    onClick: function() {
+        	            	  	    	state=5;
+        	            	  	    	update(state);
+        	            	  	    }
+                    	  	  	},{
+        	            	  	    text: "位置偏移",
+        	            	  	    onClick: function() {
+        	            	  	    	state=7;
+        	            	  	    	update(state);
+        	            	  	    }
+                    	  	  	},{
+									text: "其它",
+									onClick: function() {
+										state=6;
+										update(state);
+									}
+								},{
+									text: "",
+								},{
+									text: "黑白图像（数字研究院）",
+									onClick: function() {
+										state=11;
+										update(state);
+									}
+								},/*{
+									text: "条纹噪声（视频质量异常）",
+									onClick: function() {
+										state=12;
+										update(state);
+									}
+								},*/{
+									text: "画面静止（数字研究院）",
+									onClick: function() {
+										state=13;
+										update(state);
+									}
+								}],
+        	            	  	onClose: closeAS()
+                    	  	});
+
+                      	}else{
+                    	  	state=0;
+                    	  	update(state);
+                      	}
+        			}
+        			  //点击确认后的回调函数
+        			  //text 是用户输入的内容
+        			}, function() {
+        			  //点击取消后的回调函数
+        				closeAS();
+        			});
+        		
+              	
+          	});
+        }
+        
+        function closeAS(){
+        	$("#button1").attr("checked",false);
+        }
+        
+        function update(state){
+        	$.ajax({
+    			url : "/weixin/equipment/edit",
+    			type : "put",
+				contentType: 'application/json;charset=utf-8',
+				headers: {
+					"X-Access-Token": u.getStorage("token")
+				},
+    			data : JSON.stringify({
+					'epId' : $("#epId").val(),
+					'state':state,
+					'updater':u.getStorage("openid")
+				}),
+    			success : function(r) {
+    				if (r.code==200) {
+    					if(state==0){
+    						$.alert("已取消异常摄像头");
+    					}else{
+    						$("#button1").remove();
+    			        	$("#ycsxt").append("<input class='weui-switch' id='button1' type='checkbox' checked='checked' >");
+    			        	initBtn();
+    						$.alert("已设为异常摄像头", function() {
+    			   				  //点击确认后的回调函数
+   			                     //window.close();
+   			                  	window.parent.closePage();
+   			   				});
+    					}
+    					
+    				}
+    			}
+    		});
+        	
+        }
+        
+        
+        
+        function imgclick(){
+       	 	$gallery = $("#gallery");
+       	 	$gallery.fadeIn(100);
+       	 	$gallery.on("click", function(){
+                   $gallery.fadeOut(100);
+               });
+       	  // $('.weui-gallery__del').remove();
+       	}
+        
+
+
+    </script>
+</body>
+</html>

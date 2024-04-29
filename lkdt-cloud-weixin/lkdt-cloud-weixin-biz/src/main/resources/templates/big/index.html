@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>江苏高速公路恶劣天气数字监测与智能预警系统</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="../css/font-awesome.min.css?v=2" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css?v=3.3.7">
+    <link href="../css/animate.css?v=2" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="../css/swiper.min.css?v=2">
+    <link rel="stylesheet" type="text/css" href="../js/plugins/layer/skin/layer.css?v=2">
+    <link rel="stylesheet" type="text/css" href="../css/main-v5.0.css?v=2">
+    <style type="text/css">
+    	/** 字体 **/
+		  @font-face{
+		    font-family: yjsz;
+		    src:url('../../fonts/DS-DIGI-1.ttf');
+		  }
+  
+        .dsc {
+            margin: 5px;
+            text-align: center;
+            display: none;
+        }
+
+        #rechart:hover .dsc {
+            display: block;
+        }
+
+        .amap-layer {
+            /*animation: glow 800ms ease-out infinite alternate;*/
+        }
+
+        .amap-labels {
+            /*animation: glow 800ms ease-out infinite alternate;*/
+        }
+
+        @keyframes glow {
+            0% {
+                box-shadow: 0 0 0;
+            }
+            100% {
+                box-shadow: rgb(253 10 10) 0px 0px 88px inset;
+            }
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        #allmap {
+            background: none !important;
+        }
+
+        .amap-layer:nth-of-type(1) {
+            opacity: 0.2;
+            filter: alpha(opacity=40);
+        }
+
+        .weizhi_li {
+            width: 35% !important;;
+        }
+
+        .fengsu_li {
+            width: 20% !important;;
+        }
+
+        .fengxiang_li {
+            width: 20% !important;;
+        }
+
+		.c-div-left{
+			width: calc(100% - 310px);
+			height: 540px;
+			margin-right: 10px;
+			float: left;
+			background-color: #000000;
+		}
+		
+        .c-div-right {
+            width: 300px;
+            height: 540px;
+            float: right;
+        }
+
+        .c-div-right .canvas-div {
+            width: calc(100%);
+            height: 100%;
+            margin: 0px auto;
+            position: relative;
+            background: #4f5153;
+        }
+
+        .top-right1 {
+            width: 100%;
+            height: calc(100% - 540px - 15px);
+            margin-top: 15px;
+            float: left;
+            border: #ffffff 1px solid;
+        }
+
+        .top-right1 .leida-data-div {
+            width: 100%;
+            height: 100%;
+        }
+
+        /** 通过 v-html 创建的 DOM 内容不受 scoped 样式影响，可以通过深度作用选择器来为他们设置样式。 **/
+        .top-right1 .leida-data-div .ul-s {
+            list-style: none;
+            padding: 0px;
+            margin: 0px;
+            width: 100%;
+            height: 35px;
+            line-height: 35px;
+            border-width: 1px;
+            border-color: #ffffff;
+            border-style: none none dashed none;
+            border-top: 0px;
+            font-size: 16px;
+            color: #ffffff;
+        }
+
+        .top-right1 .leida-data-div .ul-s .li-s {
+            display: block;
+            width: 12%;
+            margin-left: 1%;
+            float: left;
+            text-align: center;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .top-right1 .leida-data-div .ul-s .li-s.id-width {
+            width: 6%;
+        }
+
+        .top-right1 .leida-data-div .ul-s .li-s.width21 {
+            width: 21%;
+        }
+
+        .top-right1 .leida-data-div .ul-s .li-s.li-event-color {
+            color: #ff0000;
+        }
+
+        .top-right1 .leida-data-div .leida-data {
+            height: calc(100% - 35px);
+            overflow: auto;
+            padding-left: 0px;
+        }
+        
+        .tj-ll{
+		    width: 100%;
+		    height: 140px;
+		    margin: 10px auto;
+		    /*font-size: 13px;*/
+		  }
+		  .tj-ll .tj-ll-1{
+		    width: 100%;
+		    height: 65px;
+		
+		  }
+		  .tj-ll .tj-ll-1 .tj-ll-1-1{
+		    width: calc(50% - 5px);
+		    height: 100%;
+		    float: left;
+		    background: #446a6a;
+		  }
+		  .tj-ll .tj-ll-1 .tj-ll-1-1 .dispaly-block{
+		    display: block;
+		    margin: 0px;
+		    padding: 0px;
+		    height: 40px;
+		    line-height: 40px;
+		    text-align: center;
+		  }
+		  .tj-ll .tj-ll-1 .tj-ll-1-1 .s-ll{
+		    color: #00d8ff;
+		    /*text-shadow: 0 0 25px #00d8ff;*/
+		    font-size: 40px;
+		    font-family: 'yjsz';
+		  }
+		
+		  .d-video{
+		    width: 100%;
+		    height: 340px;
+		  }
+    </style>
+
+</head>
+<body style="background: url(/fog/beijing.jpg?v=1) no-repeat;">
+<!-- Sidebar -->
+<div class="row" style="width: 100%;height: 100%;padding: 10px 0px 10px 30px;">
+	<input id="radarServicePath" name="radarServicePath" th:value="${radarServicePath}" type="hidden">
+    <!-- Sidbar Widgets -->
+    <div class="col-md-4" style="overflow: hidden; outline: none;height: 100%;margin: 0;padding: 0;">
+        <!-- Profile Menu -->
+        <!-- Feeds -->
+        <div class="row" style="width: 100%;height: 17%;margin: 0;padding: 0;">
+            <div class="s-widget col-md-4" style="margin: 0;padding: 0;">
+                <h2 class="tile-title">告警统计</h2>
+                <div class="alert alert-danger alert-icon" onclick="openCalendar()">
+                    <span style="margin-left: 26px;">今日告警:<span id="todayAlarm"></span>次</span> <i
+                        class="icon fa fa-exclamation-triangle"></i>
+                </div>
+
+                <div class="alert alert-danger alert-icon" onclick="openCalendar()">
+                    <span style="margin-left: 26px;">本月累计告警:<span id="monthAlarm"></span>次</span> <i
+                        class="icon fa fa-exclamation-circle"></i>
+                </div>
+            </div>
+            <div class="col-md-8" style="margin: 0;padding: 0 0 0 10px;" id="rechart">
+                <div class="tile quick-stats media">
+                    <div id="routVisibility"
+                         style="height: 150px; width: 100%; "></div>
+                    <!--<div class="dsc">G15连云港段道路能见度</div>-->
+                </div>
+            </div>
+        </div>
+        <div class="row" style="height: 83%;">
+            <!-- Main Chart -->
+            <div class="tile col-md-12" style="height: calc(100%);">
+                <div class="visual_conBot" style="height: calc(100%);">
+                    <input id="liveAddress" style="height: calc(100%);" th:value="${liveAddress}" hidden/>
+                    <div id="allmap" style="min-height: 400px;height: calc(100%);width: 100%">
+                        <div id="left_bottom_btn"
+                             style="position: absolute; left: 10px;bottom: 10px; z-index: 1;">
+                            <button class="btn btn-default" title="不合规设备" type="button" aria-expanded="false"
+                                    onclick="buhegeshipin_click()"
+                                    style="padding: 0 3px; background-color: rgba(6, 21, 55, 0.1); border-color: rgba(6, 21, 55, 0.1); color: #07A6FF;"
+                            >不合规设备
+                            </button>
+                            <button class="btn btn-default" title="异常设备" type="button" aria-expanded="false"
+                                    onclick="tuanwuyujing_click()"
+                                    style="display:none;padding: 0 3px; background-color: rgba(6, 21, 55, 0.1); border-color: rgba(6, 21, 55, 0.1); color: #07A6FF;"
+                            >异常设备
+                            </button>
+                        </div>
+                        <div id="buhegeshipin"
+                             style="position:absolute;width:100%;bottom:0;z-index:99;background-color:#061537;color: white;display: none;">
+                            <div class="close_out">
+                                <div id="close"></div>
+                            </div>
+                            <div class="visual_title">
+                                <span>不合规视频路数统计</span> <img src="/lkdtWX/img/ksh33.png">
+                                <span>不合规视频占比:<span id="percentage"></span>%</span>
+                            </div>
+                            <div class="visual_table">
+                                <div id="eventList" class="list_alarm_stroll_y">
+                                    <ul class="th">
+                                        <li style="width:10%;text-align: left;">#</li>
+                                        <li style="width:30%;text-align: left;">摄像头</li>
+                                        <li style="width:30%;text-align: left;">异常现象</li>
+                                        <li style="width:30%;text-align: left;">位置</li>
+                                    </ul>
+                                    <ul id="exceptionEqus">
+                                        <li style="text-align: left;"></li>
+                                        <li style="text-align: left;"></li>
+                                        <li style="text-align: left;"></li>
+                                        <li style="text-align: left;"></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="tuanwuyujing"
+                             style="position:absolute;width:100%;bottom:0;z-index:99;background-color:#061537;color: white;display: none;">
+                            <div class="close_out">
+                                <div id="close"></div>
+                            </div>
+                            <div class="visual_title">
+                                <span>异常设备</span> <img src="/lkdtWX/img/ksh33.png">
+                            </div>
+                            <div class="visual_table">
+                                <div id="alarmList" class="list_alarm_stroll_y">
+                                    <ul class="th">
+                                        <li style="width:25%;text-align: left;">编号</li>
+                                        <li style="width:25%;text-align: left;">情况说明</li>
+                                        <li style="width:25%;text-align: left;">开始时间</li>
+                                        <li style="width:25%;text-align: left;">持续时间</li>
+                                    </ul>
+                                    <ul id="contentUl">
+                                        <li style="width:25%;text-align: left;">-</li>
+                                        <li style="width:25%;text-align: left;">-</li>
+                                        <li style="width:25%;text-align: left;">-</li>
+                                        <li style="width:25%;text-align: left;">-</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="scroll-wrap">
+                            <ul id="scroll-wrap-id" class="scroll-con fn-left">
+                                <!--<li >xxx路段当前最小可视距离xxx米。</li>-->
+                            </ul>
+                        </div>
+                        <div id="alarm_icon">
+                            <img src="/lkdtWX/img/alarm_black.png" width="100%" height="100%">
+                        </div>
+
+                        <div id="expand" data="1">
+                                    <span class="glyphicon glyphicon-chevron-right expand-triangle"
+                                          aria-hidden="true"></span>
+                        </div>
+                        <div id="expand-popc"></div>
+                        <div id="expand-popc-preview">
+                            <div class="img_close_out">
+                                <div id="close"></div>
+                            </div>
+                            <img id="expand-popc-preview-img"/>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="clearfix"></div>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <div class="col-md-6" style="padding-top: 0px;height: calc(100%);">
+        <div class="" style="height: calc(100%);">
+        	<div class="c-div-left">
+        		<div class="tj-ll">
+		          <div class="tj-ll-1" style="margin-bottom: 10px;">
+		            <div class="tj-ll-1-1" style="">
+		              <span class="s-ll dispaly-block" id="currentDay"></span>
+		              <span class="dispaly-block" style="height: 20px;line-height: 20px;">今日流量</span>
+		            </div>
+		            <div class="tj-ll-1-1" style="float: right;">
+		              <span class="s-ll dispaly-block" id="speedAvg"></span>
+		              <span class="dispaly-block" style="height: 20px;line-height: 20px;">平均时速 km/h</span>
+		            </div>
+		          </div>
+		          <div class="tj-ll-1" style="">
+		            <div class="tj-ll-1-1" style="">
+		              <span class="dispaly-block" style="color: #00d8ff;font-size: 33px;" id="roadStatus"></span>
+		              <span class="dispaly-block" style="height: 20px;line-height: 20px;">路面拥堵状况</span>
+		            </div>
+		            <div class="tj-ll-1-1" style="float: right;">
+		              <span class="dispaly-block" style="color: #00d8ff;font-size: 33px;" id="riskLevel"></span>
+		              <span class="dispaly-block" style="height: 20px;line-height: 20px;">行车风险评估</span>
+		            </div>
+		          </div>
+		        </div>
+		        <div class="d-video" >
+        			<iframe src="http://47.104.80.94:10800/play.html?channel=1&iframe=yes&aspect=352x318" style="width: 100%;height: 100%;" allowfullscreen allow="autoplay; fullscreen"></iframe>
+        		</div>	
+        	</div>
+            <div class="c-div-right" ref="contentDivRight" id="contentDivRight">
+                <div class="canvas-div" ref="laneCanvas">
+                    <canvas id="canvas2" height="520" style='width:100%;position: absolute;top: 8px;left: 0;z-index: 99;' ></canvas>
+                    <canvas id="canvas" height="520" style='width:100%;position: absolute;top: 8px;left: 0;z-index: 100;' ></canvas>
+                </div>
+            </div>
+            <div class="top-right1">
+                <div class="leida-data-div">
+                    <ul class='ul-s' style="border-style: none none solid none">
+                        <li class='li-s '>ID</li>
+			            <li class='li-s'>X坐标</li>
+			            <li class='li-s'>Y坐标</li>
+			            <li class='li-s'>时速</li>
+			            <li class='li-s'>车道</li>
+			            <li class='li-s'>车型</li>
+                        <li class='li-s width21'>事件</li>
+                    </ul>
+                    <ul class="leida-data" id="leidaData" ref="leidaData">
+
+                    </ul>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+    <div class="col-md-2" style="padding-top: 0px;height: calc(100%);padding-left: 0;padding-right: 0;">
+        <div class="tile" style="height: calc(50% - 0px);">
+            <h2 class="tile-title">路段雾情排名</h2>
+
+            <div class="listview narrow list_alarm_stroll_y" id="hwIdCounts"
+                 style="height: calc(100% - 28px);overflow-y: scroll;">
+
+            </div>
+        </div>
+        <div class="tile" style="height: calc(25% - 15px);">
+            <h2 class="tile-title">车型占比统计</h2>
+
+            <div class="listview narrow list_alarm_stroll_y" id="carTypeEcharts"
+                 style="height: calc(100% - 28px);overflow-y: scroll;">
+
+            </div>
+        </div>
+        <div class="tile" style="height: calc(25% - 15px);">
+            <h2 class="tile-title">事件占比统计</h2>
+
+            <div class="listview narrow list_alarm_stroll_y" id="eventEcharts"
+                 style="height: calc(100% - 28px);overflow-y: scroll;">
+
+            </div>
+        </div>
+    </div>
+</div>
+<!--兼容性测试
+<script type="text/javascript" src="https://unpkg.com/babel-standalone@6.26.0/babel.min.js"></script>-->
+<script language="javascript"
+        src="https://webapi.amap.com/maps?v=1.4.14&key=0fb99186996b7bff85d606c80d16f224&plugin=Map3D,AMap.DistrictSearch"></script>
+<!-- 高德UI组件库 1.0 -->
+<script type="text/javascript" src="https://webapi.amap.com/ui/1.0/main.js?v=1.0.11"></script>
+<script type="text/javascript" src="../js/jquery.min.js?v=2.1.4&date=20201125"></script>
+<script type="text/javascript" src="../js/plugins/echarts/echarts.min.js?v=2&date=20201125"></script>
+<script type="text/javascript" src="../js/swiper.min.js?v=2&date=20201125"></script>
+<script type="text/javascript" src="../js/plugins/layer/layer.min.js?v=2&date=20201125"></script>
+<script type="text/javascript" src="../js/common-options.js?v=2&date=20201125"></script>
+<script type="text/javascript" src="../js/plugins/layer/layer.min.js?v=2&date=20201125"></script>
+<script type="text/javascript" src="../fog/js/big-v1.0.js?v=3&date=20210129"></script>
+<script type="text/javascript">
+
+	let tryTime = 0 ;
+	let lockReconnect = false;
+	let myCarType ;
+	let myEvent ;
+    let equId = "1001";
+    let laneData = {};
+    let canvasHeight = 520;
+    let bl = 0;
+    let radarServicePath = "";
+    let websock ;
+    let canvas ;
+    let context ;
+    
+    let radarDataWebsocketOnopen ;
+    let radarDataWebsocketOnerror;
+    let radarDataWebsocketOnmessage ;
+    let radarDataWebsocketOnclose ;
+
+    $(document).ready(function () {
+    	radarServicePath = $("#radarServicePath").val();
+    	
+        //初始化车道
+        initCancas();
+        
+        //车型占比统计
+        carTypeFunction();
+        
+        //事件占比统计
+        eventFunction();
+        
+    });
+
+
+    // 初始化画布
+    function initCancas() {
+        $.ajax({
+            type: "GET",
+            url: radarServicePath+"radar/bigScreen/queryRadarLaneList",
+            data: {"equId": equId + ""},
+            success: function (res) {
+                if (res.success && res.result) {
+                	console.log(res)
+                    getLaneData(res);
+                }
+            },
+            error: function (e) {
+                console.log("获取车道信息-else", e)
+            }
+        });
+    }
+
+    //解析数据
+    function getLaneData(res) {
+        laneData = res.result;
+        //总车道数
+        let sumLane = laneData.length
+        //车道总宽度
+        let sumLaneWidth = 0
+        for (let item of laneData) {
+            sumLaneWidth += item.laneWidth
+        }
+
+        //画布宽度
+        // let canvasWidth = $refs.laneCanvas.clientWidth
+        let canvasWidth = $('#contentDivRight').width()
+        //画布车道宽度 = 画布宽度 - 左右宽度 - 车道数
+        let canvasLaneWidth = canvasWidth - 40 * 2
+        //画布车道与实际车道宽度比列 = canvasLaneWidth / sumLaneWidth
+        bl = canvasLaneWidth / sumLaneWidth
+
+        let canvas2 = document.querySelector('#canvas2');
+        let contextCD = canvas2.getContext('2d');
+
+        //左侧边线
+        contextCD.fillStyle = '#b3b3b3';
+        contextCD.fillRect(40, 0, 2, canvasHeight);
+        //绘制刻度线(每个刻度距离50)
+        scaleLine(contextCD, 35, 10, 35, canvasHeight)
+        //刻度线
+        contextCD.fillStyle = '#f0f0f0';
+        contextCD.fillRect(30, 510, 10, 1);
+        //刻度值
+        scaleValue(contextCD, canvasHeight, 50);
+
+        //右侧边线
+        contextCD.fillStyle = '#b3b3b3';
+        contextCD.fillRect(260, 0, 2, canvasHeight);
+
+        let tCount = 42;
+        for (let i in laneData) {
+            let item = laneData[i];
+
+            if (item.laneRoad === '0') {
+                //隔离带底色
+                contextCD.fillStyle = '#6c7558';
+                // contextCD.fillStyle = '#b3b3b3';
+            } else {
+                //车道底色
+                contextCD.fillStyle = '#333333';
+            }
+            contextCD.fillRect(tCount, 0, item.laneWidth * bl, canvasHeight);
+
+            if (i > 0) {
+                if (i == item.medianStrip || i == item.medianStrip - 1) {
+                    //绘制车道线(实线)
+                    contextCD.fillStyle = '#b3b3b3';
+                    contextCD.fillRect(tCount, 0, 1, canvasHeight);
+                } else {
+                    //绘制车道线(虚线)
+                    dashedLane(contextCD, tCount, 0, tCount, canvasHeight)
+                }
+            }
+            tCount += item.laneWidth * bl
+        }
+
+        //WebSocket
+        initRadarData() ;
+    }
+
+    //绘制车道线(虚线)
+    function dashedLane(ctx, mx, my, lx, ly) {
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = '#b3b3b3';
+        ctx.beginPath();
+        ctx.setLineDash([6, 9]);
+        ctx.moveTo(mx, my);
+        ctx.lineTo(lx, ly);
+        ctx.stroke();
+    }
+
+    //绘制刻度线(每个刻度距离50)
+    function scaleLine(ctx, mx, my, lx, ly) {
+        ctx.lineWidth = 10;
+        ctx.strokeStyle = '#f0f0f0';
+        ctx.beginPath();
+        ctx.setLineDash([1, 49]);
+        ctx.moveTo(mx, my);
+        ctx.lineTo(lx, ly);
+        ctx.stroke();
+    }
+
+    //绘制刻度值
+    function scaleValue(ctx, value, splitValue) {
+        for (let i = 0; i < value; i++) {
+            if (i % 50 == 0) {
+                ctx.fillText(i, 10, value - i - 5);
+            }
+        }
+    }
+    
+    //WebSocket
+    function initRadarData(){
+    	canvas = document.querySelector('#canvas');
+        context = canvas.getContext('2d');
+        initRadarDataWebSocket();
+    }
+    
+    function initRadarDataWebSocket(){
+    	let url = radarServicePath.replace("https://","wss://").replace("http://","ws://")
+        + "/radarDataWebSocket/" + this.token + "/" + this.equId ;
+    	console.log(url)
+    	websock = new WebSocket(url);
+    	websock.onopen = radarDataWebsocketOnopen;
+        websock.onerror = radarDataWebsocketOnerror;
+        websock.onmessage = radarDataWebsocketOnmessage;
+        websock.onclose = radarDataWebsocketOnclose;
+    }
+    
+    radarDataWebsocketOnopen = function(event) {
+    	console.log("【雷达数据Websocket】：连接成功");
+    }
+    
+    radarDataWebsocketOnerror = function(event){
+    	console.log("【雷达数据Websocket】：连接出错");
+    	radarDataReconnect();
+    }
+    
+    radarDataWebsocketOnmessage = function(event){
+    	// console.log("【雷达数据Websocket】：收到消息===",event.data);
+    	if(event.data != null && event.data.length > 0){
+    		// 模拟车辆移动
+    		canvasMove(event.data);
+    	}
+    }
+    
+    radarDataWebsocketOnclose = function(event){
+    	console.log("【雷达数据Websocket】：退出连接");
+    }
+    
+    function radarDataReconnect() {
+        if(tryTime < 10) {
+          // console.log('that.lockReconnect==============',that.lockReconnect)
+          if(lockReconnect) return;
+          lockReconnect = true;
+          //没连接上会一直重连，设置延迟避免请求过多
+          setTimeout(function () {
+            console.info("【雷达数据Websocket】：尝试重连...");
+            websock = null;
+            tryTime++;
+            // console.log("************",that.tryTime)
+            initRadarDataWebSocket();
+            lockReconnect = false;
+
+          }, 5000);
+        }
+    }
+    
+ 	// 模拟车辆移动
+    function canvasMove(data){
+    	let resultData = JSON.parse(data)
+
+        $("#currentDay").html(resultData.currentDay);
+    	$("#speedAvg").html(resultData.speedAvg);
+    	$("#roadStatus").html(resultData.roadStatus);
+    	$("#riskLevel").html(resultData.riskLevel);
+        let jsonData = JSON.parse(resultData.radarData) ;
+
+        if(jsonData.length > 0){
+          // 清除画布
+          context.clearRect(0, 0, canvas.width, canvas.height);
+
+          let carHeight = 10;
+          for(let item of jsonData) {
+            //不同车长显示不同颜色和长度
+            if(item.carLength > 6 && item.carLength <= 19 ){
+              context.fillStyle = '#fc9800';
+              carHeight = 13;
+            }else if (item.carLength > 19){
+              context.fillStyle = '#fe00fe';
+              carHeight = 16;
+            }else{
+              context.fillStyle = '#1aff00';
+              carHeight = 10;
+            }
+
+            for(let ld of laneData){
+              if(ld.laneRadar == item.laneNum){
+                // 有绿化带的右侧x值 = （当前车道与最左侧车道的距离 + 100偏离 ） * 画布与实际车道的跨度比例 + 画布车道起始位置42 - context.fillRect第三个参数的一半
+                // 由于画布坐标是从上到下，行车轨迹是从下到上，所以Y值 = 画布高度 - Y坐标
+                context.fillRect((ld.leftMostWidth + ld.laneWidth / 2) * bl + 42 - 5 ,canvasHeight - item.sY,10,carHeight)
+              }
+            }
+          }
+
+          let html = "";
+          for(let item of jsonData) {
+            //数据表格
+            html += "<ul class='ul-s'>";
+            html += "<li class='li-s ' >" + item.targetId+ "</li>";
+            html += "<li class='li-s' >" + item.sX+ "</li>";
+            html += "<li class='li-s' >" + item.sY+ "</li>";
+            html += "<li class='li-s' >" + item.vY+ "</li>";
+            html += "<li class='li-s' >" + item.laneNum+ "</li>";
+            if(item.carLength > 6 && item.carLength <= 19 ){
+              html += "<li class='li-s' style='color: #fc9800;' >大车</li>";
+            }else if (item.carLength > 19){
+              html += "<li class='li-s' style='color: #fe00fe;' >超长车</li>";
+            }else{
+              html += "<li class='li-s' >小车</li>";
+            }
+            if(item.event == 0){
+              html += "<li class='li-s width21' >无事件</li>";
+            }else if(item.event == 1){
+              html += "<li class='li-s width21 li-event-color' >车辆停止</li>";
+            }else if(item.event == 2){
+              html += "<li class='li-s width21 li-event-color' >逆行</li>";
+            }else if(item.event == 3){
+              html += "<li class='li-s width21 li-event-color' >超速行驶</li>";
+            }else if(item.event == 5){
+              html += "<li class='li-s width21 li-event-color' >实线变道</li>";
+            }else if(item.event == 101){
+              html += "<li class='li-s width21 li-event-color' >停止消失</li>";
+            }else if(item.event == 102){
+              html += "<li class='li-s width21 li-event-color' >逆行消失</li>";
+            }else if(item.event == 103){
+              html += "<li class='li-s width21 li-event-color' >超速行驶消失</li>";
+            }else if(item.event == 105){
+              html += "<li class='li-s width21 li-event-color' >实线变道消失</li>";
+            }else {
+              html += "<li class='li-s width21 li-event-color' ></li>";
+            }
+
+            html += "</ul>";
+          }
+          // this.$refs.leidaData.innerHTML = html;
+          document.getElementById("leidaData").innerHTML = html;
+        }
+    }
+    
+  	//车型占比统计
+    function carTypeFunction(){
+    	$.ajax({
+            type: "GET",
+            url: radarServicePath+"radar/bigScreen/queryCarTypeRatio",
+            data: {"equId": equId + ""},
+            success: function (res) {
+                if (res.success && res.result) {
+                	myCarType = echarts.init(document.getElementById('carTypeEcharts'));
+                    let myCarTypeOption = JSON.parse(JSON.stringify(option1));
+                    myCarTypeOption.title.text = '车型统计';
+                    myCarTypeOption.title.subtext = '';
+                    myCarTypeOption.series[0].name = '车型数量';
+                    myCarTypeOption.series[0].data = res.result;
+                    myCarType.setOption(myCarTypeOption);
+                }
+            },
+            error: function (e) {
+                console.log("车型占比统计-error", e)
+            }
+        });
+    }
+    
+    //事件占比统计
+    function eventFunction(){
+    	$.ajax({
+            type: "GET",
+            url: radarServicePath+"radar/bigScreen/queryEventRatio",
+            data: {"equId": equId + ""},
+            success: function (res) {
+                if (res.success && res.result) {
+                	myEvent = echarts.init(document.getElementById('eventEcharts'));
+                	let myEventOption = JSON.parse(JSON.stringify(option1));
+                    myEventOption.title.text = '事件占比统计';
+                    myEventOption.title.subtext = '';
+                    myEventOption.series[0].name = '事件数量';
+                    myEventOption.series[0].data = res.result;
+                    myEvent.setOption(myEventOption);
+                }
+            },
+            error: function (e) {
+                console.log("事件占比统计-error", e)
+            }
+        });
+    }
+    let option1 = {
+        title: {
+            text: '某站点用户访问来源',
+            left: 'center',
+            textStyle:{
+                color:'#fff'
+            }
+        },
+        tooltip: {
+            trigger: 'item',
+            formatter: '{a} <br/>{b}: {c} ({d}%)',
+            position: ['5%', '10%']
+        },
+        // legend: {
+        //     orient: 'vertical',
+        //     left: 'left',
+        // },
+        "color": [
+            "#3fb1e3",
+            "#6be6c1",
+            "#c4ebad",
+            "#626c91",
+            "#a0a7e6",
+            "#96dee8"
+            // "#4ea397",
+            // "#22c3aa",
+            // "#7bd9a5",
+            // "#d0648a",
+            // "#f58db2",
+            // "#f2b3c9"
+        ],
+        series: [
+            {
+                type: 'pie',
+                radius: '50%',
+                emphasis: {
+                    itemStyle: {
+                        shadowBlur: 10,
+                        shadowOffsetX: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    }
+                },
+                label: {
+                    formatter: '{b}：{d}%  ',
+                    fontSize: 12
+                },
+                labelLine: {
+                    show: false,
+                    length: 1,
+                    length2: 1
+                }
+            }
+        ]
+    };
+
+</script>
+</body>
+</html>

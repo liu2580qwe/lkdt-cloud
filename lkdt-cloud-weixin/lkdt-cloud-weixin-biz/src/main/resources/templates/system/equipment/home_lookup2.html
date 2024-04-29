@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<script>
+    function nofind(_this){
+        _this.src="/fog/nofind.jpg";
+    }
+</script>
+<body class="gray-bg">
+	<input id="epId" name="epId" type="hidden" th:value="${epId}">
+	<input id="path" name="path" type="hidden" th:value="${path}">
+	<input id="fMeter" name="fMeter" type="hidden" th:value="${fMeter}">
+	<input id="videopath" name="videopath" type="hidden" th:value="${videopath}">
+	<div class="wrapper wrapper-content" style="height: 100%;padding:0;">
+		<div style="height: 80%;width:50%;float: left;">
+			<img id='img1' alt="" onerror="nofind(this)" style="height: 95%;width: auto;margin:auto;display:none;"> 
+			<div id="video123" style="height: 100%;"></div>
+			<div id='fMeter_V'  style="position: absolute;top: 35%;left: 25px;color: #ff9d06;font-size: 22px;" th:value="${fMeter}"></div>
+		</div>
+		<div id="container" style="height: 80%;width:50%;clear: right;float: left;"></div>
+	</div>
+	<!-- ECharts -->
+	<script type="text/javascript" src="/lkdtWX/js/jquery.min.js" ></script>
+	<script src="/lkdtWX/js/plugins/echarts/echarts-all.js"></script>
+	<script src="/lkdtWX/js/ckplayer/ckplayer.min.js"></script>
+</body>
+<script type="text/javascript">
+	var videoObject = {
+		container: '#video123',//“#”代表容器的ID，“.”或“”代表容器的class
+		variable: 'player',//该属性必需设置，值等于下面的new chplayer()的对象
+		autoplay:true,//自动播放
+			live:true,
+	//		    	poster:'http://localhost:8099/sjkvideo_wx/resources/images/fzx_0.jpg',
+		loaded:'startv',
+		video:$("#videopath").val()//url//视频地址
+	};
+
+var player = null;
+player=new ckplayer(videoObject);
+    document.getElementById('img1').src = $("#path").val();
+    Date.prototype.Format = function(fmt){
+        var o = {
+            "M+" : this.getMonth()+1,                 //月份
+            "d+" : this.getDate(),                    //日
+            "h+" : this.getHours(),                   //小时
+            "m+" : this.getMinutes(),                 //分
+            "s+" : this.getSeconds(),                 //秒
+            "q+" : Math.floor((this.getMonth()+3)/3), //季度
+            "S"  : this.getMilliseconds()             //毫秒
+        };
+        if(/(y+)/.test(fmt)) {
+            fmt=fmt.replace(RegExp.$1, (this.getFullYear()+"").substr(4 - RegExp.$1.length));
+        }
+        for(var k in o) {
+            if(new RegExp("("+ k +")").test(fmt)){
+                fmt = fmt.replace(RegExp.$1, (RegExp.$1.length==1) ? (o[k]) : (("00"+ o[k]).substr((""+ o[k]).length)));
+            }
+        }
+        return fmt;
+    };
+
+    //统计
+    var dom = document.getElementById("container");
+    var myChart = echarts.init(dom);
+    var option = {
+        title: {
+            text: "可见距离统计"
+        },
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: {
+                type: 'cross',
+                label: {
+                    backgroundColor: '#283b56'
+                }
+            }
+        },
+        grid:{
+            x:45,
+            x2:40,
+            y:50,
+            y2:20
+        },
+        legend: {
+            data:['可见距离曲线']
+        },
+        xAxis: {
+            type: 'category',
+            name: 'HH:ss',
+            data: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']
+        },
+        yAxis: {
+            type: 'value',
+            scale: true,
+            name: '可见距离（米）',
+            max: 1000,
+            min: 0
+        },
+        series: [{
+            data: [1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000],
+            type: 'line',
+            name:'可见距离曲线',
+            smooth: true
+        }]
+    };
+
+    /**
+	 * 更新数据
+     */
+	function updateImgPath(){
+	    //获取图片
+      	$.ajax({
+            type: "post",
+            url: "/system/equipment/lookup/updateimgpath/"+$("#epId").val(),
+        }).success(function(message) {
+            var imgdata=message;
+            var p = imgdata.path;
+            document.getElementById("img1").src = p;
+            $("#fMeter_V").html(imgdata.fMeter||'0'+"m");
+        }).fail(function(err){
+            console.log(err);
+        });
+        var date = new Date().Format('yyyy-MM-dd');
+		//获取统计图
+        $.ajax({
+            type: "get",
+            url: "/system/alarm/distanceStatistic",
+            dataType:'json',
+            data: {epId:$("#epId").val(),date:date}
+        }).success(function(data) {
+            if (option && typeof option === "object") {
+                option.title.text = date;
+                option.xAxis.data = data.xAxis.split(",");
+                option.series[0].data = data.series.split(",");
+                myChart.setOption(option, true);
+            }
+        }).fail(function(err){
+            console.log(err);
+        });
+	}
+
+	//图片刷新3s
+	setInterval(updateImgPath,3000);
+    updateImgPath();
+
+</script>
+</html>

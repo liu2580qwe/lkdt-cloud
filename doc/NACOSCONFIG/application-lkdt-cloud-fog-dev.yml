@@ -1,0 +1,56 @@
+sm2:
+  #  deviceCode: 3f5a7b8c77e8497284cf931609c9cb26
+  #  user: PT1100202002260001
+  #  url: http://172.31.199.252:9101/
+  #  updateToken: true
+  #  url: http://172.31.50.10:8080/
+  url: 123
+  corp: vid_zjhd_test
+  prodCode: test
+  md5: sa&*tm*!ie^^c#*
+  updateToken: true
+spring:
+  data:
+    mongodb:
+      uri: mongodb://testAdmin:123456@lkdt-cloud-mongodb:27017/alarmlog?authSource=admin
+  cloud:
+    stream:
+      bindings:
+        windPushSend-out-0:
+          destination: wind_push_channel
+          binder: local_rabbit
+          group: wind_push_channel_group1
+        checkSendNotice-out-0:
+          destination: check_send_channel
+          binder: local_rabbit
+          group: check_send_channel_group1
+        threePartPushOutPut-out-0:
+          destination: three_part_channel
+          binder: local_rabbit
+          group: three_part_channe1_group1
+      binders:
+        local_rabbit:
+          type: rabbit
+          environment:
+            spring:
+              rabbitmq:
+                host: lkdt-cloud-rabbitmq
+                port: 5672
+                username: guest
+                password: guest
+                virtual-host: /
+xxl:
+  job:
+    admin:
+      addresses: http://lkdt-cloud-xxljob-admin:8080/xxl-job-admin
+    accessToken:
+    executor:
+      appname: xxl-job-executor-fog
+      address:
+      ip:
+      port: 8898
+      logpath: /data/applogs/xxl-job/jobhandler1
+      logretentiondays: 30
+external-service:
+  service-path: http://47.104.80.94:8082/
+  radar-service-path: http://47.104.80.94:8082/boot/

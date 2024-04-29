@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.lkdt.modules.radar.mapper.ZcLdRadarFrameLaneMapper">
+
+    <insert id="insertBatch" parameterType="org.lkdt.modules.radar.entity.ZcLdRadarFrameLane">
+        INSERT INTO zc_ld_radar_frame_lane (radar_id, frame_id, lane_num, v_avg, avg_time_distance, small_count, medium_count, large_count,
+        small_count_ratio, medium_count_ratio, large_count_ratio,
+        car_flow_density, speed_discrete, speed_discrete_avg, speed_discrete_neighbor, lane_ratio, date_time)
+        VALUES
+        <foreach collection="list" item="zcLdRadarFrameLane" separator =",">
+            (#{zcLdRadarFrameLane.radarId}, #{zcLdRadarFrameLane.frameId}, #{zcLdRadarFrameLane.laneNum}, #{zcLdRadarFrameLane.vAvg},
+            #{zcLdRadarFrameLane.avgTimeDistance}, #{zcLdRadarFrameLane.smallCount},
+            #{zcLdRadarFrameLane.mediumCount}, #{zcLdRadarFrameLane.largeCount},#{zcLdRadarFrameLane.smallCountRatio},
+            #{zcLdRadarFrameLane.mediumCountRatio}, #{zcLdRadarFrameLane.largeCountRatio},
+            #{zcLdRadarFrameLane.carFlowDensity}, #{zcLdRadarFrameLane.speedDiscrete},#{zcLdRadarFrameLane.speedDiscreteAvg},#{zcLdRadarFrameLane.speedDiscreteNeighbor},
+            #{zcLdRadarFrameLane.laneRatio},#{zcLdRadarFrameLane.dateTime})
+        </foreach >
+    </insert>
+    
+    
+    <!-- 统计（各车道）大小车占比度 -->
+	<select id="queryLaneRoadCarType" parameterType="java.util.Map" resultType="java.util.Map">
+		select case when small_sum = 0 then 0 else small_sum / all_sum *100 end as small_avg, 
+			case when big_sum = 0 then 0 else big_sum / all_sum *100 end as big_avg ,
+			lane_num, tj_date from 
+		(
+			select sum(small_count) as small_sum, sum(medium_count) + sum(large_count) as big_sum, 
+			sum(small_count) + sum(medium_count) + sum(large_count) as all_sum, 
+			lane_num, 
+			<if test='tjDateType == "H"'> DATE_FORMAT(date_time,'%Y-%m-%d %H') as tj_date </if>
+			<if test='tjDateType == "M"'> DATE_FORMAT(date_time,'%Y-%m-%d %H:%i') as tj_date </if>
+			<if test='tjDateType == "S"'> DATE_FORMAT(date_time,'%Y-%m-%d %H:%i:%s') as tj_date </if>
+			from zc_ld_radar_frame_lane 
+			<where>  
+				<if test="equId != null and equId != ''"> and radar_id = #{equId} </if>
+				<if test="dateTime != null and dateTime != ''"> and date_time >= #{dateTime} </if> 
+			</where>
+			group by lane_num,tj_date
+		) tt order by tj_date
+	</select>
+	
+	
+	<!-- 统计（各车道）车道占有率和交通流密度 -->
+	<select id="queryLaneRatioAndFlowDensity" parameterType="java.util.Map" resultType="java.util.Map">
+		select lane_num , avg(car_flow_density) as car_flow_density , avg(lane_ratio) * 100 as lane_ratio,
+			<if test='tjDateType == "H"'> DATE_FORMAT(date_time,'%Y-%m-%d %H') as tj_date </if>
+			<if test='tjDateType == "M"'> DATE_FORMAT(date_time,'%Y-%m-%d %H:%i') as tj_date </if>
+			<if test='tjDateType == "S"'> DATE_FORMAT(date_time,'%Y-%m-%d %H:%i:%s') as tj_date </if>
+		FROM zc_ld_radar_frame_lane
+		<where>  
+			<if test="equId != null and equId != ''"> and radar_id = #{equId} </if>
+			<if test="dateTime != null and dateTime != ''"> and date_time >= #{dateTime} </if> 
+		</where>
+		group by lane_num,tj_date
+		order by tj_date
+	</select>
+	
+	
+	<!-- 统计（各车道）平均时距 -->
+	<select id="queryLaneAvgTimeDistance" parameterType="java.util.Map" resultType="java.util.Map">
+		select avg(avg_time_distance) as avg_time_distance , lane_num ,
+			<if test='tjDateType == "H"'> DATE_FORMAT(date_time,'%Y-%m-%d %H') as tj_date </if>
+			<if test='tjDateType == "M"'> DATE_FORMAT(date_time,'%Y-%m-%d %H:%i') as tj_date </if>
+			<if test='tjDateType == "S"'> DATE_FORMAT(date_time,'%Y-%m-%d %H:%i:%s') as tj_date </if>
+		FROM zc_ld_radar_frame_lane
+		<where>  
+			avg_time_distance > 0
+			<if test="equId != null and equId != ''"> and radar_id = #{equId} </if>
+			<if test="dateTime != null and dateTime != ''"> and date_time >= #{dateTime} </if> 
+		</where>
+		group by lane_num,tj_date
+		order by tj_date
+	</select>
+	
+</mapper>

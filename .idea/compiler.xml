@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="lkdt-xxl-job-core" />
+        <module name="lkdt-cloud-radar-api" />
+        <module name="lkdt-cloud-monitor" />
+        <module name="lkdt-cloud-system-biz" />
+        <module name="lkdt-cloud-traffic-incident-biz" />
+        <module name="lkdt-cloud-fog-api" />
+        <module name="lkdt-cloud-radar-biz" />
+        <module name="lkdt-xxl-job-admin" />
+        <module name="lkdt-cloud-weixin-api" />
+        <module name="lkdt-common-cloud" />
+        <module name="lkdt-cloud-traffic-incident-api" />
+        <module name="lkdt-cloud-fog-biz" />
+        <module name="lkdt-common-cloud-starter" />
+        <module name="lkdt-cloud-weixin-biz" />
+        <module name="lkdt-common-job" />
+        <module name="lkdt-common-core" />
+        <module name="lkdt-cloud-system-api" />
+        <module name="lkdt-cloud-gateway" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="lkdt-cloud" target="1.8" />
+      <module name="lkdt-cloud-fog" target="1.8" />
+      <module name="lkdt-cloud-fog-api" target="1.8" />
+      <module name="lkdt-cloud-fog-biz" target="1.8" />
+      <module name="lkdt-cloud-gateway" target="1.8" />
+      <module name="lkdt-cloud-module" target="1.8" />
+      <module name="lkdt-cloud-monitor" target="1.8" />
+      <module name="lkdt-cloud-radar" target="1.8" />
+      <module name="lkdt-cloud-radar-api" target="1.8" />
+      <module name="lkdt-cloud-radar-biz" target="1.8" />
+      <module name="lkdt-cloud-system" target="1.8" />
+      <module name="lkdt-cloud-system-api" target="1.8" />
+      <module name="lkdt-cloud-system-biz" target="1.8" />
+      <module name="lkdt-cloud-traffic-incident" target="1.8" />
+      <module name="lkdt-cloud-traffic-incident-api" target="1.8" />
+      <module name="lkdt-cloud-traffic-incident-biz" target="1.8" />
+      <module name="lkdt-cloud-weixin" target="1.8" />
+      <module name="lkdt-cloud-weixin-api" target="1.8" />
+      <module name="lkdt-cloud-weixin-biz" target="1.8" />
+      <module name="lkdt-common" target="1.8" />
+      <module name="lkdt-common-cloud" target="1.8" />
+      <module name="lkdt-common-cloud-starter" target="1.8" />
+      <module name="lkdt-common-core" target="1.8" />
+      <module name="lkdt-common-job" target="1.8" />
+      <module name="lkdt-xxl-job" target="1.8" />
+      <module name="lkdt-xxl-job-admin" target="1.8" />
+      <module name="lkdt-xxl-job-core" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="lkdt-cloud-fog-api" options="-parameters" />
+      <module name="lkdt-cloud-fog-biz" options="-parameters" />
+      <module name="lkdt-cloud-gateway" options="-parameters" />
+      <module name="lkdt-cloud-monitor" options="-parameters" />
+      <module name="lkdt-cloud-radar-api" options="-parameters" />
+      <module name="lkdt-cloud-radar-biz" options="-parameters -bootclasspath &quot;C:/Program Files/Java/jdk1.8.0_351/jre/lib/rt.jar&quot; -extdirs D:\projects\lkdt-cloud\lkdt-cloud-radar\lkdt-cloud-radar-biz/libs/examples-2.0.jar" />
+      <module name="lkdt-cloud-system-api" options="-parameters" />
+      <module name="lkdt-cloud-system-biz" options="-parameters" />
+      <module name="lkdt-cloud-traffic-incident-api" options="-parameters" />
+      <module name="lkdt-cloud-traffic-incident-biz" options="-parameters" />
+      <module name="lkdt-cloud-weixin-api" options="-parameters" />
+      <module name="lkdt-cloud-weixin-biz" options="-parameters" />
+      <module name="lkdt-common-cloud" options="-parameters" />
+      <module name="lkdt-common-cloud-starter" options="-parameters" />
+      <module name="lkdt-common-core" options="-parameters" />
+      <module name="lkdt-common-job" options="-parameters" />
+      <module name="lkdt-xxl-job-admin" options="-parameters" />
+      <module name="lkdt-xxl-job-core" options="-parameters" />
+    </option>
+  </component>
+</project>

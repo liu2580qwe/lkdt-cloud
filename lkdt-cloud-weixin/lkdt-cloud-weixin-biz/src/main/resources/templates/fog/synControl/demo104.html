@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content ">
+    <div class="col-sm-12">
+        <div class="ibox">
+            <div class="ibox-body">
+                <input type="hidden" id="hwId" name="hwId" th:value="${hid}">
+                路段名称：<input/>
+                开始时间：<input/>
+                状态：<input/>
+                <table id="exampleTable" data-toggle="table" data-single-select="true"
+                       data-click-to-select="true" data-pagination="true" data-side-pagination="server"
+                       data-page-list="[10, 25, 50, 100, 200, All]" data-query-params="queryParams"
+                       data-url="">
+                    <thead>
+                    <tr >
+                        <th data-field="state" data-checkbox="true"></th>
+                        <th data-field="1">路段名称</th>
+                        <th data-field="2">风力</th>
+                        <th data-field="3">开始时间</th>
+                        <th data-field="4">持续时间</th>
+                        <th data-field="5">状态</th>
+                        <th data-field="6">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr >
+                        <td data-field="state" data-checkbox="true"></td>
+                        <td data-field="1">济徐高速上行101公里</td>
+                        <td data-field="2">6级</td>
+                        <td data-field="3">2019-05-21  08:50:08</td>
+                        <td data-field="4">60</td>
+                        <td data-field="5">确认中</td>
+                        <td data-field="6"><a href="#" onclick="lookFun()">查看</a></td>
+                    </tr>
+                    <tr >
+                        <td data-field="state" data-checkbox="true"></td>
+                        <td data-field="1">济徐高速上行101公里</td>
+                        <td data-field="2">7级</td>
+                        <td data-field="3">2019-05-21  08:50:08</td>
+                        <td data-field="4">60</td>
+                        <td data-field="5">确认中</td>
+                        <td data-field="6"><a href="#" onclick="lookFun()">查看</a></td>
+                    </tr>
+                    <tr >
+                        <td data-field="state" data-checkbox="true"></td>
+                        <td data-field="1">济徐高速上行101公里</td>
+                        <td data-field="2">8级</td>
+                        <td data-field="3">2019-05-21  08:50:08</td>
+                        <td data-field="4">120</td>
+                        <td data-field="5">完成</td>
+                        <td data-field="6"><a href="#" onclick="lookFun()">查看</a></td>
+                    </tr>
+                    <tr >
+                        <td data-field="state" data-checkbox="true"></td>
+                        <td data-field="1">济徐高速上行101公里</td>
+                        <td data-field="2">6级</td>
+                        <td data-field="3">2019-05-21  08:50:08</td>
+                        <td data-field="4">60</td>
+                        <td data-field="5">确认中</td>
+                        <td data-field="6"><a href="#" onclick="lookFun()">查看</a></td>
+                    </tr>
+                    <tr >
+                        <td data-field="state" data-checkbox="true"></td>
+                        <td data-field="1">济徐高速上行101公里</td>
+                        <td data-field="2">9级</td>
+                        <td data-field="3">2019-05-21  08:50:08</td>
+                        <td data-field="4">60</td>
+                        <td data-field="5">完成</td>
+                        <td data-field="6"><a href="#" onclick="lookFun()">查看</a></td>
+                    </tr>
+                    <tr >
+                        <td data-field="state" data-checkbox="true"></td>
+                        <td data-field="1">济徐高速上行101公里</td>
+                        <td data-field="2">6级</td>
+                        <td data-field="3">2019-05-21  08:50:08</td>
+                        <td data-field="4">60</td>
+                        <td data-field="5">完成</td>
+                        <td data-field="6"><a href="#" onclick="lookFun()">查看</a></td>
+                    </tr>
+                    <tr >
+                        <td data-field="state" data-checkbox="true"></td>
+                        <td data-field="1">济徐高速上行101公里</td>
+                        <td data-field="2">6级</td>
+                        <td data-field="3">2019-05-21  08:50:08</td>
+                        <td data-field="4">60</td>
+                        <td data-field="5">完成</td>
+                        <td data-field="6"><a href="#" onclick="lookFun()">查看</a></td>
+                    </tr>
+                    <tr >
+                        <td data-field="state" data-checkbox="true"></td>
+                        <td data-field="1">济徐高速上行101公里</td>
+                        <td data-field="2">6级</td>
+                        <td data-field="3">2019-05-21  08:50:08</td>
+                        <td data-field="4">60</td>
+                        <td data-field="5">完成</td>
+                        <td data-field="6"><a href="#" onclick="lookFun()">查看</a></td>
+                    </tr>
+                    <tr >
+                        <td data-field="state" data-checkbox="true"></td>
+                        <td data-field="1">济徐高速上行101公里</td>
+                        <td data-field="2">11级</td>
+                        <td data-field="3">2019-05-21  08:50:08</td>
+                        <td data-field="4">60</td>
+                        <td data-field="5">完成</td>
+                        <td data-field="6"><a href="#" onclick="lookFun()">查看</a></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="myModal" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">大风预警</h4>
+            </div>
+            <div class="modal-body">
+                <img src="/fog/demo100/wind.png" width="100%"/>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:include="include :: footer"></div>
+
+<script type="text/javascript">
+    function lookFun(params) {
+        $('#myModal').modal('show');
+    }
+</script>
+</body>
+
+</html>

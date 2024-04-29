@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<style>
+    .gray-bg {
+        background: url(/fog/beijing.jpg);
+        background-size: 100% 155%;
+    }
+</style>
+<body class="gray-bg">
+    <input id="roadAlarmId_" th:value="${alarmRoad.roadAlarmId}" hidden>
+    <input id="hwId_" th:value="${alarmRoad.hwId}" hidden>
+    <input id="startTime_" th:value="${#dates.format(alarmRoad.starttime, 'yyyy-MM-dd HH:mm:ss')}" hidden>
+    <input id="endTime_" th:value="${#dates.format(alarmRoad.endtime, 'yyyy-MM-dd HH:mm:ss')}" hidden>
+    <div class="wrapper wrapper-content ">
+        <div class="col-sm-12">
+            <div class="ibox">
+                <div class="ibox-body">
+                    <div class="fixed-table-toolbar">
+                        <div class="columns pull-right">
+                            <button class="btn btn-success" onclick="reLoad()">查询</button>
+                        </div>
+                        <div class="columns pull-left col-md-2 nopadding">
+                            <table>
+                                <tr>
+                                    <td>开始时间：</td>
+                                    <td><input id="startTime" type="text" class="form-control" placeholder="yyyy-MM-dd HH:mm:ss"></td>
+                                    <td>结束时间：</td>
+                                    <td><input id="endTime" type="text" class="form-control" placeholder="yyyy-MM-dd HH:mm:ss"></td>
+                                    <td>高速编号：</td>
+                                    <td><input id="hwId" type="text" class="form-control" placeholder="高速编号" style="width: 100px;"></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <table id="exampleTable" data-mobile-responsive="true"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div th:include="include::footer"></div>
+    <script type="text/javascript" src="/lkdtWX/js/appjs/system/alarmRoad/bindRoadControl.js"></script>
+</body>
+</html>

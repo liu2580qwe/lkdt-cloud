@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html style="background-color: white;">
+	<head>
+	    <meta charset="utf-8">
+	    <title></title>
+	    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+	    <meta name="apple-mobile-web-app-capable" content="yes">
+	    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<script src="/lkdtWX/js/jquery.min.js?v=2.1.4"></script>
+	    <script src="/lkdtWX/plugins/mui/js/mui.min.js"></script>
+	    <link href="/lkdtWX/plugins/mui/css/mui.min.css" rel="stylesheet"/>
+	</head>
+	<style>
+		html,body{
+			height: 100%;
+		}
+		button{
+			width: 80%;
+		    height: 50px;
+		    margin-top: 100px;
+	    }
+	</style>
+	<body style="background-color: white;">
+		<header class="mui-bar mui-bar-nav" style="background-color: #007AFF;">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"  style="color: white;"></a>
+			<h1 class="mui-title" style="color: white;">诱导灯手动控制</h1>
+		</header>
+		<div id="" class="mui-content" style="background-color: white;height: 100%;">
+			<select id="hwId" class="mui-select" name="hwId">
+				<option value="" selected = "selected">---无有效路段---</option>
+			</select>
+			<div class="mui-content-padded" style="text-align: center;margin-top: 10%;">
+				<button id='cj' class="mui-btn mui-btn-primary" onclick="save()" style="font-size: 20px;">开启诱导灯</button>
+				<button id='qx' class="mui-btn mui-btn-warning" onclick="cancel()" style="font-size: 20px;">关闭诱导灯</button>
+			</div>
+		</div>
+		<script>
+			$.post("/weixin/getSubscribeRoad", {openid:"o2LBM1AZDaEM6eNS-pzFmHvZqUyM"}, function(data){
+				if(data && data.length > 0){
+					let html = ``;
+					html += `<option value="" selected = "selected">---请选择---</option>`;
+					data.forEach(function(item, index, arr){
+						html += `<option value="`+item.value+`" >`+item.label+`</option>`;
+					});
+					$("#hwId").html(html);
+				}
+			});
+			function save(){
+				$.post("/weixin/openLamp", {hwId:$("#hwId").val()}, function(data){
+					if(data){
+						mui.alert(data.msg);
+					} else {
+						mui.alert("网络错误");
+					}
+				});
+	      	}
+	      	function cancel(){
+				$.post("/weixin/closeLamp", {hwId:$("#hwId").val()}, function(data){
+					if(data){
+						mui.alert(data.msg);
+					} else {
+						mui.alert("网络错误");
+					}
+				});
+	      	}
+		</script>
+	</body>
+</html>

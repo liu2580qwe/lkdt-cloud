@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.lkdt.modules.radar.mapper.ZcLdLaneInfoMapper">
+
+	<delete id="deleteByMainId" parameterType="java.lang.String">
+		DELETE 
+		FROM  zc_ld_lane_info 
+		WHERE
+			 equ_id = #{mainId} 
+	</delete>
+	
+	<select id="selectByMainId" parameterType="java.lang.String" resultType="org.lkdt.modules.radar.entity.ZcLdLaneInfo">
+		SELECT * 
+		FROM  zc_ld_lane_info
+		WHERE
+			 equ_id = #{mainId} 
+	</select>
+	
+	<!-- 废弃，不使用字典表关联 -->
+	<select id="queryByMainId2222" parameterType="java.lang.String" resultType="org.lkdt.modules.radar.entity.ZcLdLaneInfo">
+		select t1.equ_code,t1.equ_name,t1.median_strip,t1.lane,t1.direction,
+			t3.item_text as lane_road_name,
+			t2.lane_middle_width,t2.id,t2.equ_id,t2.lane_radar,t2.lane_road,t2.lane_width,t2.left_most_width
+		from zc_ld_radar_equipment t1 ,zc_ld_lane_info t2 ,sys_dict_item t3
+		where t1.id = t2.equ_id and t2.lane_road = t3.item_value
+		and t3.dict_id = '1377903800389902337'
+		and t2.equ_id = #{mainId} 
+		order by t2.lane_radar
+	</select>
+	
+	<select id="queryByMainId" parameterType="java.lang.String" resultType="org.lkdt.modules.radar.entity.ZcLdLaneInfo">
+		select t1.equ_code,t1.equ_name,t1.median_strip,t1.lane,t1.direction,
+			t2.lane_middle_width,t2.id,t2.equ_id,t2.lane_radar,t2.lane_road,t2.lane_width,t2.left_most_width
+		from zc_ld_radar_equipment t1 ,zc_ld_lane_info t2
+		where t1.id = t2.equ_id 
+		and t2.equ_id = #{mainId} 
+		order by t2.lane_radar
+	</select>
+	
+	<select id="queryAllLane" resultType="org.lkdt.modules.radar.entity.ZcLdLaneInfo">
+		SELECT t1.*,t2.event_sy_min,t2.event_sy_max ,t2.radar_install_lane_direction,t2.radar_type
+		FROM  zc_ld_lane_info t1 ,zc_ld_radar_equipment t2
+		where t1.equ_id = t2.id
+	</select>
+	
+	
+</mapper>

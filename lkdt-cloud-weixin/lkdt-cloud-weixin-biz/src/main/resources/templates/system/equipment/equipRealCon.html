@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<!-- 新 Bootstrap 核心 CSS 文件 -->
+<link href="/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+<style>
+</style>
+<body class="gray-bg" style="height: 97%;    overflow: hidden;padding: 5px;">
+	<div class="col-md-3" style="padding:0px 5px 0px 5px;border-radius: 5px;">
+		<div id="equipRealCon" style="width:100%;height: 300px;float: left;clear: right;"></div>
+	</div>
+</body>
+<script src="/lkdtWX/js/jquery.min.js?v=2.1.4"></script>
+<script src="/lkdtWX/js/bootstrap.min.js"></script>
+<script src="/lkdtWX/js/plugins/echarts/echarts.min.js"></script>
+<script type="text/javascript">
+     // 统计图 start
+     //设备实时在线情况
+     var dom1 = document.getElementById("equipRealCon");
+     var myChart1 = echarts.init(dom1);
+     option1 = {
+         backgroundColor:'rgba(6,21,55,0.1)',
+         title: {
+             text: '设备实时运行情况',
+             left: 'center',
+             textStyle:{
+                 fontSize: 13,
+                 color:'#fff'
+             }
+         },
+         tooltip : {
+             trigger: 'item',
+             formatter: "{a} <br/>{b} : {c} ({d}%)",
+             textStyle: {
+                 "fontSize": 10
+             }
+         },
+         legend: {
+             // orient: 'vertical',
+             // top: 'top',
+             bottom: 10,
+             left: 'center',
+             data: ['在运行', '无效设备'],
+             textStyle:{
+                 color:'#fff'
+             }
+         },
+         series : [
+             {
+                 name:"设备运行情况",
+                 type: 'pie',
+                 radius : '65%',
+                 center: ['50%', '50%'],
+                 selectedMode: 'single',
+                 data:[
+                     {value:0, name: '在运行'},
+                     {value:0, name: '无效设备'}
+                 ],
+                 itemStyle: {
+                     normal:{
+                         color:function(params) {
+                             //自定义颜色
+                             var colorList = ['#2BB949', '#C23531'];
+                             return colorList[params.dataIndex]
+                         }
+                     },
+                     emphasis: {
+                         shadowBlur: 10,
+                         shadowOffsetX: 0,
+                         shadowColor: 'rgba(0, 0, 0, 0.5)'
+                     }
+                 }
+             }
+         ]
+     };
+     myChart1.setOption(option1, true);
+     //设备实时运行情况
+     $.ajax({url:'/ai/listen/getEquipRealCon',type:'post',data:{hwId:'1'},dataType:'json',
+         success:function(data){
+             option1.series[0].data = data;
+             myChart1.setOption(option1, true);
+         }
+     });
+</script>
+</html>

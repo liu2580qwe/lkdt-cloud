@@ -1,0 +1,93 @@
+------author:scott--------date:20200521-------for: 新增三个微服务模块 ------
+jeecg-cloud-demo(+)      微服务模块示例
+jeecg-cloud-gateway(+)   路由网关
+jeecg-cloud-system(+)    系统管理抽取API  TODO 不完善，system还未删除
+------author:scott--------date:20200521-------for: 新增三个微服务模块 ------
+
+------author:scott--------date:20200521-------for: 增加spring-cloud依赖 / 修改springweb的引入位置 / 修改online引入位置 / 替换为undertow容器------
+pom.xml
+jeecg-boot-module-system/pom.xml
+jeecg-boot-base-common/pom.xml
+------author:scott--------date:20200521-------for: 增加spring-cloud依赖 / 修改springweb的引入位置 / 修改online引入位置 / 替换为undertow容器 ------
+
+------author:scott--------date:20200521-------for: 将system的config迁移到common里面------
+org/jeecg/config/(-)
+org/jeecg/config/ShiroConfig.java  TODO 暂时未迁移，需要删除
+org.jeecg.modules.shiro.authc.interceptor.OnlineInterceptor TODO 暂时删除，待测试
+------author:scott--------date:20200521-------for: 将system的config迁移到common里面 ------
+
+------author:scott--------date:20200522-------for: 新增模块jeecg-base-common(+) ------
+jeecg-base-common(+)
+------author:scott--------date:20200522-------for: 新增模块jeecg-base-common(+) ------
+
+------author:scott--------date:20200522-------for: 修改日志配置------
+jeecg-cloud\jeecg-cloud-demo\jeecg-cloud-demo-biz\src\main\resources\logback-spring.xml
+jeecg-cloud\jeecg-cloud-system\jeecg-cloud-system-biz\src\main\resources\logback-spring.xml
+------author:scott--------date:20200522-------for: 修改日志配置 ------
+
+------author:scott--------date:20200522-------for: swagger接口文档，只保留swagger-bootstrap-ui
+pom.xml
+------author:scott--------date:20200522-------for: swagger接口文档，只保留swagger-bootstrap-ui
+
+------author:scott--------date:20200528-------for: docker-compose.yml 制作
+doc/db/Dockerfile(+)
+doc/db/lkdtcloud_mysql5.7.sql
+doc/NACOSCONFIG/application-jeecg-cloud.yml
+doc/NACOSCONFIG/jeecg-cloud-gateway.yml
+jeecg-cloud-demo/jeecg-cloud-demo-biz/bootstrap.yml
+jeecg-cloud-demo/jeecg-cloud-demo-biz/Dockerfile(+)
+jeecg-cloud-gateway/bootstrap.yml
+jeecg-cloud-gateway/Dockerfile(+)
+jeecg-cloud-monitor/application.yml
+jeecg-cloud-monitor/Dockerfile(+)
+jeecg-cloud-system/bootstrap.yml
+jeecg-cloud-system/Dockerfile(+)
+docker-compose.yml(+)
+------author:scott--------date:20200528-------for:  docker-compose.yml 制作
+
+------author:scott--------date:20200604-------for:  MQ示例代码，新模块
+jeecg-cloud-mq-demo(+)
+------author:scott--------date:20200604-------for:  MQ示例代码，新模块
+
+------author:scott--------date:20200702-------for: 重构maven结构，支持profile配置文件切换
+jeecg-cloud-gateway/bootstrap.yml
+jeecg-cloud-gateway/pom.xml
+jeecg-cloud-monitor/application.yml
+jeecg-cloud-monitor/pom.xml
+jeecg-cloud-system/jeecg-cloud-system-biz/bootstrap.yml
+jeecg-cloud-system/jeecg-cloud-system-biz/pom.xml
+
+jeecg-common/jeecg-common-core/pom.xml
+pom.xml
+docker-compose.yml
+------author:scott--------date:20200702-------for: 重构maven结构，支持profile配置文件切换
+
+------author:scott--------date:20200702-------for: 新增jeecg-cloud-module业务模块大包，新增业务模块统一放在这里
+jeecg-cloud-module
+jeecg-cloud-module/jeecg-cloud-demo(迁移位置)
+jeecg-cloud-module/jeecg-cloud-mq-demo(迁移位置)
+------author:scott--------date:20200702-------for:  新增jeecg-cloud-module业务模块大包，新增业务模块统一放在这里
+------author:jzyadmin--------date:20200703-------for: 新增reids集群配置文档，以及部分不兼容集群调整
+org/jeecg/config/ShiroConfig.java(兼容集群与单机redis)
+doc/build/redis（增加redis cluster集群配置）
+------author:jzyadmin--------date:20200703-------for:  新增reids集群配置文档，以及部分不兼容集群调整
+
+------author:scott--------date:20200708-------for:  新增xxl-job 示例项目
+jeecg-cloud-module/jeecg-cloud-job-demo(+)
+jeecg-cloud-module/pom.xml
+------author:scott--------date:20200708-------for:  新增xxl-job 示例项目
+
+-- author:jzyadmin--------date:20200721-------for：rabbitmq 添加
+docker-compose.yml
+doc/NACOSCONFIG/application-jeecg-cloud-dev.yml
+-- author:jzyadmin--------date:20200721-------for：rabbitmq 添加
+-- author:jzyadmin--------date:20200805-------for：nginx 添加，端口只开放默认端口80集中访问
+build/nginx/default.conf(+)
+build/compose-upload.md
+-- author:jzyadmin--------date:20200805-------for：nginx 添加，端口只开放默认端口80集中访问
+-- author:jzyadmin--------date:20200820-------for：nacos 自动加载配置
+doc/db/nacos-mysql.sql(+)
+doc/db/Dockerfile
+doc/db/lkdtcloud_mysql5.7.sql
+docker-compose.yml
+-- author:jzyadmin--------date:20200805-------for：nacos 自动加载配置

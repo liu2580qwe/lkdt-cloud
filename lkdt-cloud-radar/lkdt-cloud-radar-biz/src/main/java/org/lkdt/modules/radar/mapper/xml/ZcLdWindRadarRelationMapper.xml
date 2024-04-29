@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.lkdt.modules.radar.mapper.ZcLdWindRadarRelationMapper">
+    <delete id="delByWindIdAndRadarId">
+        delete from zc_ld_wind_radar_relation where radar_id = #{radarId} and wind_id=#{windId}
+    </delete>
+    <!--根据radarId查询wind_id-->
+    <select id="selectByRadarId" resultType="java.lang.String">
+        select wind_id from zc_ld_wind_radar_relation where radar_id = #{radarId}
+    </select>
+</mapper>

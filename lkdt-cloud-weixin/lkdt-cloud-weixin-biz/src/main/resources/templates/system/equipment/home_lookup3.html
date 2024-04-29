@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<style>
+p{
+	margin: 0 0 5px;
+}
+.col-md-4{
+	width: 33.33%;
+	float: left;
+}
+</style>
+<script>
+    function nofind(_this){
+        _this.src="/fog/nofind.jpg";
+    }
+</script>
+<body class="gray-bg" style="height: 97%;    overflow: hidden;padding: 5px;">
+	<input id="epId" name="epId" type="hidden" th:value="${epId}">
+	<input id="path" name="path" type="hidden" th:value="${path}">
+	<input id="fMeter" name="fMeter" type="hidden" th:value="${fMeter}">
+	<input id="videopath" name="videopath" type="hidden" th:value="${videopath}">
+	<div class="row" style="height: 50%;width: 100%;">
+		
+		<div class="col-md-6" style="    background-color: #090a21;
+    color: #fff;  font-size: 15px;padding: 5px;height: 100%;">
+			<span>
+				<p>当前可见距离：<span id="mi"></span>米（<span id="zhuangtai"></span>） </p>
+	 			<p>当前雾趋势：无 </p>
+				<p>今日最大可见距离：<span id="maxDay"></span>米 </p>
+				<p>今日最低可见距离：<span id="minDay"></span>米 </p>
+				<p>今日告警次数：<span id="gjcsD"></span>次     </p> 
+				<p>今日误报次数： <span id="wbcsD"></span>次    </p> 
+				<p>本月告警次数：<span id="gjcsM"></span>次 </p>
+				<p>本月误报次数： <span id="wbcsM"></span>次                             </p>
+			</span>
+		</div>
+		<div class="col-md-6" style="height: 100%;">
+			<div style="    text-align: center;    height: 100%;    float: left;    width: 100%;">
+				<img id='img1' alt="" onerror="nofind(this)" style="height: 100%;width: auto;margin:auto;display: none;">
+				<div id="video123" style="height: 100%;"></div>
+				<div id='fMeter_V'  style="position: absolute;top: 75%;left: 20%;color: #ff9d06;font-size: 22px;" th:value="${fMeter}"></div>
+			</div>
+		</div>
+		<div class="col-md-4" style="height: 100%;display: block;">
+			<div id="wubaolv" style="height: 100%;width:95%;clear: right;display: block;"></div>
+		</div>
+	</div>
+	<div class="row" style="height: 50%;width: 99%;">
+		<div class="col-md-12" style="height: 100%;">
+			<div id="container1" style="height: 100%;width:100%;"></div>
+		</div>
+		<div class="col-md-4" style="height: 95%;margin-top: 4%;display: block;">
+			<div class="echartspie" id="echarts-pie-chart" style="width:100%;margin:auto;float: left;height: 100%;"></div>
+		</div>
+		<div class="col-md-4" style="height: 95%;margin-top: 4%;display: block;">
+			<div class="echartspie" id="echarts-pie-chart2" style="width:100%;margin:auto;float: left;height: 100%;"></div>
+		</div>
+		
+	</div>
+	<!-- ECharts -->
+	<script src="/lkdtWX/js/plugins/echarts/echarts.min.js"></script>
+	<script type="text/javascript" src="/lkdtWX/js/jquery.min.js" ></script>
+	<script src="/lkdtWX/js/ckplayer/ckplayer.js"></script>
+</body>
+<script type="text/javascript">
+var videoObject = {
+		container: '#video123',//“#”代表容器的ID，“.”或“”代表容器的class
+		variable: 'player',//该属性必需设置，值等于下面的new chplayer()的对象
+		autoplay:true,//自动播放
+			live:true,
+	//		    	poster:'http://localhost:8099/sjkvideo_wx/resources/images/fzx_0.jpg',
+		video:$("#videopath").val()//url//视频地址
+	};
+
+var player = null;
+player=new ckplayer(videoObject);
+    document.getElementById('img1').src = $("#path").val();
+    Date.prototype.Format = function(fmt){
+        var o = {
+            "M+" : this.getMonth()+1,                 //月份
+            "d+" : this.getDate(),                    //日
+            "h+" : this.getHours(),                   //小时
+            "m+" : this.getMinutes(),                 //分
+            "s+" : this.getSeconds(),                 //秒
+            "q+" : Math.floor((this.getMonth()+3)/3), //季度
+            "S"  : this.getMilliseconds()             //毫秒
+        };
+        if(/(y+)/.test(fmt)) {
+            fmt=fmt.replace(RegExp.$1, (this.getFullYear()+"").substr(4 - RegExp.$1.length));
+        }
+        for(var k in o) {
+            if(new RegExp("("+ k +")").test(fmt)){
+                fmt = fmt.replace(RegExp.$1, (RegExp.$1.length==1) ? (o[k]) : (("00"+ o[k]).substr((""+ o[k]).length)));
+            }
+        }
+        return fmt;
+    };
+
+    //统计
+    var dom1 = document.getElementById("container1");
+    var myChart1 = echarts.init(dom1);
+    var option = {
+        title: {
+            text: "可见距离统计",
+            textStyle: {
+                color: '#ffffff'
+            }
+        },
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: {
+                type: 'cross',
+                label: {
+                    backgroundColor: '#283b56'
+                }
+            }
+        },
+        grid:{
+            x:45,
+            x2:40,
+            y:50,
+            y2:20
+        },
+        xAxis: {
+            type: 'category',
+            name: 'HH:ss',
+            data: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
+            axisLabel : {
+                textStyle: {
+                    color: '#ffffff'
+                }
+            },
+            nameTextStyle:{
+           	 color: '#ffffff'
+           }
+        },
+        yAxis: {
+            type: 'value',
+            scale: true,
+            name: '可见距离（米）',
+            max: 1000,
+            min: 0,
+            axisLabel : {
+                textStyle: {
+                    color: '#ffffff'
+                }
+            },
+            nameTextStyle:{
+           	 color: '#ffffff'
+           }
+        },
+        series: [{
+            data: [1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000],
+            type: 'line',
+            name:'可见距离曲线',
+            smooth: true
+        }]
+    };
+    var pieoption = {
+    	    title : {
+    	        text: '校验统计',
+    	        
+    	        x:'center',
+                textStyle: {
+                    color: '#ffffff'
+                }
+    	    },
+    	    tooltip : {
+    	        trigger: 'item',
+    	        formatter: "{b} : {c} ({d}%)"
+    	    },
+    	    series : [
+    	        {
+    	            name: 'pie',
+    	            type: 'pie',
+    	            radius : '55%',
+    	            center: ['50%', '50%'],
+    	            data:[],
+    	            itemStyle: {
+    	                emphasis: {
+    	                    shadowBlur: 10,
+    	                    shadowOffsetX: 0,
+    	                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+    	                },
+    	                normal:{ 
+    				           label:{
+    				              show: true, 
+    				              formatter: '{b}:({d}%)' 
+    				              }, 
+    				              labelLine :
+    				              	{show:true,
+    				            	  length:5
+    				            	  }	
+    				              }
+    	            }
+    	        }
+    	    ]
+    	};
+    var pieoptionalarm  = {
+    	    title : {
+    	        text: '误报率',
+    	        subtext: '本月',
+    	        x:'center',
+                textStyle: {
+                    color: '#ffffff'
+                }
+    	    },
+    	    tooltip : {
+    	        trigger: 'item',
+    	        formatter: "{b} : {c} ({d}%)"
+    	    },
+    	    series : [
+    	        {
+    	            name: 'pie',
+    	            type: 'pie',
+    	            radius : '55%',
+    	            center: ['50%', '50%'],
+    	            data:[],
+    	            itemStyle: {
+    	                emphasis: {
+    	                    shadowBlur: 10,
+    	                    shadowOffsetX: 0,
+    	                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+    	                },
+    	                normal:{ 
+    				           label:{ 
+    				              show: true, 
+    				              formatter: '{b}:({d}%)' 
+    				              }, 
+    				              labelLine :
+  				              	{show:true,
+  				            	  length:1
+  				            	  }	
+    				              }
+    	            }
+    	        }
+    	    ]
+    	};
+    var wubaooption = {
+		    title: {
+		        text: '误报率统计',
+	            textStyle: {
+	                color: '#ffffff'
+	            }
+		    },
+		    grid:{
+	            x:45,
+	            x2:40,
+	            y:50,
+	            y2:20
+	        },
+		    tooltip: {
+		        trigger: 'axis',
+		        axisPointer: {
+		            type: 'cross',
+		            label: {
+		                backgroundColor: '#283b56'
+		            }
+	        
+		        },
+	        formatter: '{b}月<br/>误报率:{c0}%<br/>告警次数:{c1}'
+		    },
+		    dataZoom: {
+		        show: false,
+		        start: 0,
+		        end: 100
+		    },
+		    xAxis: [
+		        {
+		            type: 'category',
+		            name:'月份',
+		            boundaryGap: true,
+		            data: [],
+	                axisLabel : {
+	                    textStyle: {
+	                        color: '#ffffff'
+	                    }
+	                },
+	                nameTextStyle:{
+	                	 color: '#ffffff'
+	                }
+		        }
+		    ],
+		    visualMap: {
+		        // calculable: true,
+		        // min: 0,
+		        // max: 1000,
+		        top: 'top',
+		        left:'middle',
+		        // right: 5,
+		        color:['#2BB949'],
+		        textStyle:{
+		            color:'#fff'
+		        },
+		        pieces: [{
+		            gt: 0,
+		            lte: 300,
+		            color: '#2BB949'
+		        }]
+		    },
+		    yAxis: [
+		        {
+		            type: 'value',
+		            scale: true,
+		            name: '误报率(%)',
+		            max: 100,
+		            min: 0,
+		            boundaryGap: [0.2, 0.2],
+	                axisLabel : {
+	                    textStyle: {
+	                        color: '#ffffff'
+	                    }
+	                },
+	                nameTextStyle:{
+	                	 color: '#ffffff'
+	                }
+		        },
+		        {
+		            type: 'value',
+		            scale: true,
+		            max: 100,
+		            min: 0,
+		            name: '告警次数',
+		            boundaryGap: [0.2, 0.2],
+	                axisLabel : {
+	                    textStyle: {
+	                        color: '#ffffff'
+	                    }
+	                },
+	                nameTextStyle:{
+	                	 color: '#ffffff'
+	                }
+		        }
+		    ],
+		    series: [
+		        {
+		            name:'误报率',
+		            type:'line',
+		            yAxisIndex: 0,
+		            data:[]
+		            
+		        },
+		        {
+		            name:'告警次数',
+		            type:'bar',
+		            yAxisIndex: 1,
+		            itemStyle: {
+	                    normal: {
+	                    	color:'#c23531'
+	                    }
+		            },
+		            data:[]
+		        }
+		    ]
+		};
+    $(function() {
+    	$.ajax({
+    		type : 'get',
+    		url : "/fog/verificationlog" + "/logStaByEpId",
+    		data:{epId:$("#epId").val()},
+    		success : function(data) {
+    			var piedata=data.piedata;
+    			var wbtj=piedata.all-piedata.one-piedata.two-piedata.thr;
+    			pieoption.series[0].data=[{value:piedata.you,name:'优'},{value:piedata.liang,name:'良',itemStyle  : {
+    				color : '#91c7ae'}},{value:piedata.hege,name:'合格',itemStyle  : {
+        				color : '#fcdb3f'}},{value:piedata.buhege,name:'不合格',itemStyle  : {
+            				color : '#d48265'}}]
+    			var pieChart = echarts.init(document.getElementById("echarts-pie-chart"));
+    			pieChart.setOption(pieoption);
+    			//$(window).resize(pieChart.resize);
+    			
+    		}
+    	});
+    	$.ajax({
+    		type : 'get',
+    		url : "/system/alarm" + "/alarmPieByEpId",
+    		data:{epId:$("#epId").val()},
+    		success : function(data) {
+    			console.log(data);
+    			var piedata=data.piedata;
+    			var wbtj=piedata.all-piedata.one-piedata.two-piedata.thr;
+    			pieoptionalarm.series[0].data=[{value:piedata.youxiao,name:'有效'},{value:piedata.wuxiao,name:'无效',itemStyle  : {
+    				color : '#91c7ae'}}]
+    			var pieChart2 = echarts.init(document.getElementById("echarts-pie-chart2"));
+    			pieChart2.setOption(pieoptionalarm);
+    			//$(window).resize(pieChart.resize);
+    			
+    		}
+    	});
+    	$.ajax({
+    		type : 'get',
+    		url : "/system/alarm" + '/alarmZhuByCalX',
+    		data:{'epId':$("#epId").val()},
+    		success : function(data) {
+    			var wubaoChart = echarts.init(document.getElementById("wubaolv"));
+    			wubaooption.xAxis[0].data=data.month;
+    			wubaooption.series[0].data=data.wubaolv;
+    			wubaooption.series[1].data=data.all;
+    			wubaoChart.setOption(wubaooption);
+    	        //$(window).resize(myChart.resize);
+     		}
+    	});
+    	$.ajax({
+    		type : 'get',
+    		url : "/system/alarm" + '/home_lookup',
+    		data:{'epId':$("#epId").val()},
+    		success : function(data) {
+    			if(data){
+    				$("#maxDay").html(data.maxDay||0);
+    				$("#minDay").html(data.minDay||0);
+    				$("#gjcsD").html(data.gjcsD||0);
+    				$("#wbcsD").html(data.wbcsD||0);
+    				$("#gjcsM").html(data.gjcsM||0);
+    				$("#wbcsM").html(data.wbcsM||0);
+    			}
+     		}
+    	});
+    	setInterval(updateImgPath,60000);
+        updateImgPath();
+    });
+
+    /**
+	 * 更新数据
+     */
+	function updateImgPath(){
+	    //获取图片
+        $.ajax({
+            type: "post",
+            url: "/system/equipment/lookup/updateimgpath/"+$("#epId").val(),
+        }).success(function(message) {
+            var imgdata=message;
+            var p = imgdata.path;
+            $("#fMeter_V").html(imgdata.fMeter||'0'+"m");
+            $("#mi").html(imgdata.fMeter||'0');
+            if(imgdata.fMeter>=200){
+            	 $("#zhuangtai").html("晴朗");
+            }else if(imgdata.fMeter>=100){
+            	$("#zhuangtai").html("大雾");
+            }else if(imgdata.fMeter>=50){
+            	$("#zhuangtai").html("浓雾");
+            }else if(imgdata.fMeter>=30){
+            	$("#zhuangtai").html("强浓雾");
+            }else if(imgdata.fMeter<30){
+            	$("#zhuangtai").html("特强浓雾");
+            }
+        }).fail(function(err){
+            console.log(err);
+        });
+        var date = new Date().Format('yyyy-MM-dd');
+		//获取统计图
+        $.ajax({
+            type: "get",
+            url: "/system/alarm/distanceStatistic",
+            dataType:'json',
+            data: {epId:$("#epId").val(),date:date}
+        }).success(function(data) {
+            if (option && typeof option === "object") {
+                option.title.text = date;
+                option.xAxis.data = data.xAxis.split(",");
+                option.series[0].data = data.series.split(",");
+                myChart1.setOption(option, false);
+            }
+        }).fail(function(err){
+            console.log(err);
+        });
+	}
+
+	//图片刷新3s
+	
+
+</script>
+</html>

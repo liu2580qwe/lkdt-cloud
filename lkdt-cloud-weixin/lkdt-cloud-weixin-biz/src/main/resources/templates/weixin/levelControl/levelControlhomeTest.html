@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<!-- <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width"> -->
+	<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+	<!-- iphone会把一串数字识别为电话号码，点击的时候会提示是否呼叫，屏蔽这功能则把telephone设置为no -->
+	<meta content="telephone=no" name="format-detection" />
+	<!-- iphone的私有标签，默认值为default（白色），可以定为black（黑色）和black-translucent（灰色半透明） -->
+	<meta content="black" name="apple-mobile-web-app-status-bar-style">
+	<!-- iphone设备的是有标签 允许全屏模式浏览，隐藏浏览器导航栏 -->
+	<meta content="yes" name="apple-mobile-web-app-capable" />
+	<!-- 全屏显示 -->
+	<meta content="yes" name="apple-touch-fullscreen" />
+	<!-- UC强制全屏 -->
+	<meta name="full-screen" content="yes">
+	<!-- QQ强制全屏 -->
+	<meta name="x5-fullscreen" content="true">
+	<!-- 屏蔽百度转码 -->
+	<meta http-equiv="Cache-Control" content="no-transform" />
+	<meta http-equiv="Cache-Control" content="no-siteapp" />
+	<title>智高速</title>
+	<!-- 引入 WeUI -->
+	<link rel="stylesheet" href="/lkdtWX/plugins/weui/css/weui.css"/>
+	<link rel="stylesheet" href="/lkdtWX/plugins/weui/css/weuix.css"/>
+
+	<style>
+		a{text-decoration: none;}
+		a:hover{text-decoration: none;}
+		.police_bind{width: 100%;height: 100%;}
+		.police_bind .t{width: 100%;height: 10%;position: relative;}
+		.police_bind .t .right-fix{position: fixed;right:3%;top: 3%;display: flex;flex-direction: column;}
+		.police_bind .t .right-fix .img-div{width: 15vw;height: 15vw;margin-bottom: 10px;border: 1px solid #9f9f9f;border-radius:5px;box-shadow:2px 2px 5px #cfcfcf;}
+		.police_bind .t .right-fix .img-div img{width: 10vw;height: 10vw;margin: 0 auto;display: block;}
+		.police_bind .t .right-fix .img-div span{width: 100%;font-size: 3.2vw;display: block;width: 100%;text-align: center;}
+		.police_bind .f{width: 60%;margin:0 auto;}
+		.police_bind .f .i{width: 50%;height: auto;margin:0 auto;}
+		.police_bind .f .i img{width: 100%;height: auto;}
+		.police_bind .f .d{width: 100%;height: auto;margin:0 auto;}
+		.police_bind .f .d input{padding:4px 0;margin-top:6vw;  width:100%; height:7vw; background-color: #FFFFFF; font-size:16px; line-height:7vw; box-sizing:content-box; background:transparent;}
+		.police_bind .f .d button{padding:4px 0;margin:15px 0; width:100%; height:7vw; border:none; font-size:18px; line-height:7vw; box-sizing:content-box; background-color: #ee7700;color: white;}
+
+		.btn-fix{display: -webkit-box;margin-top: 3vw;}
+		.btn-fix .img-div{width: 26vw;height: 26vw;border: 1px solid #9f9f9f;border-radius:5px;box-shadow:2px 2px 5px #cfcfcf;}
+		.btn-fix .img-div img{width: 19vw;height: 19vw;margin: 0 auto;display: block;}
+		.btn-fix .img-div span{width: 100%;font-size: 4vw;display: block;text-align: center;}
+
+		.police_bind .c{width: 92%;margin:30vw auto 0px auto;} 
+		/* .police_bind .c{width: 92%;position: fixed;bottom: 10vw;left: 3vw;} */
+		.police_bind .c .scroll-wrap{height: 62px; overflow: hidden;}
+		.police_bind .c .scroll-wrap ul{margin-top: 0px;}
+		.police_bind .c .scroll-wrap ul li{height: 30px; line-height: 30px; font-size:17px; color:black; border-bottom: #333 1px dashed;white-space: nowrap;overflow: hidden;text-overflow:ellipsis;}
+
+		.weui-table td, .weui-table th, table td, table th{width: 25%;height: 30px; line-height: 30px;font-size:16px;border-top:none;border-left: none;border-right: none;border-bottom: 1px dashed #063B6A;padding:0px;text-align: center;}
+
+		.clear{clear:both;}
+	</style>
+</head>
+<body>
+<!-- <div class="weui-btn_default weui-header ">
+    <h1 class="weui-header-title f-green">警号确认</h1>
+</div> -->
+<input id="auth" th:value="${auth}" hidden>
+<input id="openid" th:value="${openid}" hidden>
+<div class="police_bind" >
+	<div class="t" >
+		<div class="right-fix" style="display: none;">
+			<div class="img-div" >
+				<img src="/lkdtWX/plugins/weui/img/buttons/daolubangding_meizi.png" aria-hidden="true" onclick="gotobindRoad()"></img>
+				<span>路段绑定</span>
+			</div>
+			<div class="img-div">
+				<img src="/lkdtWX/plugins/weui/img/buttons/guanzhitongzhi.png" aria-hidden="true" onclick="binControlNotice()"></img>
+				<span>管制通知</span>
+			</div>
+		</div>
+	</div>
+	<div class="f">
+		<div class="i"><img alt="" src="/lkdtWX/img/jiaojing.png"></div>
+		<div class="d">
+			<input class="" id="policeId" name="policeId" maxlength="20" placeholder="请输入警号"  />
+		</div>
+		<div class="d">
+			<button type="button" class="btn btn-primary" onclick="btnLogin()">警号确认</button>
+		</div>
+
+		<div class="btn-fix" style="display: show;">
+			<div class="img-div" style="margin-right:10%;">
+				<img src="/lkdtWX/plugins/weui/img/buttons/daolubangding_meizi.png" aria-hidden="true" onclick="gotobindRoad()"></img>
+				<span>路段绑定</span>
+			</div>
+			<div class="img-div">
+				<img src="/lkdtWX/plugins/weui/img/buttons/guanzhitongzhi.png" aria-hidden="true" onclick="binControlNotice()"></img>
+				<span>管制通知</span>
+			</div>
+		</div>
+	</div>
+	<div class="c">
+		<!-- <div>
+            <table>
+                <tr style="background: #f2eee6;">
+                    <td>名称</td>
+                    <td>管制建议</td>
+                    <td>发生时间</td>
+                    <td>所属路段</td>
+                </tr>
+            </table>
+        </div>
+          <div class="scroll-wrap" >
+            <ul class="scroll-con fn-left" >
+                <li >
+                    <table>
+                        <tr >
+                            <td>K1006-1</td>
+                            <td>二级管制</td>
+                            <td>17:52:26</td>
+                            <td>G15连云港</td>
+                        </tr>
+                    </table>
+                </li>
+                <li >
+                    <table>
+                        <tr >
+                            <td>K1006-2</td>
+                            <td>解除管制</td>
+                            <td>17:52:26</td>
+                            <td>G15连云港</td>
+                        </tr>
+                    </table>
+                </li>
+            </ul>
+        </div> -->
+		<div class="scroll-wrap" >
+			<ul class="scroll-con fn-left" >
+				<li >K1006-1(G15连云港)当前可视距离87米。</li>
+				<li >K1006-2(G15连云港)当前可视距离54米。</li>
+			</ul>
+		</div>
+	</div>
+</div>
+
+<!-- 引入 WeJS -->
+<script src="/lkdtWX/plugins/weui/js/commonMap.js"></script>
+<script src="/lkdtWX/plugins/weui/js/zepto.min.js"></script>
+<script src="/lkdtWX/plugins/weui/js/zepto.weui.js"></script>
+<script src="/lkdtWX/plugins/weui/js/php.js"></script>
+<script src="/lkdtWX/plugins/weui/js/axios.min.js"></script>
+<script src="/lkdtWX/plugins/weui/jweixin/jweixin-1.4.0.js"></script>
+<!--<script src="/lkdtWX/plugins/weui/js/eruda.js"></script>-->
+
+<script>
+	//防止页面后退
+	//	history.pushState(null, null, window.location.href)
+	//window.onpopstate = function (event) {
+	//      history.go(1)
+	//}
+
+	let openid = $('#openid').val();
+
+	let isBindPoliceId = false;	//是否已经绑定警号
+	$(function(){
+
+		$.showLoading("授权认证");
+
+		$(document.body).pullToRefresh({
+			distance: 50,
+			onRefresh:function() {
+				window.location.reload();
+				$(document.body).pullToRefreshDone();
+			}
+		});
+
+		$("input").on('blur',function(){
+			$(window).scrollTop(0);
+		});
+
+		if($("#auth").val() == 1){
+			$.hideLoading();
+			initOpenid();
+			jqScroll();
+		} else {
+			$.confirm("系统检测到您未授权，是否前往认证授权?", "授权提示", function() {
+				//认证
+				wx.miniProgram.navigateTo({url: '/pages/index/jump'})
+			}, function() {
+				//关闭
+				wx.closeWindow();
+			});
+		}
+	});
+
+	function initOpenid(){
+		u.setStorage("openid",openid);
+		// //初始化code
+		// let code = getURLParameter("code");
+		// let signUrl = window.location.href.split('#')[0];
+		// //console.log("code==="+code);
+		// //console.log("href==="+window.location.href);
+		// //console.log("signUrl==="+signUrl);
+		// if(code){
+		// 	axios.post('/weixin/map/getOpenFid',{code:code,url:signUrl})//也可以直接拼接在url
+		// 			.then(function(rs){
+		// 				if(rs.data && rs.data.openid){
+		// 					//初始化code
+		// 					u.setStorage("code",code);
+		// 					//初始化openid
+		// 					u.setStorage("openid",rs.data.openid);
+		//
+		// 					levelControl();
+		//
+		// 				} else {
+		// 					clearCode();
+		// 					alert('500 请求失效，请重新打开');
+		// 					isfollowqr(undefined,true,'请关注公众号获取数据','智高速');
+		// 				}
+		// 			}).catch(function(e){
+		// 		clearCode();
+		// 		alert('404 网络错误');
+		// 		isfollowqr(undefined,true,'请关注公众号获取数据','智高速');
+		// 	});
+		// }
+	}
+
+
+	// /**清空code,openid*/
+	// function clearCode(){
+	// 	//清空code,openid
+	// 	u.setStorage("code","");
+	// 	u.setStorage("openid","");
+	// }
+
+	function levelControl(){
+		openid = u.getStorage("openid") ;
+		//初始化获取所有路段
+		axios.post('/weixin/map/getHighways',{hwId:0})//也可以直接拼接在url
+				.then(function(rs){
+					if(rs.data && rs.data.highways){
+						u.setStorage("highways",rs.data.highways);
+						//$.toptip('路段信息加载成功','success');
+						/* axios.post('/weixin/wxUser/levelControl',{openid:openid})//也可以直接拼接在url
+                            .then(function(rs){
+                                $.hideLoading();
+                                $("#policeId").val(rs.data.policeId);
+                                if(rs.data != null && rs.data != ""){
+                                    isBindPoliceId = true;
+                                }
+                            }).catch(function(e){
+                            $.hideLoading();
+                            $.toast("网络异常", "cancel");
+                        }); */
+					} else {
+						console.log("无路段数据");
+						//$.toptip('无路段数据','success');
+					}
+				}).catch(function(e){
+			console.log(e);
+			//$.toptip('路段请求失败','error');
+		});
+	}
+
+
+	//返回
+	function bindBack(){
+		window.location.replace("/weixin/map/wxMap");
+	}
+
+	function btnLogin(){
+		//参数
+		let policeId = $("#policeId").val();
+		if(policeId == null || policeId.length == 0 ){
+			$.toast("请输入警号", "forbidden");
+		}else{
+			axios.post('/weixin/wxUser/bindTrafficPolice',{policeId:policeId,openid:openid,isBindPoliceId:isBindPoliceId})//也可以直接拼接在url
+					.then(function(rs){
+						$.hideLoading();
+						if(rs.data && rs.data.code == 0){
+							// $.noti({title: "保存成功",time: 2000,});
+							//$.alert("绑定警号成功", "",function (){
+							//	bindToadTrafficPoliceBack();
+							//});
+							bindToadTrafficPoliceBack();
+						} else {
+							$.toast(rs.data.msg, "cancel");
+						}
+					}).catch(function(e){
+				$.hideLoading();
+				$.toast("网络异常", "cancel");
+			});
+		}
+	}
+
+	//绑定路段
+	function bindToadTrafficPoliceBack(){
+		$.showLoading();
+		u.setStorage("bindRoadTrafficPolice","2");
+		axios.post('/weixin/wxUser/bindRoad',{openid:openid})//也可以直接拼接在url
+				.then(function(rs){
+					$.hideLoading();
+					if(rs.data){
+						window.location.replace(rs.data);
+					} else {
+						$.toast("跳转失败", "cancel");
+					}
+				}).catch(function(e){
+			$.hideLoading();
+			$.toast("网络异常", "cancel");
+		});
+
+		//window.location.replace("/weixin/wxUser/bindRoad?openid="+openid);
+	}
+
+	//跳转道路绑定
+	function gotobindRoad(){
+		u.setStorage("bindRoadTrafficPolice","1");
+		window.location.replace("/weixin/wxUser/bindRoadTrafficPolice?openid="+openid);
+	}
+
+	//警情滚动
+	function jqScroll(){
+		var len = $(".scroll-con li").length;
+		if(len > 1){
+			textRoll=function(){
+				$(".scroll-wrap").find(".scroll-con").animate({
+					marginTop : "-31px"
+				},1000,function(){
+					$(this).css({marginTop : "0px"}).find("li:first").appendTo(this);
+				});
+			};
+			var roll= setInterval('textRoll()',2000);
+			$(".scroll-con li").mouseenter(function() {
+				clearInterval(roll);
+			}).mouseout(function(){
+				clearInterval(roll);
+				roll= setInterval('textRoll()',2000);
+			});
+		}
+	}
+
+
+	//管制通知
+	function binControlNotice(){
+		window.location.replace("/weixin/wxUser/controlNotice");
+		//window.location.href="/weixin/wxUser/controlNotice";
+	}
+
+</script>
+</body>
+</html>

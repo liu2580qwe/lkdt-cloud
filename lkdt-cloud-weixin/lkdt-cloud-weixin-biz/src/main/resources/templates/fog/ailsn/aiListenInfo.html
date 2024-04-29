@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<style>
+	.layui-layer-page .layui-layer-content {
+		position: relative;
+		overflow: auto;
+		background-color: #061537;
+	}
+</style>
+<script>
+	var errorImg = function(ele){ele.src = '/img/serverImg.jpg';}
+</script>
+<body style="background-color: rgba(0,0,0,0);">
+	<div style="padding: 0px 10px 10px 10px;">
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+				<div>
+					<h2>
+						计算资源池
+					</h2>
+					<hr class="simple" color="#6f5499" />
+				</div>
+				<div class="row">
+					<div class="col-md-3">
+						<input id="search_" type="text" style="width:100%;margin-right: 10px;"  class="form-control" placeholder="请输入服务器名" autocomplete="off"/><br/>
+					</div>
+					<div class="col-md-3">
+						<input id="searchIp_" type="text" style="width:100%;margin-right: 10px;"  class="form-control" placeholder="请输入IP地址" autocomplete="off"/><br/>
+					</div>
+					<div class="col-md-1" style="height: 34px;">
+						<input type="button" class="btn" value="查询" onclick="javascript:init();" style="float:left;"/><br/>
+					</div>
+					<div class="col-md-1" style="height: 34px;">
+						<input type="button" class="btn" value="重置" onclick="clear_();" style="float:left;"/><br/>
+					</div>
+					<div class="col-md-1" style="height: 34px;">
+						<!--<input type="button" class="btn btn-success" value="初始化" onclick="" style="float:left;"/><br/>-->
+					</div>
+				</div>
+				<div id="serverIds" class="row">
+					<!--<div class="col-md-3">
+						<div class="thumbnail" >
+							<img alt="300x200" width="200px" height="300px" src="/statics/tools/bootstrap3/default_006.jpg" onerror="errorImg(this);"/>
+							<div class="caption">
+								<h3>
+									server1
+								</h3>
+								<p>
+									详情
+								</p>
+								<p>
+									<a class="btn" href="#">详情»</a>
+								</p>
+							</div>
+						</div>
+					</div>-->
+				</div>
+				<div class="row clearfix">
+					<div class="col-md-4 column">
+					</div>
+					<div class="col-md-4 column">
+					</div>
+					<div class="col-md-4 column">
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<span th:text="${aiListenInfoList}"/>
+	<div th:include="include :: footer"></div>
+	<script>
+		$(function(){
+            init.call(this);
+		});
+		var clear_ = function(ele){
+			$("#search_").val('');
+            $("#searchIp_").val('');
+			init.call(this);
+		}
+		var init = function(ele){
+            //清空列表
+            $('#serverIds').html('');
+            $.ajax({
+                url:'/ai/listen/aiListenInfo/list',
+                type:'POST',
+				data:{searchGroupName:$('#search_').val(),searchIP:$('#searchIp_').val()},
+                dataType:'json',
+            	success:function(result,status,xhr){
+                	var serverHtml = "";
+                	//遍历服务器信息
+                	for(var prop in result){
+                        var sign = "";
+                        var cpu ;//cpu
+                        var cpuHtml = "<div id='"+result[prop].groupName+"_cpu' style='display:none'>";
+                        var cpuTitle = "";
+                        var cpuAvgUsed = 0.0;//CPU平均使用率
+                        var disk ;//硬盘
+                        var diskHtml = "<div id='"+result[prop].groupName+"_disk' style='display:none'>";
+                        var diskTitle = "";
+                        var diskDUsed = 0.0;//硬盘使用率
+                        if(timeFn(result[prop].currTime)<900){//小于900秒
+                            sign += '<span title="正常在线" class="glyphicon glyphicon-ok-sign" style="color: green; font-size: 23px;position:absolute;right:20px;top:5px;"/>';
+                        } else {
+                            sign += '<span title="已离线" class="glyphicon glyphicon-remove-sign" style="color: red; font-size: 23px;position:absolute;right:20px;top:5px;"/>';
+                        }
+                        cpu = result[prop].cpu.replace(/\[/g,"").replace(/\]/g,"").replace(/\s/g,"").split(",");
+                        for(var i=0; i < cpu.length; i++){
+                            cpuHtml += 'CPU'+cpu[i].split("-")[0]+' 已使用'+cpu[i].split("-")[1]+'<div title="CPU'+cpu[i].split("-")[0]+' 已使用'+cpu[i].split("-")[1]+'" class="progress" style="margin-bottom:5px;">' +
+                                '<div class="progress-bar" style="width:'+cpu[i].split("-")[1]+';">'+cpu[i].split("-")[1]+'</div></div>';
+                            cpuTitle += 'CPU'+cpu[i].split("-")[0]+'-已使用'+cpu[i].split("-")[1]+'\n';
+                            cpuAvgUsed += parseFloat(cpu[i].split("-")[1].replace('%',''));
+                        }
+                        cpuAvgUsed = (cpuAvgUsed/cpu.length).toFixed(1)+'%';
+                        cpuHtml += "</div>";
+                        disk = result[prop].files.replace(/\[/g,"").replace(/\]/g,"").replace(/\s/g,"").split(",");
+                        for(var i=0; i < disk.length; i++){
+                            diskHtml += disk[i].split("-")[0]+'盘 '+disk[i].split("-")[1]+'G 已使用'+(disk[i].split("-")[3]*100/disk[i].split("-")[1]).toFixed(1)+
+								'%<div title="'+disk[i].split("-")[0]+'盘 '+disk[i].split("-")[1]+'G 已使用'+(disk[i].split("-")[3]*100/disk[i].split("-")[1]).toFixed(1)+'%" class="progress" style="margin-bottom:5px;">' +
+                                '<div class="progress-bar" style="width:'+(disk[i].split("-")[3]*100/disk[i].split("-")[1]).toFixed(1)+'%;">'+(disk[i].split("-")[3]*100/disk[i].split("-")[1]).toFixed(1)+'%</div></div>';
+                            diskTitle += disk[i].split("-")[0]+'盘-'+disk[i].split("-")[1]+'G-已使用'+(disk[i].split("-")[3]*100/disk[i].split("-")[1]).toFixed(1)+'%\n';
+                            if(disk[i].split("-")[0] == 'D'){
+                                diskDUsed = ' D:'+(disk[i].split("-")[3]*100/disk[i].split("-")[1]).toFixed(1)+'%';
+							}
+                        }
+                        diskHtml += "</div>";
+                        serverHtml += '<div class="col-md-3"><div class="thumbnail" >'+
+                            '<h4 style="width:90%;">'+result[prop].groupName+ sign +'</h4>'+
+                            '<img alt="100x100" style="float:left;" width="100px" height="100px" src="" onerror="errorImg(this);"/>'+
+                            '<div class="caption"><p>IP:'+result[prop].ip+':'+result[prop].port+'</p>'+
+                            '<p>内存使用率:'+result[prop].memory+'</p><p>CPU:'+cpu.length+'核 使用率:'+cpuAvgUsed+'</p><p>硬盘:共'+disk.length+'个'+diskDUsed+'</p>' +
+                            '<a class="btn" style="font:10px;" title="'+cpuTitle+'" href="#" onclick="showServerInfo(\'CPU详情\',\''+result[prop].groupName+'_cpu\')">CPU详情»</a>'+
+                            '<a class="btn" style="font:10px;" title="'+diskTitle+'" href="#" onclick="showServerInfo(\'硬盘详情\',\''+result[prop].groupName+'_disk\')">硬盘详情»</a>'+
+                            cpuHtml+diskHtml+'</div></div></div>';
+                    }
+                    $('#serverIds').html(serverHtml);
+                },
+                error:function(xhr,status,error){
+                    layer.info("网络开小差了");
+                }
+            });
+		}
+
+        $("#search_").bind("input propertychange change", function(event) {
+            init.call(this);
+        });
+
+        $("#searchIp_").bind("input propertychange change", function(event) {
+            init.call(this);
+        });
+
+		var showServerInfo = function(title,id){
+            var layerIndex;
+            layerIndex = layer.open({
+				title:title,
+                type: 1,
+                shade: [0.8, '#393D49'],
+                skin: 'layui-layer-rim', //加上边框
+                area:  ['600px', '80%'], //宽高
+                content: $('#'+id).html()
+            });
+            $(document).keydown(function(event){
+                switch(event.keyCode) {
+                    case 27:
+                        layer.close(layerIndex);
+                }
+            });
+		};
+
+        /**计算时间差*/
+        var timeFn = function(time) {
+            var dateBegin = new Date(time.replace(/-/g, "/"));//将-转化为/，使用new Date
+            return Math.round((new Date().getTime() - dateBegin.getTime())/1000);
+        };
+	</script>
+</body>
+</html>

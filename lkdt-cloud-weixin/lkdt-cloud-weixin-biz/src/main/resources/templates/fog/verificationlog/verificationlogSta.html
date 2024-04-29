@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<style>
+	.fixed-table-container{
+		height: 220px;
+	}
+</style>
+<body class="gray-bg">
+	<input id="epId" name="epId" type="hidden" th:value="${epId}">
+	<input id="equName" name="equName" type="hidden" th:value="${equName}">
+	<div style="margin-top:50px;height: 100%; ">
+	<div class="echartspie" id="echarts-pie-chart" style="width:46%;margin:auto;float: left;height: 80%;"></div>
+	<div class="echartsbar" id="echarts-bar-chart" style="width:46%;margin:auto;float: right;height: 80%;"></div>
+	</div>
+	<!--shiro控制bootstraptable行内按钮看见性 来自bootdo的创新方案 -->
+		<div>
+			<script type="text/javascript">
+				var s_edit_h = 'hidden';
+				var s_remove_h = 'hidden';
+				var s_resetPwd_h = 'hidden';
+			</script>
+		</div>
+		<div shiro:hasPermission="system:verificationlog:edit">
+			<script type="text/javascript">
+				s_edit_h = '';
+			</script>
+		</div>
+		<div shiro:hasPermission="system:verificationlog:remove">
+			<script type="text/javascript">
+				var s_remove_h = '';
+			</script>
+		</div>
+		<div shiro:hasPermission="system:verificationlog:resetPwd">
+			<script type="text/javascript">
+				var s_resetPwd_h = '';
+			</script>
+		</div>
+	</div>
+	<div th:include="include :: footer"></div>
+	<script src="/lkdtWX/js/plugins/echarts/echarts-all.js"></script>
+	<script type="text/javascript" src="/lkdtWX/js/appjs/fog/verificationlog/verificationlogSta.js"></script>
+	
+</body>
+</html>

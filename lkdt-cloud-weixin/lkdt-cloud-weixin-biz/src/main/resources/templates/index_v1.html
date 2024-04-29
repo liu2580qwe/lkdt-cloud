@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="renderer" content="webkit">
+    <!--[if lt IE 9]>
+    <meta http-equiv="refresh" content="0;ie.html"/>
+    <![endif]-->
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="/css/bootstrap.min.css?v=3.3.7" rel="stylesheet">
+    <link href="/css/font-awesome.min.css?v=4.4.1" rel="stylesheet">
+    <link href="/css/plugins/toastr/toastr.min.css?v=1" rel="stylesheet">
+    <link href="/css/animate.css?v=1" rel="stylesheet">
+    <link href="/css/style.css?v=4.1.1" rel="stylesheet">
+
+    <link rel="stylesheet" type="text/css" href="/css/main-v5.0.css?v=1">
+    <title>江苏高速公路恶劣天气数字监测与智能预警系统</title>
+    <style type="text/css">
+        .head_top {
+            height: 42px;
+            line-height: 42px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            position: relative;
+            text-align: center;
+        }
+
+        #time {
+            font-size: 20px;
+            margin-right: 12px;
+        }
+
+        .iframeC {
+            height: calc(100% - 19px)
+        }
+
+        /* Top Menu */
+        #top-menu {
+            position: absolute;
+            right: 300px;
+            padding: 0;
+            top: 0;
+        }
+        
+        .title_1{
+        	width: 233px;
+        	height: 42px;
+        	font-size: 14px;
+        	text-align: center;
+        	background: rgba(0, 0, 0, 0.23);
+        	float: left;
+        }
+        .title_1 span{
+        	display: inline-block;
+        	
+        }
+        .title_ul li{
+    		float:left;
+    		list-style: disc;
+    		margin: 0px 20px 0px 18px;
+    		padding-left: 20px;
+    		color: #96bcdf;
+    		font-size: 17px;
+    		letter-spacing: 10px;
+    	}
+        .underLine {
+            /*text-decoration: underline;*/
+            text-decoration-line: underline;
+            /*padding-bottom: 1px;
+            border-bottom: 1px solid;*/
+        }
+    </style>
+</head>
+
+<body class="fixed-sidebar full-height-layout gray-bg  pace-done mini-navbar" style="overflow: hidden">
+<script type="text/javascript">
+    window.setHtmlById = function ($id, $html) {
+        $("#" + $id).html($html);
+    }
+</script>
+<input id="liveAddress" style="height: calc(100%);" th:value="${liveAddress}" hidden/>
+<div id="wrapper">
+    <!--左侧导航开始-->
+    <nav class="navbar-default navbar-static-side" role="navigation">
+        <div class="sidebar-collapse">
+            <ul class="nav" id="side-menu">
+                <li class="nav-header">
+                    <div class="dropdown profile-element hidden">
+
+                        <a data-toggle="dropdown" class="dropdown-toggle" href="#"> <span
+                                class="clear"> <span class="block m-t-xs"><strong
+                                class="font-bold" th:text="${username}">admin</strong></span> <span
+                                class="text-muted text-xs block">超级管理员<b class="caret"></b></span>
+							</span>
+                        </a>
+                        <ul class="dropdown-menu animated fadeInRight m-t-xs">
+                            <li><a click="personal()" href="#">修改头像</a></li>
+                            <li><a click="personal()" href="#">个人资料</a></li>
+                            <li><a click="personal()" href="#">密码修改</a></li>
+                            <li><a click="personal()" href="#">信箱</a></li>
+                            <li class="divider"></li>
+                            <li><a href="/logout">安全退出</a></li>
+                        </ul>
+                        <div class="logo-element"></div>
+                    </div>
+                </li>
+                <!--
+            <li><a href="#"> <i class="fa fa-home"></i> <span
+                    class="nav-label">主页</span> <span class="fa arrow"></span>
+            </a>
+                <ul class="nav nav-second-level">
+                    <li><a id="index001" class="J_menuItem" href="index_v1.html"
+                           data-index="0" th:href="@{/main}">监控驾驶舱</a></li>
+                </ul>
+            </li>
+             -->
+                <li th:each="menu : ${menus}">
+                    <a href="#">
+                        <i class="fa fa fa-bar-chart-o" th:class="${menu.attributes.icon}"></i>
+                        <span class="nav-label" th:text="${menu.text}">基础信息</span>
+                        <span class="fa arrow"></span>
+                    </a>
+                    <ul class="nav nav-second-level">
+                        <li th:each="cmenu : ${menu.children}">
+                            <!--<a class="J_menuItem" href="graph_echarts.html" th:text="${cmenu.text}" th:href="${cmenu.attributes.url}">系统管理</a>-->
+                            <a th:if="${cmenu.attributes.url} eq '/report/alarmReport/alarmFogStatistics'"
+                               target="_blank"
+                               class="J_menuItem" th:href="${cmenu.attributes.url}"
+                               onClick="window.open('/report/alarmReport/alarmFogStatistics')"
+                               th:text="${cmenu.text}"></a>
+                            <a th:unless="${cmenu.attributes.url} eq '/report/alarmReport/alarmFogStatistics'"
+                               class="J_menuItem" href="graph_echarts.html" th:text="${cmenu.text}"
+                               th:href="${cmenu.attributes.url}">系统管理</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <!--左侧导航结束-->
+    <!--右侧部分开始-->
+    <div id="page-wrapper" class="dashbard-1">
+        <div class="row border-bottom">
+            <nav class="navbar navbar-static-top" role="navigation"
+                 style="margin-bottom: 0">
+                <!-- <span id="wc-no-js" class="logo-name" style="width: 233px; float: left;display: none;">欢迎访问</span>
+                <div class="head_top" id="title-no-js" style="display: none;">
+                    <span style="font-size: 28px;" id="head_title">江苏高速公路恶劣天气数字监测与智能预警系统</span>
+                    <div id="time" class="pull-right">
+                        <span id="hours">00</span> : <span id="min">00</span> : <span
+                            id="sec">00</span>
+                    </div>
+                </div> -->
+                
+                <div  id="wc-now-js" class="title_1" >
+                	<span style="letter-spacing: 8px;">江苏高速公路恶劣天气</span>
+                	<span style="letter-spacing: 5.9px;">数字监测与智能预警系统</span>
+                </div>
+                <div class="head_top" id="title-now-js" style="text-align: left;">
+                	<div style="width:calc(100% - 233px);height:42px;margin-left:233px;background:#214a6f;">
+                		<ul class="title_ul" style="margin: 0px;" >
+	                    	<li style="list-style:none;">道路团雾</li>
+	                    	<li>雾霾</li>
+	                    	<li>冰雪</li>
+	                    	<li>沙尘</li>
+	                    	<li>大风</li>
+	                    	<li>雷暴</li>
+	                    	<li style="margin-right:0px;">雨水</li>
+	                    </ul>
+	                    <div id="time" class="pull-right">
+	                        <span id="hours">00</span> : <span id="min">00</span> : <span
+	                            id="sec">00</span>
+	                    </div>
+                	</div>
+                </div>
+
+                <div class="row content-tabs">
+                    <button class="roll-nav roll-left J_tabLeft">
+                        <i class="fa fa-backward"></i>
+                    </button>
+                    <nav class="page-tabs J_menuTabs">
+                        <div class="page-tabs-content">
+                            <a href="javascript:;" class="active J_menuTab"
+                               data-id="index_v1.html">首页</a>
+                        </div>
+                    </nav>
+                    <div id="top-menu" style="right:220px;">
+                        <div class="pull-left tm-icon">
+                            <a data-drawer="fgyj" class="drawer-toggle" href="" style="width: 80px;" title="法规依据">
+                                <i class="fa fa-balance-scale"></i>
+                                法规依据
+                            </a>
+                        </div>
+                        <div class="pull-left tm-icon">
+                            <a data-drawer="messages" class="drawer-toggle" href="" title="浓雾实时告警">
+                                <div style="background: url(../img/fog.png);height: 35px; width: 35px;background-size: 100%;display: inline-block;float:left;"></div>
+                                <i class="n-count animated" 精度 id="nwssgjCount">0</i> <!--<span>浓雾实时告警</span>-->
+                            </a>
+                        </div>
+                        <div class="pull-left tm-icon">
+                            <a data-drawer="notifications" class="drawer-toggle" href="" title="大风实时告警">
+                                <div style="background: url(../img/wind.png);height: 30px; width: 30px; margin-right: 15px;background-size: 100%;display: inline-block;float:left;"></div>
+                                <i class="n-count animated" 精度 id="dfssgjCount">0</i> <!--<span>大风实时告警</span>-->
+                            </a>
+                        </div>
+                    </div>
+
+                    <button class="roll-nav roll-right J_tabRight" style="right: 190px;">
+                        <i class="fa fa-forward"></i>
+                    </button>
+                    <div class="btn-group roll-nav roll-right" style="right: 160px;background: rgba(40, 52, 78, 0);">
+                        <button class="dropdown J_tabClose roll-nav" style=""
+                                data-toggle="dropdown">
+                            关闭操作<span class="caret"></span>
+                        </button>
+                        <ul role="menu" class="dropdown-menu dropdown-menu-right"
+                            style="background-color: #1c3369;">
+                            <li class="J_tabShowActive"><a>定位当前选项卡</a></li>
+                            <li class="divider"></li>
+                            <li class="J_tabCloseAll"><a>关闭全部选项卡</a></li>
+                            <li class="J_tabCloseOther"><a>关闭其他选项卡</a></li>
+                        </ul>
+                    </div>
+
+                    <a onclick="personal()" href="#" class="roll-nav roll-right"
+                       style="width: 60px; right: 60px;"><i class="fa fa-id-card"></i>
+                        个人</a> <a href="/logout" class="roll-nav roll-right J_tabExit"><i
+                        class="fa fa fa-sign-out"></i> 退出</a>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Messages Drawer -->
+        <div id="messages" class="tile drawer animated">
+            <div class="listview narrow">
+                <div class="media">
+                    <a href="javascript:;">浓雾实时告警</a> <span class="drawer-close">×</span>
+
+                </div>
+                <div class="overflow"
+                     style="height: 254px; overflow: hidden; outline: none;"
+                     tabindex="5001" id="nwssgj">
+                    <!--<div class="media">
+                        <div class="pull-left">
+                            <img width="40" src="img/profile-pics/1.png" alt="">
+                        </div>
+                        <div class="media-body">
+                            <small class="text-muted">调度班长 - 2分钟前</small><br> <a
+                                class="t-overflow" href="">空调系统数据采集异常，请工作人员检查。</a>
+                        </div>
+                    </div>
+                    <div class="media">
+                        <div class="pull-left">
+                            <img width="40" src="img/profile-pics/2.png" alt="">
+                        </div>
+                        <div class="media-body">
+                            <small class="text-muted">值班专员 - 15分钟前</small><br> <a
+                                class="t-overflow" href="">办公室供暖系统出现异常，无法提供正常供暖，请排除故障!</a>
+                        </div>
+                    </div>
+                    <div class="media">
+                        <div class="pull-left">
+                            <img width="40" src="img/profile-pics/3.png" alt="">
+                        </div>
+                        <div class="media-body">
+                            <small class="text-muted">自动化班长 - 3小时前</small><br> <a
+                                class="t-overflow" href="">能源费用分布图以及报表数据有误差，请核对</a>
+                        </div>
+                    </div>
+                    <div class="media">
+                        <div class="pull-left">
+                            <img width="40" src="img/profile-pics/4.png" alt="">
+                        </div>
+                        <div class="media-body">
+                            <small class="text-muted">值班人员 - 3小时前</small><br> <a
+                                class="t-overflow" href="">锅炉房水温过高，告警系统启动，请及时查看.</a>
+                        </div>
+                    </div>
+                    <div class="media">
+                        <div class="pull-left">
+                            <img width="40" src="img/profile-pics/1.jpg" alt="">
+                        </div>
+                        <div class="media-body">
+                            <small class="text-muted">办公室 - 4小时前</small><br> <a
+                                class="t-overflow" href="">请各部门提供上周能耗统计数据，本周将针对关键能耗点进行技术优化</a>
+                        </div>
+                    </div>
+                    <div class="media">
+                        <div class="pull-left">
+                            <img width="40" src="img/profile-pics/2.jpg" alt="">
+                        </div>
+                        <div class="media-body">
+                            <small class="text-muted">值班专员 - 5小时前</small><br> <a
+                                class="t-overflow" href="">自动化班提供1#机房总耗电量远远超过预测值，请再次核对数据并及时告知！</a>
+                        </div>
+                    </div>
+                    <div class="media">
+                        <div class="pull-left">
+                            <img width="40" src="img/profile-pics/3.png" alt="">
+                        </div>
+                        <div class="media-body">
+                            <small class="text-muted">办公室 - 6小时前</small><br> <a
+                                class="t-overflow" href="">请提供“人均空调系统能耗”和“制冷系统能效比”两组数据</a>
+                        </div>
+                    </div>
+                    <div class="media">
+                        <div class="pull-left">
+                            <img width="40" src="img/profile-pics/4.jpg" alt="">
+                        </div>
+                        <div class="media-body">
+                            <small class="text-muted">办公室专责 - 6小时前</small><br> <a
+                                class="t-overflow" href="">请调度班提供2#机房和3#基站的能耗统计数据.</a>
+                        </div>
+                    </div>
+                    <div class="media">
+                        <div class="pull-left">
+                            <img width="40" src="img/profile-pics/5.png" alt="">
+                        </div>
+                        <div class="media-body">
+                            <small class="text-muted">网管中心 - 7小时前</small><br> <a
+                                class="t-overflow" href="">今天凌晨将进行断网检修，请各部门及时下载相关材料</a>
+                        </div>
+                    </div>-->
+                </div>
+                <!--<div class="media text-center whiter l-100">
+                    <a href=""><small>查看所有</small></a>
+                </div>-->
+            </div>
+        </div>
+
+        <!-- Notification Drawer -->
+        <div id="notifications" class="tile drawer animated">
+            <div class="listview narrow">
+                <div class="media">
+                    <a href="javascript:;">大风实时告警</a> <span class="drawer-close">×</span>
+                </div>
+                <div class="overflow"
+                     style="height: 254px; overflow: hidden; outline: none;"
+                     tabindex="5002">
+
+                    <!--<div class="media">
+                        <div class="pull-left">
+                            <img width="40" src="img/profile-pics/1.png" alt="">
+                        </div>
+                        <div class="media-body">
+                            <small class="text-muted">值班人员 - 35秒前</small><br> <a
+                                class="t-overflow" href="">供暖系统能耗数据采集异常</a>
+                        </div>
+                    </div>
+                    <div class="media">
+                        <div class="pull-left">
+                            <img width="40" src="img/profile-pics/3.jpg" alt="">
+                        </div>
+                        <div class="media-body">
+                            <small class="text-muted">调度值班室 - 1分钟前</small><br> <a
+                                class="t-overflow" href="">办公照明系统出现故障，请立即检修！</a>
+                        </div>
+                    </div>
+                    <div class="media">
+                        <div class="pull-left">
+                            <img width="40" src="img/profile-pics/3.png" alt="">
+                        </div>
+                        <div class="media-body">
+                            <small class="text-muted">办公室 - 2分钟前</small><br> <a
+                                class="t-overflow" href="">办公区空调1#机组无法正常工作，异响</a>
+                        </div>
+                    </div>
+                    <div class="media">
+                        <div class="pull-left">
+                            <img width="40" src="img/profile-pics/4.png" alt="">
+                        </div>
+                        <div class="media-body">
+                            <small class="text-muted">值班专责 - 3分钟前</small><br> <a
+                                class="t-overflow" href="">1#制冷站中级故障告警，请立即前往查看</a>
+                        </div>
+                    </div>
+                    <div class="media">
+                        <div class="pull-left">
+                            <img width="40" src="img/profile-pics/4.jpg" alt="">
+                        </div>
+                        <div class="media-body">
+                            <small class="text-muted">值班人员 - 4分钟前</small><br> <a
+                                class="t-overflow" href="">冷机用电量突变，请查看是否故障</a>
+                        </div>
+                    </div>
+                    <div class="media">
+                        <div class="pull-left">
+                            <img width="40" src="img/profile-pics/2.jpg" alt="">
+                        </div>
+                        <div class="media-body">
+                            <small class="text-muted">办公室专责 - 5分钟前</small><br> <a
+                                class="t-overflow" href="">新风系统告警，无法正常工作</a>
+                        </div>
+                    </div>-->
+                </div>
+                <!--<div class="media text-center whiter l-100">
+                    <a href=""><small>查看所有</small></a>
+                </div>-->
+            </div>
+        </div>
+
+        <div id="fgyj" class="tile drawer animated">
+            <div class="listview narrow">
+                <div class="media">
+                    <a href="">法规依据</a> <span class="drawer-close">×</span>
+                </div>
+                <div class="overflow"
+                     style="height: 254px; overflow: hidden; outline: none;"
+                     tabindex="5002">
+                    <div class="media">
+                        <div class="pull-left">
+                            <img width="40" src="img/profile-pics/4.jpg" alt="">
+                        </div>
+                        <div class="media-body">
+                            <a class="t-overflow underLine" target="_blank"
+                               href="http://www.gov.cn/banshi/2005-08/23/content_25579.htm">《道路交通安全法实施条例》（第五节
+                                高速公路的特别规定）</a>
+                        </div>
+                    </div>
+                    <div class="media">
+                        <div class="pull-left">
+                            <img width="40" src="img/profile-pics/2.jpg" alt="">
+                        </div>
+                        <div class="media-body">
+                            <a class="t-overflow underLine" href="#">《江苏省恶劣天气条件下高速公路交通管制工作规范》</a>
+                        </div>
+                    </div>
+                    <div class="media">
+                        <div class="pull-left">
+                            <img width="40" src="img/profile-pics/2.jpg" alt="">
+                        </div>
+                        <div class="media-body">
+                            <a class="t-overflow underLine" href="#" onclick="fogAlarmRulesClick()">【局部路段团雾预警规则】：以高速公路交警大队管辖路段或路段管理（分）中心为一个预警计算单元，
+                                当遇有局部路段团雾或烧秸秆烟雾等事件导致与同路段相邻监测点的能见度值相差大于100米时（容易引起司机瞬间黑视或恐慌），
+                                推送“前方团雾谨慎驾驶”预警信息。团雾（烟雾）预警范围尺寸与路段摄像机视角覆盖路段范围一致。</a>
+                        </div>
+                    </div>
+                    <!--<div class="media">
+                        <div class="pull-left">
+                            <img width="40" src="img/profile-pics/2.jpg" alt="">
+                        </div>
+                        <div class="media-body">
+                            <a class="t-overflow" href="#" onclick="fogLowDistanceAlarmRulesClick()">【恶劣天气低能见度预警规则】：
+                                </a>
+                        </div>
+                    </div>-->
+                </div>
+                <!--<div class="media text-center whiter l-100">
+                    <a href=""><small>查看所有</small></a>
+                </div>-->
+            </div>
+        </div>
+
+        <div class="row J_mainContent" id="content-main"
+             style="margin-top: 0px">
+            <iframe class="J_iframe iframeC" name="iframe0" width="100%" src=""
+                    th:src="@{/main}" frameborder="0" data-id="index_v1.html" seamless></iframe>
+        </div>
+    </div>
+    <!--右侧部分结束-->
+    <!--右侧边栏开始-->
+</div>
+<div class="signup-footer"
+     style="position: absolute; bottom: 0px; background: #827e7e; width: 100%; text-align: center;">
+    <!--<div class="pull-center">&copy;
+        中交信科集团海德科技公司版权所有&nbsp;&nbsp;&nbsp;&nbsp;2020 All Rights&nbsp;ZCloud
+    </div>-->
+    <div class="pull-center" id="version_info">&copy;
+        中交信科集团海德科技公司版权所有&nbsp;&nbsp;&nbsp;&nbsp;2021 All Rights
+        ZCloud&nbsp;&nbsp;&nbsp;&nbsp;系统支持：江苏交控数字交通研究院
+    </div>
+</div>
+<!-- 全局js -->
+<script src="/lkdtWX/js/jquery.min.js?v=2.1.4"></script>
+<script src="/lkdtWX/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="/lkdtWX/js/plugins/metisMenu/jquery.metisMenu.js"></script>
+<script src="/lkdtWX/js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+<script src="/lkdtWX/js/plugins/layer/layer.min.js"></script>
+<!-- 自定义js -->
+<script src="/lkdtWX/js/app.js?v=4.1.0"></script>
+<script type="text/javascript" src="/lkdtWX/js/contabs.js"></script>
+<!-- 第三方插件 -->
+<script src="/lkdtWX/js/plugins/pace/pace.min.js"></script>
+<!-- Toastr script -->
+<script src="/lkdtWX/js/plugins/toastr/toastr.min.js"></script>
+<script type="text/javascript">
+    var stompClient = null;
+    $(function () {
+        /* let liveAddress = $("#liveAddress").val();
+        let version_info = $("#version_info")[0].innerHTML;
+        let head_title = $("#head_title")[0].innerHTML;
+        try {
+            if (liveAddress != "") {
+                let liveAddressJSON$temp = eval('(' + liveAddress + ')');
+                if (liveAddressJSON$temp.version_info) {
+                    $("#version_info")[0].innerHTML = liveAddressJSON$temp.version_info;
+                }
+                if (liveAddressJSON$temp.head_title) {
+                	$("#wc-no-js").css("display","block");
+                	$("#title-no-js").css("display","block");
+                	$("#wc-now-js").css("display","none");
+                	$("#title-now-js").css("display","none");
+                    $("#head_title")[0].innerHTML = liveAddressJSON$temp.head_title;
+                }
+            }
+        } catch (e) {
+            console.log(e);
+        } */
+    });
+
+    function connect() {
+        var sock = new SockJS("/endpointChat");
+        var stomp = Stomp.over(sock);
+        stomp.connect('guest', 'guest', function (frame) {
+
+            /**? 订阅了/user/queue/notifications 发送的消息,这里雨在控制器的 convertAndSendToUser 定义的地址保持一致,?
+             *  这里多用了一个/user,并且这个user 是必须的,使用user 才会发送消息到指定的用户。?
+             *  */
+            stomp
+                .subscribe("/user/queue/notifications",
+                    handleNotification);
+            stomp.subscribe('/topic/getResponse', function (response) { //订阅/topic/getResponse 目标发送的消息。这个是在控制器的@SendTo中定义的。
+                toastr.options = {
+                    "closeButton": true,
+                    "debug": false,
+                    "progressBar": true,
+                    "positionClass": "toast-bottom-right",
+                    "onclick": null,
+                    "showDuration": "400",
+                    "hideDuration": "1000",
+                    "timeOut": "7000",
+                    "extendedTimeOut": "1000",
+                    "showEasing": "swing",
+                    "hideEasing": "linear",
+                    "showMethod": "fadeIn",
+                    "hideMethod": "fadeOut"
+                }
+                toastr.info(JSON.parse(response.body).responseMessage);
+            });
+        });
+
+        function handleNotification(message) {
+            //wrapper.notify();
+            toastr.info(message.body);
+        }
+    }
+
+    var personal = function () {
+        layer.open({
+            type: 2,
+            title: '个人设置',
+            maxmin: true,
+            shadeClose: false,
+            area: ['800px', '600px'],
+            content: '/sys/user/personal'
+        });
+    }
+
+    var fogAlarmRulesClick = function () {
+        layer.open({
+            title: '局部路段团雾预警规则',
+            area: ['800px', '480px'],
+            shadeClose: false,
+            content: '【局部路段团雾预警规则】：以高速公路交警大队管辖路段或路段管理（分）中心为一个预警计算单元，' +
+                '当遇有局部路段团雾或烧秸秆烟雾等事件导致与同路段相邻监测点的能见度值相差大于100米时（容易引起司机瞬间黑视或恐慌），' +
+                '推送“前方团雾谨慎驾驶”预警信息。团雾（烟雾）预警范围尺寸与路段摄像机视角覆盖路段范围一致。'
+        });
+    }
+</script>
+
+<script type="text/javascript">
+    (function () {
+
+        var newDate = new Date();
+
+        newDate.setDate(newDate.getDate());
+
+        setInterval(function () {
+
+            // Create a newDate() object and extract the seconds of the current time on the visitor's
+            var seconds = new Date().getSeconds();
+
+            // Add a leading zero to seconds value
+            $("#sec").html((seconds < 10 ? "0" : "") + seconds);
+        }, 1000);
+
+        setInterval(function () {
+
+            // Create a newDate() object and extract the minutes of the current time on the visitor's
+            var minutes = new Date().getMinutes();
+
+            // Add a leading zero to the minutes value
+            $("#min").html((minutes < 10 ? "0" : "") + minutes);
+        }, 1000);
+
+        setInterval(function () {
+
+            // Create a newDate() object and extract the hours of the current time on the visitor's
+            var hours = new Date().getHours();
+
+            // Add a leading zero to the hours value
+            $("#hours").html((hours < 10 ? "0" : "") + hours);
+        }, 1000);
+    })();
+
+    /* --------------------------------------------------------
+     Messages + Notifications
+     -----------------------------------------------------------*/
+    (function () {
+
+        $('body').on('click touchstart', '.drawer-toggle', function (e) {
+            e.preventDefault();
+            var drawer = $(this).attr('data-drawer');
+
+            $('.drawer:not("#' + drawer + '")').removeClass('toggled');
+
+            if ($('#' + drawer).hasClass('toggled')) {
+                $('#' + drawer).removeClass('toggled');
+            } else {
+                $('#' + drawer).addClass('toggled');
+            }
+        });
+
+        //Close when click outside
+        $(document).on('mouseup touchstart', function (e) {
+            var container = $('.drawer, .tm-icon');
+            if (container.has(e.target).length === 0) {
+                $('.drawer').removeClass('toggled');
+                $('.drawer-toggle').removeClass('open');
+            }
+        });
+
+        //Close
+        $('body').on('click touchstart', '.drawer-close', function () {
+            $(this).closest('.drawer').removeClass('toggled');
+            $('.drawer-toggle').removeClass('open');
+        });
+    })();
+</script>
+</body>
+</html>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/lkdt-cloud.iml" filepath="$PROJECT_DIR$/.idea/lkdt-cloud.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lkdt-cloud-fog/lkdt-cloud-fog.iml" filepath="$PROJECT_DIR$/lkdt-cloud-fog/lkdt-cloud-fog.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lkdt-cloud-fog/lkdt-cloud-fog-api/lkdt-cloud-fog-api.iml" filepath="$PROJECT_DIR$/lkdt-cloud-fog/lkdt-cloud-fog-api/lkdt-cloud-fog-api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lkdt-cloud-fog/lkdt-cloud-fog-biz/lkdt-cloud-fog-biz.iml" filepath="$PROJECT_DIR$/lkdt-cloud-fog/lkdt-cloud-fog-biz/lkdt-cloud-fog-biz.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lkdt-cloud-gateway/lkdt-cloud-gateway.iml" filepath="$PROJECT_DIR$/lkdt-cloud-gateway/lkdt-cloud-gateway.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lkdt-cloud-module/lkdt-cloud-module.iml" filepath="$PROJECT_DIR$/lkdt-cloud-module/lkdt-cloud-module.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lkdt-cloud-monitor/lkdt-cloud-monitor.iml" filepath="$PROJECT_DIR$/lkdt-cloud-monitor/lkdt-cloud-monitor.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lkdt-cloud-radar/lkdt-cloud-radar.iml" filepath="$PROJECT_DIR$/lkdt-cloud-radar/lkdt-cloud-radar.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lkdt-cloud-radar/lkdt-cloud-radar-api/lkdt-cloud-radar-api.iml" filepath="$PROJECT_DIR$/lkdt-cloud-radar/lkdt-cloud-radar-api/lkdt-cloud-radar-api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lkdt-cloud-radar/lkdt-cloud-radar-biz/lkdt-cloud-radar-biz.iml" filepath="$PROJECT_DIR$/lkdt-cloud-radar/lkdt-cloud-radar-biz/lkdt-cloud-radar-biz.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lkdt-cloud-system/lkdt-cloud-system.iml" filepath="$PROJECT_DIR$/lkdt-cloud-system/lkdt-cloud-system.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lkdt-cloud-system/lkdt-cloud-system-api/lkdt-cloud-system-api.iml" filepath="$PROJECT_DIR$/lkdt-cloud-system/lkdt-cloud-system-api/lkdt-cloud-system-api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lkdt-cloud-system/lkdt-cloud-system-biz/lkdt-cloud-system-biz.iml" filepath="$PROJECT_DIR$/lkdt-cloud-system/lkdt-cloud-system-biz/lkdt-cloud-system-biz.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lkdt-cloud-traffic-incident/lkdt-cloud-traffic-incident.iml" filepath="$PROJECT_DIR$/lkdt-cloud-traffic-incident/lkdt-cloud-traffic-incident.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lkdt-cloud-traffic-incident/lkdt-cloud-traffic-incident-api/lkdt-cloud-traffic-incident-api.iml" filepath="$PROJECT_DIR$/lkdt-cloud-traffic-incident/lkdt-cloud-traffic-incident-api/lkdt-cloud-traffic-incident-api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lkdt-cloud-traffic-incident/lkdt-cloud-traffic-incident-biz/lkdt-cloud-traffic-incident-biz.iml" filepath="$PROJECT_DIR$/lkdt-cloud-traffic-incident/lkdt-cloud-traffic-incident-biz/lkdt-cloud-traffic-incident-biz.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lkdt-cloud-weixin/lkdt-cloud-weixin.iml" filepath="$PROJECT_DIR$/lkdt-cloud-weixin/lkdt-cloud-weixin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lkdt-cloud-weixin/lkdt-cloud-weixin-api/lkdt-cloud-weixin-api.iml" filepath="$PROJECT_DIR$/lkdt-cloud-weixin/lkdt-cloud-weixin-api/lkdt-cloud-weixin-api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lkdt-cloud-weixin/lkdt-cloud-weixin-biz/lkdt-cloud-weixin-biz.iml" filepath="$PROJECT_DIR$/lkdt-cloud-weixin/lkdt-cloud-weixin-biz/lkdt-cloud-weixin-biz.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lkdt-common/lkdt-common.iml" filepath="$PROJECT_DIR$/lkdt-common/lkdt-common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lkdt-common/lkdt-common-cloud/lkdt-common-cloud.iml" filepath="$PROJECT_DIR$/lkdt-common/lkdt-common-cloud/lkdt-common-cloud.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lkdt-common/lkdt-common-cloud-starter/lkdt-common-cloud-starter.iml" filepath="$PROJECT_DIR$/lkdt-common/lkdt-common-cloud-starter/lkdt-common-cloud-starter.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lkdt-common/lkdt-common-core/lkdt-common-core.iml" filepath="$PROJECT_DIR$/lkdt-common/lkdt-common-core/lkdt-common-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lkdt-common/lkdt-common-job/lkdt-common-job.iml" filepath="$PROJECT_DIR$/lkdt-common/lkdt-common-job/lkdt-common-job.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lkdt-xxl-job/lkdt-xxl-job.iml" filepath="$PROJECT_DIR$/lkdt-xxl-job/lkdt-xxl-job.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lkdt-xxl-job/lkdt-xxl-job-admin/lkdt-xxl-job-admin.iml" filepath="$PROJECT_DIR$/lkdt-xxl-job/lkdt-xxl-job-admin/lkdt-xxl-job-admin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lkdt-xxl-job/lkdt-xxl-job-core/lkdt-xxl-job-core.iml" filepath="$PROJECT_DIR$/lkdt-xxl-job/lkdt-xxl-job-core/lkdt-xxl-job-core.iml" />
+    </modules>
+  </component>
+</project>

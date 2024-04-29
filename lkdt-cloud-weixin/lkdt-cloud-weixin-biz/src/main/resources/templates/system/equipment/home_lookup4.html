@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<link href="/css/plugins/fullcalendar/fullcalendar.min.css" rel="stylesheet">
+  <link href="/css/plugins/fullcalendar/fullcalendar.print.css" rel="stylesheet" media="print">
+<style>
+p{
+	    margin: 0 0 14px;
+    font-size: 3.1vw;
+    color: #f1a908;
+}
+.col-md-4{
+	width: 33.33%;
+	float: left;
+}
+.fc-icon-x:after {
+    font-size: 290%;
+}
+</style>
+<script>
+    function nofind(_this){
+        _this.src="/fog/nofind.jpg";
+    }
+</script>
+<body class="gray-bg" style="height: 97%;    overflow: hidden;padding: 5px;background: #132535;">
+	<input id="epId" name="epId" type="hidden" th:value="${epId}">
+	<input id="path" name="path" type="hidden" th:value="${path}">
+	<input id="fMeter" name="fMeter" type="hidden" th:value="${fMeter}">
+	<input id="videopath" name="videopath" type="hidden" th:value="${videopath}">
+	<div class="row" style="height: 50%;width: 100%;">
+		<div id="mydiv1" class="fc-popover fc-more-popover" style="display: none;background-color: #313046;cursor: pointer;width: 50%;position: absolute;
+    z-index: 9999;left: 0;">
+			<img id="clickimg" alt="" src="" style="width: 90%;margin-left: 8%;    max-height: 35vw;">
+			<span class="fc-close fc-icon fc-icon-x"></span>
+		</div>
+		<div class="col-md-6" style="    background-color: #090a21;
+    color: #fff;  font-size: 15px;padding: 5px;height: 100%;    padding-left: 40px;width: 50%;float: left;    font-family: sans-serif;">
+			<span>
+				<p>当前可见距离：<span id="mi"></span>米<!-- （<span id="zhuangtai"></span>）  --></p>
+	 			<p>当前雾趋势：无 </p>
+				<p>今日最大可见距离：<span id="maxDay"></span>米 </p>
+				<p>今日最低可见距离：<span id="minDay"></span>米 </p>
+				<input id="close" type="button" onclick="closeFog()" style="display: none;    position: fixed;
+    top: 0px;
+    left: 38%;" value="关闭告警"/>
+				<!-- <p>今日告警次数：<span id="gjcsD"></span>次     </p> 
+				<p>今日误报次数： <span id="wbcsD"></span>次    </p> 
+				<p>本月告警次数：<span id="gjcsM"></span>次 </p>
+				<p>本月误报次数： <span id="wbcsM"></span>次                             </p> -->
+			</span>
+		</div>
+		<div class="col-md-6" style="height: 100%;width: 50%;float: left;">
+			<div style="    text-align: center;    height: 100%;    float: left;    width: 100%;">
+				<img id='img1' alt="" onerror="nofind(this)" style="height: 100%;width: auto;margin:auto;display: none;">
+				<div id="video123" style="height: 100%;width: 100%;"></div>
+				<div id='fMeter_V'  style="position: absolute;top: 75%;left: 20%;color: #ff9d06;font-size: 22px;" th:value="${fMeter}"></div>
+			</div>
+		</div>
+	</div>
+	<div class="row" style="height: 50%;width: 99%;">
+		<div class="col-md-12" style="height: 100%;">
+			<div id="container1" style="height: 100%;width:100%;"></div>
+		</div>
+	</div>
+	<!-- ECharts -->
+	<script src="/lkdtWX/js/plugins/echarts/echarts.min.js"></script>
+	<script src="/lkdtWX/js/common-options.js"></script>
+	<script type="text/javascript" src="/lkdtWX/js/jquery.min.js" ></script>
+	<script src="/lkdtWX/js/ckplayer/ckplayer.min.js"></script>
+	<!-- FastClick -->
+	<script src="/lkdtWX/js/fastclick.js"></script>
+</body>
+<script type="text/javascript">
+    //统计
+    var dom1 = document.getElementById("container1");
+    var myChart1 = echarts.init(dom1);
+    var imgpathsjson=[];
+    var option = common_options1;
+    myChart1.getZr().on('click', function (params) {
+		var pointInPixel= [params.offsetX, params.offsetY];
+	    if (myChart1.containPixel('grid',pointInPixel)) {
+	        /*此处添加具体执行代码*/
+            
+            var pointInGrid=myChart1.convertFromPixel({seriesIndex:0},pointInPixel);
+	        //X轴序号
+	        var xIndex=pointInGrid[0];
+ 
+            //获取当前图表的option
+	        var op=myChart1.getOption();
+ 
+            //获得图表中我们想要的数据
+			var time = op.xAxis[0].data[xIndex];
+			var value = op.series[0].data[xIndex];
+			time=time.replace(":","");
+			//time=Number(time);
+			// console.log(time+"："+value+"%");
+			// console.log(imgpathsjson[time]);
+			var date = new Date();
+			var hour = date.getHours();
+			var minute = date.getMinutes();
+			if(minute<10){ 
+				minute="0"+minute;
+			}
+			var hm=hour+""+minute;
+			if(Number(hm)<Number(time)){
+				var yesterdaytime=(new Date).getTime()-24*60*60*1000;
+				date=new Date(yesterdaytime);
+			}
+			
+			var year = date.getFullYear();
+			var month = date.getMonth()+1;
+			var day = date.getDate();
+			
+			
+			if($("#epId").val().indexOf('_new')>-1){
+				
+				if(month<10){
+					month='0'+month;
+				}
+				if(day<10){
+					day='0'+day;
+				}
+				document.getElementById('clickimg').src = '/ppv/getimgforpath?imgpath='+encodeURIComponent('http://127.0.0.1:8002/public/fog/img?cid=NT001&tm='+year+month+day+time);
+			}else{
+				var dateStr=year+'-'+month+'-'+day;
+				document.getElementById('clickimg').src = imgpathsjson[time];
+			}
+			
+			show('mydiv1');
+ 
+	    }
+	});
+    function show(id) {
+        var objDiv = $("#"+id+"");
+        $(objDiv).css("display","block");
+    }
+    
+    function closeFog(){
+    	var epId=$("#epId").val();
+    	$.ajax({
+    		type : "POST",
+    		url : "/system/alarm/closeFog/"+epId,
+    		success : function(data) {
+    			if (data.code == 0) {
+    				parent.layer.msg("操作成功");
+    				var index = parent.layer.getFrameIndex(window.name); // 获取窗口索引
+    				parent.layer.close(index);
+    				
+    			} else {
+    				parent.layer.alert(data.msg);
+    				var index = parent.layer.getFrameIndex(window.name); // 获取窗口索引
+    				parent.layer.close(index);
+    				
+    			}
+
+    		}
+    	});
+    }
+    
+    $(function() {
+   	    var hasClose = parent.gethasClose();
+   	    console.log(hasClose);
+   	    if(hasClose==1){
+   	    	$("#close").show();
+   	    }
+    	if($("#epId").val()=='NT001'||$("#epId").val()=='NT001_new'){
+    		$("#videopath").val('https://ainjdjc.jchc.cn/live_video_low/NT001.m3u8')
+    	}
+    	
+    	var videoObject = {
+    			container: '#video123',//“#”代表容器的ID，“.”或“”代表容器的class
+    			variable: 'player',//该属性必需设置，值等于下面的new chplayer()的对象
+    			autoplay:true,//自动播放
+    				live:true,
+    				html5m3u8:true,
+    				mobileCkControls:false,
+    		//		    	poster:'http://localhost:8099/sjkvideo_wx/resources/images/fzx_0.jpg',
+    			video:$("#videopath").val()//url//视频地址
+    		};
+
+    	var player = null;
+    	player=new ckplayer(videoObject);
+    	document.getElementById('img1').src = $("#path").val();
+    	if(!$("#videopath").val()){
+    		$("#video123").hide();
+    		$("#img1").show();
+    	}
+    	$.ajax({
+    		type : 'get',
+    		url : "/system/alarm" + '/home_lookup',
+    		data:{'epId':$("#epId").val()},
+    		success : function(data) {
+    			if(data){
+    				/* $("#gjcsD").html(data.gjcsD||0);
+    				$("#wbcsD").html(data.wbcsD||0);
+    				$("#gjcsM").html(data.gjcsM||0);
+    				$("#wbcsM").html(data.wbcsM||0); */
+    			}
+     		}
+    	});
+    	setInterval(updateImgPath,60000);
+        updateImgPath();
+    });
+
+    /**
+	 * 更新数据
+     */
+	function updateImgPath(){
+	    //获取图片
+        $.ajax({
+            type: "post",
+            url: "/system/equipment/lookup/updateimgpath/"+$("#epId").val(),
+        }).success(function(message) {
+            var imgdata=message;
+            var p = imgdata.path;
+            /* if(imgdata.fMeter>=500){
+            	imgdata.fMeter=500;
+            	$("#mi").html('>500');
+            }else{
+            	$("#mi").html(imgdata.fMeter||'0');
+            }
+            $("#fMeter_V").html(imgdata.fMeter||'0'+"m"); */
+            
+            /* if(imgdata.fMeter>=200){
+            	 $("#zhuangtai").html("晴朗");
+            }else if(imgdata.fMeter>=100){
+            	$("#zhuangtai").html("大雾");
+            }else if(imgdata.fMeter>=50){
+            	$("#zhuangtai").html("浓雾");
+            }else if(imgdata.fMeter>=30){
+            	$("#zhuangtai").html("强浓雾");
+            }else if(imgdata.fMeter<30){
+            	$("#zhuangtai").html("特强浓雾");
+            } */
+        }).fail(function(err){
+            console.log(err);
+        });
+        var date = new Date(new Date().getTime()-24*60*60*1000).Format('yyyy-MM-dd hh:mm:ss');
+		//获取统计图
+        $.ajax({
+            type: "get",
+            url: "/system/alarm/distanceStatistic",
+            dataType:'json',
+            data: {epId:$("#epId").val(),date:date}
+        }).success(function(data) {
+            if (option && typeof option === "object") {
+                //option.title.text = date;
+                option.xAxis.data = data.xAxis.split(",");
+                var seriesData = data.series.split(",");
+                for(var i = 0;i<seriesData.length;i++){
+                	seriesData[i] = parseInt(seriesData[i]);
+                	if(seriesData[i] <= 30){
+                		seriesData[i] = parseInt(seriesData[i]/0.3);
+                	}else if(seriesData[i] <= 50){
+                		seriesData[i] = parseInt(seriesData[i]*5-50);
+                	}else if(seriesData[i] <= 100){
+                		seriesData[i] = parseInt(seriesData[i]*2+100);
+                	}else if(seriesData[i] <= 200){
+                		seriesData[i] = parseInt(seriesData[i]+200);
+                	}else{
+                		seriesData[i] = parseInt((parseInt(seriesData[i])+200));
+                	}
+                }
+                option.series[0].data = seriesData;
+                /* option.series[0].areaStyle.normal.color=new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                    offset: 0,
+                    color: 'rgba(255, 0, 0, 0.7)'
+                }, {
+                    offset: 0.8,
+                    color: 'rgba(255, 0, 0, 0.3)'
+                }], false); */
+                imgpathsjson=data.imgpaths;
+                myChart1.setOption(option, false);
+                var series = data.series.split(",");
+                var min = parseInt(series[0]);
+                var max = parseInt(series[0]);
+                var len = series.length;
+                for (var i = 1; i < len; i++){ 
+	                if (parseInt(series[i]) < min){
+	                	min = parseInt(series[i]); 
+	                }
+	                if (parseInt(series[i]) > max){
+	                	max = parseInt(series[i]); 
+	                }
+                } 
+                
+                $("#maxDay").html(max||0);
+				$("#minDay").html(min||0);
+				
+				var lastval = series[len-1];
+				if(lastval>=500){
+					lastval=500;
+	            	$("#mi").html('>500');
+	            }else{
+	            	$("#mi").html(lastval||'0');
+	            }
+	            $("#fMeter_V").html(lastval||'0'+"m");
+            }
+        }).fail(function(err){
+            console.log(err);
+        });
+	}
+	$('.fc-close').bind('click',function(event){
+        hide('mydiv1');
+    });
+	function hide(id) {
+        var objDiv = $("#"+id+"");
+        $(objDiv).css("display", "none");
+    }
+
+	//图片刷新3s
+	
+
+</script>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<script	src="/lkdtWX/js/plugins/laydate/laydate.js"></script>
+
+
+<style>
+	.search-span{
+		height: 60px;
+		padding: 10px 10px;
+		display: -webkit-inline-box;
+	}
+</style>
+<body class="gray-bg" style="color:white;">
+	<div class="wrapper wrapper-content ">
+		<div class="col-sm-12">
+			<div class="ibox">
+				<div class="ibox-body">
+					<div class="fixed-table-toolbar" style="display: flex;">
+						<div class="columns pull-right col-md-10 nopadding" style="width:100%">
+						    <span class="search-span" style="">
+								<span>告警年份：</span>
+					            <input type="text" class="layui-input" id="year" placeholder="yyyy" lay-verify="date" autocomplete="off">
+			                </span>
+							<span class="search-span" style="">
+								<span>所属公路：</span>
+								<input id="hwId" name="hwId" class="hidden">
+								<input id="name" name="name" class="form-control" type="text"
+									style="cursor: pointer;width: 120px;" onclick="openHighway()"
+									readonly="readonly" placeholder="所属公路">
+							</span>
+							<span class="search-span" style="">
+								<span>摄像头编码：</span>
+								<input id="epid" name="epid" class="hidden">
+								<input id="camName" type="text" class="form-control" style="width: 170px;"
+								readonly="readonly" placeholder="选择摄像头"  onclick="openCamera()">
+							</span>
+							<span class="search-span" style="">
+								<button class="btn btn-success" onclick="selectInfo()">查询</button>
+							</span>
+							<div class="columns pull-right">
+								
+							</div>
+						</div>
+					</div>
+					<div id="info" style="width: 100%;  height: 410px;" >
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--shiro控制bootstraptable行内按钮看见性 来自bootdo的创新方案 -->
+	</div>
+	<div th:include="include :: footer"></div>
+	<!-- ECharts -->
+    <script src="/lkdtWX/js/plugins/echarts/echarts.min.js"></script>
+	<script type="text/javascript" src="/lkdtWX/js/appjs/fog/alarm/alarmStatistics.js"></script>
+</body>
+</html>

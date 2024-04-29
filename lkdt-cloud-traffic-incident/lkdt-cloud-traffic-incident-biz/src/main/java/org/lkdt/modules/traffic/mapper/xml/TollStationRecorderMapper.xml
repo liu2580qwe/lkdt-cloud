@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.lkdt.modules.traffic.mapper.TollStationRecorderMapper">
+    <select id="list" resultType="org.lkdt.modules.traffic.entity.TollStationRecorder">
+        select `recordeid`,`tsnum`,`tsname`,`roadname`,`roadnum`,`direction`,`io`,`lat`,`lon`,`closereason`,`closereasontext`,`closetime`,`croadcid`,`cunitid`,`datatype`,`estimatopen`,`eventid`,`eventname`,`exetime`,`id`,`infotype`,`noticetime`,`oldid`,`stationnames`,`stationname`,`tollstationid`,`allow`,`forbidtime`,`allowtime` from zc_toll_station_recorder
+        <where>
+            <if test="id != null and recordeid != ''"> and recordeid = #{recordeid} </if>
+            <if test="tsnum != null and tsnum != ''"> and tsnum = #{tsnum} </if>
+            <if test="_tsname != null and _tsname != ''"> and tsname = #{_tsname} </if>
+            <if test="tsname != null and tsname != ''"> and tsname like concat('%',#{tsname},'%') </if>
+            <if test="roadname != null and roadname != ''"> and roadname = #{roadname} </if>
+            <if test="roadnum != null and roadnum != ''"> and roadnum = #{roadnum} </if>
+            <if test="direction != null and direction != ''"> and direction = #{direction} </if>
+            <if test="io != null and io != ''"> and io = #{io} </if>
+            <if test="lat != null and lat != ''"> and lat = #{lat} </if>
+            <if test="lon != null and lon != ''"> and lon = #{lon} </if>
+            <if test="closereason != null and closereason != ''"> and closereason = #{closereason} </if>
+            <if test="closereasontext != null and closereasontext != ''"> and closereasontext = #{closereasontext} </if>
+            <if test="closetime != null and closetime != ''"> and closetime = #{closetime} </if>
+            <if test="startclosetime != null and startclosetime != ''"> and STR_TO_DATE(closetime,'%Y-%m-%d %H:%i:%s') >= #{startclosetime} </if>
+            <if test="endclosetime != null and endclosetime != ''"> and STR_TO_DATE(closetime,'%Y-%m-%d %H:%i:%s') &lt; #{endclosetime} </if>
+            <if test="croadcid != null and croadcid != ''"> and croadcid = #{croadcid} </if>
+            <if test="cunitid != null and cunitid != ''"> and cunitid = #{cunitid} </if>
+            <if test="datatype != null and datatype != ''"> and datatype = #{datatype} </if>
+            <if test="estimatopen != null and estimatopen != ''"> and estimatopen = #{estimatopen} </if>
+            <if test="eventid != null and eventid != ''"> and eventid = #{eventid} </if>
+            <if test="eventname != null and eventname != ''"> and eventname = #{eventname} </if>
+            <if test="exetime != null and exetime != ''"> and exetime = #{exetime} </if>
+            <if test="id != null and id != ''"> and id = #{id} </if>
+            <if test="infotype != null and infotype != ''"> and infotype = #{infotype} </if>
+            <if test="noticetime != null and noticetime != ''"> and noticetime = #{noticetime} </if>
+            <if test="oldid != null and oldid != ''"> and oldid = #{oldid} </if>
+            <if test="stationnames != null and stationnames != ''"> and stationnames = #{stationnames} </if>
+            <if test="stationname != null and stationname != ''"> and stationname = #{stationname} </if>
+            <if test="tollstationid != null and tollstationid != ''"> and tollstationid = #{tollstationid} </if>
+            <if test="allow != null and allow != ''"> and allow = #{allow} </if>
+            <if test="forbidtime != null and forbidtime != ''"> and DATE_FORMAT(forbidtime,'%Y-%m-%d') = #{forbidtime} </if>
+            <if test="allowtime != null and allowtime != ''"> and allowtime = #{allowtime} </if>
+        </where>
+        <choose>
+            <when test="sort != null and sort.trim() != ''">
+                order by ${sort} ${order}
+            </when>
+            <otherwise>
+                order by recordeid desc
+            </otherwise>
+        </choose>
+        <if test="offset != null and limit != null">
+            limit #{offset}, #{limit}
+        </if>
+    </select>
+
+    <delete id="deleteByMainId" parameterType="java.lang.String">
+		DELETE
+		FROM  zc_toll_station_recorder
+		WHERE
+			 eventid = #{mainId} 	</delete>
+
+    <select id="selectByMainId" parameterType="java.lang.String" resultType="org.lkdt.modules.traffic.entity.TollStationRecorder">
+		SELECT *
+		FROM  zc_toll_station_recorder
+		WHERE
+		eventid = #{mainId}
+	</select>
+</mapper>
